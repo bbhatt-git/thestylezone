@@ -1,0 +1,8 @@
+{
+  "name": "Remix: The Style Zone",
+  "description": "Fashion Ecommerce Platform for Mahendranagar, Nepal featuring guest checkout, local persistence, eSewa/Khalti QR payments, and a fully functional Admin Dashboard.",
+  "requestFramePermissions": [],
+  "majorCapabilities": [
+    "MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"
+  ]
+}
