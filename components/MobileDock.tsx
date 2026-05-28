@@ -11,14 +11,10 @@ import CartSidebar from '@/components/CartSidebar';
 
 export default function MobileDock() {
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(true);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const totalCartItems = useCart((state) => state.getTotalItems());
   const totalWishItems = useWishlist((state) => state.itemIds.length);
-
-  useEffect(() => {
-    setIsMounted(true);
-  }, []);
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },

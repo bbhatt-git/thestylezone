@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect, useCallback } from 'react';
 
 interface PriceSliderClientProps {
   min: number;
@@ -14,6 +14,7 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
   const [dragging, setDragging] = useState<'min' | 'max' | null>(null);
   const sliderRef = useRef<HTMLDivElement>(null);
 
+  // Sync internal state with props when they change
   useEffect(() => {
     setMinVal(min);
     setMaxVal(max);
@@ -23,21 +24,21 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
     return ((value - min) / (max - min)) * 100;
   };
 
-  const getValueFromPercent = (percent: number) => {
+  const getValueFromPercent = useCallback((percent: number) => {
     return Math.round(min + (percent / 100) * (max - min));
-  };
+  }, [min, max]);
 
-  const handleMouseDown = (thumb: 'min' | 'max') => (e: React.MouseEvent) => {
+  const handleMouseDown = useCallback((thumb: 'min' | 'max') => (e: React.MouseEvent) => {
     e.preventDefault();
     setDragging(thumb);
-  };
+  }, []);
 
-  const handleTouchStart = (thumb: 'min' | 'max') => (e: React.TouchEvent) => {
+  const handleTouchStart = useCallback((thumb: 'min' | 'max') => (e: React.TouchEvent) => {
     e.preventDefault();
     setDragging(thumb);
-  };
+  }, []);
 
-  const handleMouseMove = (e: MouseEvent) => {
+  const handleMouseMove = useCallback((e: MouseEvent) => {
     if (!dragging || !sliderRef.current) return;
 
     const rect = sliderRef.current.getBoundingClientRect();
@@ -53,9 +54,9 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
       setMaxVal(newMax);
       onChange(minVal, newMax);
     }
-  };
+  }, [dragging, maxVal, minVal, onChange, getValueFromPercent]);
 
-  const handleTouchMove = (e: TouchEvent) => {
+  const handleTouchMove = useCallback((e: TouchEvent) => {
     if (!dragging || !sliderRef.current) return;
 
     const rect = sliderRef.current.getBoundingClientRect();
@@ -72,7 +73,7 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
       setMaxVal(newMax);
       onChange(minVal, newMax);
     }
-  };
+  }, [dragging, maxVal, minVal, onChange, getValueFromPercent]);
 
   const handleMouseUp = () => {
     setDragging(null);
@@ -95,7 +96,7 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
         document.removeEventListener('touchend', handleTouchEnd);
       };
     }
-  }, [dragging, minVal, maxVal, min, max, onChange]);
+  }, [dragging, handleMouseMove, handleTouchMove]);
 
   return (
     <div className="space-y-3">

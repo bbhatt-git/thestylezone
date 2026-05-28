@@ -46,7 +46,7 @@ export default function AboutPage() {
                 The Style Zone connects directly to our WooCommerce store system. Every product you see online is actually in stock at our Mahendranagar shop. No fake listings, no placeholder images - just real clothes you can buy and wear.
               </p>
               <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed font-sans">
-                We offer hoodies, jackets, t-shirts, and fashion accessories with different sizes and colors. Our inventory updates automatically so you always see what's available right now.
+                We offer hoodies, jackets, t-shirts, and fashion accessories with different sizes and colors. Our inventory updates automatically so you always see what&apos;s available right now.
               </p>
             </div>
           </div>
@@ -73,7 +73,7 @@ export default function AboutPage() {
               <Heart className="w-8 h-8 text-[#FE5733]" />
               <h4 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212]">Local Service</h4>
               <p className="text-xs text-[#121212]/60 leading-relaxed">
-                Visit our shop in Mahendranagar to try clothes before buying. We're here to help you find the right fit and style.
+                Visit our shop in Mahendranagar to try clothes before buying. We&apos;re here to help you find the right fit and style.
               </p>
             </div>
           </div>
@@ -84,7 +84,7 @@ export default function AboutPage() {
               <p className="text-xs font-bold text-[#FE5733] uppercase tracking-wider font-mono">VISIT OUR SHOP</p>
               <h4 className="text-2xl md:text-3xl font-black uppercase tracking-tighter font-display">Find us in Mahendranagar</h4>
               <p className="text-xs md:text-sm text-[#F5F5F0]/70 leading-relaxed">
-                Come to our store to see the clothes in person, try different sizes, and get help from our staff. We're located at Gali No. 2 near Madan Chowk in Bhimdatta Municipality.
+                Come to our store to see the clothes in person, try different sizes, and get help from our staff. We&apos;re located at Gali No. 2 near Madan Chowk in Bhimdatta Municipality.
               </p>
             </div>
             <Link href="/contact" className="bg-[#FE5733] hover:bg-white hover:text-[#121212] text-white px-8 py-4 shrink-0 transition-colors uppercase tracking-widest text-xs font-bold rounded-sm">

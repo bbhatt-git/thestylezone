@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useTransition } from 'react';
+import React, { useState, useEffect, useTransition, useMemo } from 'react';
 import ProductCard from '@/components/ProductCard';
 import PriceSliderClient from '@/components/PriceSliderClient';
 import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
@@ -49,12 +49,6 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
   const [minPrice, setMinPrice] = useState(0);
   const [maxPrice, setMaxPrice] = useState(highestPriceInStore);
-
-  // Update max price when products change
-  useEffect(() => {
-    setMaxPrice(highestPriceInStore);
-    setMinPrice(0);
-  }, [highestPriceInStore]);
   const [sortBy, setSortBy] = useState('latest');
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
@@ -104,9 +98,10 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   }, [isSortDropdownOpen]);
 
   // Reset to page 1 when filters change
+  const filterKey = `${searchTerm}-${selectedCategory}-${selectedSize}-${selectedColor}-${minPrice}-${maxPrice}-${sortBy}`;
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, selectedCategory, selectedSize, selectedColor, minPrice, maxPrice, sortBy]);
+  }, [filterKey]);
 
   // Handle filtrations
   const filteredProducts = initialProducts.filter((product) => {

@@ -7,21 +7,15 @@ import Footer from '@/components/Footer';
 import { Home, ArrowLeft, ShoppingBag, Package } from 'lucide-react';
 
 export default function NotFound() {
-  const [mounted, setMounted] = useState(false);
-  const [floatingItems, setFloatingItems] = useState<Array<{id: number, x: number, y: number, delay: number}>>([]);
-
-  useEffect(() => {
-    setMounted(true);
-    
-    // Generate floating items
-    const items = Array.from({length: 6}, (_, i) => ({
+  const [mounted, setMounted] = useState(true);
+  const [floatingItems, setFloatingItems] = useState<Array<{id: number, x: number, y: number, delay: number}>>(() => 
+    Array.from({length: 6}, (_, i) => ({
       id: i,
       x: Math.random() * 80 + 10,
       y: Math.random() * 60 + 20,
       delay: i * 0.2
-    }));
-    setFloatingItems(items);
-  }, []);
+    }))
+  );
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0] overflow-hidden relative">
@@ -66,7 +60,7 @@ export default function NotFound() {
               Page Not Found
             </h2>
             <p className="text-sm md:text-base text-stone-500 mb-8 max-w-md mx-auto leading-relaxed">
-              Oops! The page you're looking for seems to have wandered off into the fashion void. Let's get you back to style.
+              Oops! The page you&apos;re looking for seems to have wandered off into the fashion void. Let&apos;s get you back to style.
             </p>
           </div>
 
