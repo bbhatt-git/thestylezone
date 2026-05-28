@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { Star } from 'lucide-react';
 
 interface Review {
@@ -30,12 +30,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
   const [submitting, setSubmitting] = useState(false);
   const [submitMessage, setSubmitMessage] = useState({ type: '', text: '' });
 
-  useEffect(() => {
-    fetchReviews();
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [productId]);
-
-  const fetchReviews = async () => {
+  const fetchReviews = useCallback(async () => {
     try {
       const res = await fetch(`/api/reviews?product_id=${productId}`);
       const data = await res.json();
@@ -47,9 +42,35 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     } finally {
       setLoading(false);
     }
-  };
+  }, [productId]);
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  useEffect(() => {
+    let isMounted = true;
+    
+    const loadReviews = async () => {
+      try {
+        const res = await fetch(`/api/reviews?product_id=${productId}`);
+        const data = await res.json();
+        if (data.success && isMounted) {
+          setReviews(data.reviews);
+        }
+      } catch (err) {
+        console.error('Failed to load reviews', err);
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+    
+    loadReviews();
+    
+    return () => {
+      isMounted = false;
+    };
+  }, [productId]);
+
+  const handleSubmit = useCallback(async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
     setSubmitMessage({ type: '', text: '' });
@@ -83,7 +104,7 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
     } finally {
       setSubmitting(false);
     }
-  };
+  }, [productId, form, fetchReviews]);
 
   return (
     <div className="bg-white p-6 md:p-10 rounded-[4px] border border-stone-200 shadow-sm mt-8">
