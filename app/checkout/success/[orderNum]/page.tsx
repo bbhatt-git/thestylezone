@@ -62,7 +62,7 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
             {order.payment_method === 'cash_on_delivery' ? (
               <div className="bg-green-50/50 border border-green-200/60 p-4 rounded-2xl max-w-md mx-auto flex gap-3 items-center text-left">
                 <Truck className="w-5 h-5 text-green-600 flex-none" />
-                <p className="text-xs text-green-800 leading-relaxed font-medium">Order Status: <strong>Order Confirmed — pay on delivery.</strong> We will dispatch your shipment package immediately to {order.shipping_city}.</p>
+                <p className="text-xs text-green-800 leading-relaxed font-medium">Order Status: <strong>Order Confirmed — pay on delivery.</strong> We will dispatch your shipment package immediately to {order.municipality}.</p>
               </div>
             ) : (
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-2xl max-w-md mx-auto flex gap-3 items-start text-left">
@@ -102,7 +102,7 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
               <div>
                 <p className="text-[10px] text-zinc-400 font-bold uppercase tracking-wider">Recipient & Address</p>
                 <p className="text-zinc-850 font-bold">{order.customer_name} ({order.customer_phone})</p>
-                <p className="text-zinc-550 leading-relaxed mt-0.5">{order.shipping_address}, {order.shipping_city}, {order.shipping_district}</p>
+                <p className="text-zinc-550 leading-relaxed mt-0.5">{order.shipping_address}, {order.municipality}, Ward {order.wardNo}</p>
               </div>
             </div>
           </div>
