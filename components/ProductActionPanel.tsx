@@ -69,6 +69,16 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
   // Find active variant corresponding to size + color selection
   const activeVariant = variants.find(v => v.color === selectedColor && v.size === selectedSize) || variants[0];
   
+  // Fallback if no variants exist
+  if (!activeVariant) {
+    return (
+      <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
+        <p className="text-sm font-bold">Product variants not available</p>
+        <p className="text-xs mt-1">This product cannot be added to cart right now. Please contact support.</p>
+      </div>
+    );
+  }
+  
   const currentUnitPrice = (product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price) + (activeVariant?.price_delta || 0);
   const currentOriginalPrice = product.sale_price !== null && product.sale_price !== undefined ? (product.base_price + (activeVariant?.price_delta || 0)) : null;
 

@@ -244,6 +244,69 @@ export async function readDb(): Promise<DbData> {
     if (productsResult.status === 'fulfilled') {
       const wcProducts = productsResult.value.data;
       if (Array.isArray(wcProducts)) {
+        // First, fetch variations for variable products
+        const variableProducts = wcProducts.filter((p: any) => p.type === 'variable');
+        
+        for (const product of variableProducts) {
+          try {
+            const variationsResult = await api.get(`products/${product.id}/variations`, { per_page: 100 });
+            if (variationsResult.data && Array.isArray(variationsResult.data)) {
+              const variations = variationsResult.data;
+              const productVariants: ProductVariant[] = variations.map((v: any) => {
+                // Extract size and color from variation attributes
+                const sizeAttr = v.attributes?.find((a: any) => a.name?.toLowerCase() === 'size');
+                const colorAttr = v.attributes?.find((a: any) => a.name?.toLowerCase() === 'color');
+                
+                return {
+                  id: String(v.id),
+                  product_id: String(product.id),
+                  size: sizeAttr?.option || 'M',
+                  color: colorAttr?.option || 'Default',
+                  color_hex: '978877', // Default hex color
+                  sku: v.sku || '',
+                  stock: v.stock_quantity || (v.stock_status === 'instock' ? 10 : 0),
+                  price_delta: v.price ? (parseFloat(v.price) - parseFloat(product.regular_price || product.price || '0')) : 0,
+                  is_active: v.status === 'publish',
+                  created_at: v.date_created || new Date().toISOString()
+                };
+              });
+              
+              // Only add variants that don't already exist
+              productVariants.forEach(variant => {
+                if (!db.variants.some(v => v.id === variant.id)) {
+                  db.variants.push(variant);
+                }
+              });
+            }
+          } catch (varErr) {
+            console.warn(`Failed to fetch variations for product ${product.id}:`, varErr);
+          }
+        }
+        
+        // Create default variants for simple products
+        const simpleProducts = wcProducts.filter((p: any) => p.type === 'simple');
+        for (const product of simpleProducts) {
+          const existingVariant = db.variants.find(v => v.product_id === String(product.id));
+          if (!existingVariant) {
+            const colors = product.attributes?.find((a: any) => a.name?.toLowerCase() === 'color')?.options || [];
+            const sizes = product.attributes?.find((a: any) => a.name?.toLowerCase() === 'size')?.options || [];
+            
+            const defaultVariant: ProductVariant = {
+              id: `var_${product.id}`,
+              product_id: String(product.id),
+              size: sizes[0] || 'M',
+              color: colors[0] || 'Default',
+              color_hex: '978877',
+              sku: product.sku || '',
+              stock: product.stock_quantity || (product.stock_status === 'instock' ? 10 : 0),
+              price_delta: 0,
+              is_active: product.status === 'publish',
+              created_at: product.date_created || new Date().toISOString()
+            };
+            db.variants.push(defaultVariant);
+          }
+        }
+        
         db.products = wcProducts.map((p: any) => {
         const basePrice = parseFloat(p.regular_price || p.price || '0');
         const salePrice = p.sale_price ? parseFloat(p.sale_price) : null;
@@ -259,6 +322,23 @@ export async function readDb(): Promise<DbData> {
 
         const colors = p.attributes?.find((a: any) => a.name?.toLowerCase() === 'color')?.options || [];
         const sizes = p.attributes?.find((a: any) => a.name?.toLowerCase() === 'size')?.options || [];
+
+        // For variable products, get colors and sizes from variants
+        if (p.type === 'variable') {
+          const productVariants = db.variants.filter(v => v.product_id === String(p.id));
+          if (productVariants.length > 0) {
+            const variantColors = [...new Set(productVariants.map(v => v.color).filter(c => c && c !== 'Default'))];
+            const variantSizes = [...new Set(productVariants.map(v => v.size).filter(s => s))];
+            if (variantColors.length > 0) {
+              colors.length = 0;
+              colors.push(...variantColors);
+            }
+            if (variantSizes.length > 0) {
+              sizes.length = 0;
+              sizes.push(...variantSizes);
+            }
+          }
+        }
 
         return {
           id: String(p.id),

@@ -99,7 +99,18 @@ export async function POST(req: NextRequest) {
       
       const variant = db.variants.find(v => v.id === item.variantId);
       if (!variant) {
-        return NextResponse.json({ success: false, error: `Selected variant is not active for: ${item.name}` }, { status: 404 });
+        // Also check if there are any variants for this product at all
+        const productVariants = db.variants.filter(v => v.product_id === item.productId);
+        if (productVariants.length === 0) {
+          return NextResponse.json({ 
+            success: false, 
+            error: `No variants found for product: ${item.name}. Please contact support.` 
+          }, { status: 404 });
+        }
+        return NextResponse.json({ 
+          success: false, 
+          error: `Selected variant not found for: ${item.name}. Available variants: ${productVariants.map(v => `${v.size}/${v.color}`).join(', ')}` 
+        }, { status: 404 });
       }
       
       // Stock check
