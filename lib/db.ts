@@ -17,6 +17,7 @@ export function getWooCommerce() {
       consumerKey: consumerKey,
       consumerSecret: consumerSecret,
       version: 'wc/v3',
+      timeout: 10000, // 10 second timeout
     });
   }
   return woocommerceClient;
@@ -204,6 +205,12 @@ export async function saveDb(db: DbData): Promise<void> {
 
 export async function readDb(): Promise<DbData> {
   let db: DbData = { ...memoryData };
+
+  // Skip WooCommerce sync if disabled
+  if (process.env.DISABLE_WOOCOMMERCE_SYNC === 'true') {
+    console.warn('WooCommerce sync is disabled via DISABLE_WOOCOMMERCE_SYNC environment variable.');
+    return db;
+  }
 
   try {
     const api = getWooCommerce();
