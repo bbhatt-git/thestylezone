@@ -3,6 +3,7 @@ import type { Metadata } from 'next';
 import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ClientAnimationProvider from '@/components/ClientAnimationProvider';
+import PageTransition from '@/components/PageTransition';
 import MobileDock from '@/components/MobileDock';
 import { ModalProvider } from '@/contexts/ModalContext';
 
@@ -101,7 +102,9 @@ export default function RootLayout({
       <body className="antialiased min-h-screen bg-[#F5F5F0] text-[#121212]">
         <ModalProvider>
           <ClientAnimationProvider>
-            {children}
+            <PageTransition>
+              {children}
+            </PageTransition>
             <MobileDock />
           </ClientAnimationProvider>
         </ModalProvider>

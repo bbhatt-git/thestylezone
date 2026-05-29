@@ -3,7 +3,7 @@
 import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Mail, Phone, MapPin, Clock, MessageSquare, Send, CheckCircle } from 'lucide-react';
+import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
@@ -26,125 +26,128 @@ export default function ContactPage() {
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
 
-      <main className="flex-grow py-12 px-6 md:px-10">
+      <main className="flex-grow py-16 px-6 md:px-10">
         <div className="max-w-[1560px] mx-auto">
           
-          {/* Header */}
-          <div className="mb-12">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">THE STYLE ZONE • CONTACT</p>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display">
+          {/* Header - Same as privacy/terms */}
+          <div className="max-w-2xl mx-auto mb-16 text-center animate-on-scroll">
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
+              THE STYLE ZONE • CONTACT
+            </p>
+            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
               Get in <span className="text-[#FE5733]">Touch.</span>
             </h1>
-            <p className="text-sm opacity-60 max-w-xl mt-2 leading-relaxed">
-              Reach out for sizing consultations, offline order pickups, bulk corporate solutions, or immediate WhatsApp support coordinate details.
+            <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
+              Visit our boutique in Mahendranagar or reach out online. We're here to help you find your perfect style.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+          {/* Two Column Layout */}
+          <div className="max-w-5xl mx-auto grid grid-cols-1 lg:grid-cols-2 gap-8 mb-12">
             
-            {/* Left Info blocks */}
-            <div className="lg:col-span-4 space-y-6">
+            {/* Contact Info Card */}
+            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-8 animate-on-scroll">
+              <h3 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-6">
+                Contact Information
+              </h3>
               
-              {/* Box 1 Address */}
-              <div className="bg-white p-6 border border-[#121212]/5 rounded-[4px] flex items-start gap-4 shadow-sm">
-                <MapPin className="text-[#FE5733] w-6 h-6 shrink-0 mt-1" />
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212]">Showroom Address</h4>
-                  <p className="text-xs text-[#121212]/70 leading-relaxed font-sans">
-                    The Style Zone Boutique,<br />
-                    Gali No. 2, Bhimdatta-4,<br />
-                    Mahendranagar, Kanchanpur,<br />
-                    Nepal
-                  </p>
+              <div className="space-y-6">
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#F5F5F0] rounded-[4px] flex items-center justify-center shrink-0">
+                    <MapPin className="text-[#121212] w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Address</h4>
+                    <p className="text-sm text-[#121212]/70 leading-relaxed">
+                      The Style Zone<br />
+                      Street No. 2, Bhimdatta-4<br />
+                      Mahendranagar, Kanchanpur, Nepal
+                    </p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#F5F5F0] rounded-[4px] flex items-center justify-center shrink-0">
+                    <Phone className="text-[#121212] w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Phone</h4>
+                    <p className="text-sm text-[#121212]/70 font-mono">+977 984-8123456</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#F5F5F0] rounded-[4px] flex items-center justify-center shrink-0">
+                    <Mail className="text-[#121212] w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Email</h4>
+                    <p className="text-sm text-[#121212]/70 font-mono">contact@thestylezone.com.np</p>
+                  </div>
+                </div>
+
+                <div className="flex items-start gap-4">
+                  <div className="w-10 h-10 bg-[#F5F5F0] rounded-[4px] flex items-center justify-center shrink-0">
+                    <Clock className="text-[#121212] w-5 h-5" />
+                  </div>
+                  <div>
+                    <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Hours</h4>
+                    <p className="text-sm text-[#121212]/70 leading-relaxed">
+                      Sunday - Friday: 10:00 AM - 8:30 PM<br />
+                      Saturday: Closed
+                    </p>
+                  </div>
                 </div>
               </div>
-
-              {/* Box 2 Contacts */}
-              <div className="bg-white p-6 border border-[#121212]/5 rounded-[4px] flex items-start gap-4 shadow-sm">
-                <Phone className="text-[#FE5733] w-6 h-6 shrink-0 mt-1" />
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212]">Phone Contacts</h4>
-                  <p className="text-xs text-[#121212]/70 font-mono">
-                    Official Mobile: +977 984-8123456<br />
-                    WhatsApp/Viber: +977 981-2345678<br />
-                    Direct Desk Support: +977 99-520123
-                  </p>
-                </div>
-              </div>
-
-              {/* Box 3 Email */}
-              <div className="bg-white p-6 border border-[#121212]/5 rounded-[4px] flex items-start gap-4 shadow-sm">
-                <Mail className="text-[#FE5733] w-6 h-6 shrink-0 mt-1" />
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212]">Digital Support</h4>
-                  <p className="text-xs text-[#121212]/70 leading-relaxed font-mono">
-                    Support: info@thestylezone.com.np<br />
-                    Exchanges: exchange@thestylezone.com.np
-                  </p>
-                </div>
-              </div>
-
-              {/* Box 4 Hours */}
-              <div className="bg-white p-6 border border-[#121212]/5 rounded-[4px] flex items-start gap-4 shadow-sm">
-                <Clock className="text-[#FE5733] w-6 h-6 shrink-0 mt-1" />
-                <div className="space-y-1">
-                  <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212]">Showroom Timing</h4>
-                  <p className="text-xs text-[#121212]/70 leading-relaxed font-sans">
-                    Sunday to Friday: <strong className="text-[#121212]">10:00 AM - 8:30 PM</strong><br />
-                    Saturday: <strong className="text-[#FE5733] font-mono">CLOSED (Offline holiday)</strong>
-                  </p>
-                </div>
-              </div>
-
             </div>
 
-            {/* Middle Interactive Form Column */}
-            <div className="lg:col-span-5 bg-white p-6 md:p-8 border border-[#121212]/5 rounded-[4px] shadow-sm space-y-6">
-              <h3 className="text-lg font-bold text-[#121212] uppercase tracking-tight flex items-center gap-2">
-                <MessageSquare className="w-5 h-5 text-[#FE5733]" /> Message Showroom
+            {/* Contact Form Card */}
+            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-8 animate-on-scroll">
+              <h3 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-6">
+                Send us a message
               </h3>
               
               <form onSubmit={handleSubmit} className="space-y-4">
                 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Your Name</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Name</label>
                   <input 
                     type="text" 
                     required 
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    placeholder="e.g. Bhupesh Bhatt" 
-                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30" 
+                    placeholder="Your name" 
+                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none" 
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Your Email Address</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Email</label>
                   <input 
                     type="email" 
                     required 
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    placeholder="e.g. bhupesh@example.com" 
-                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30" 
+                    placeholder="your@email.com" 
+                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none" 
                   />
                 </div>
 
                 <div className="space-y-1">
-                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Message Details</label>
+                  <label className="text-[10px] font-bold uppercase tracking-wider text-[#121212]/50 block">Message</label>
                   <textarea 
                     required 
                     rows={4}
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
-                    placeholder="Let us know what apparel collections, colors, or sizing questions you have..." 
-                    className="w-full text-xs border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] p-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none" 
+                    placeholder="How can we help you?" 
+                    className="w-full text-xs border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] p-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none resize-none" 
                   />
                 </div>
 
                 <button 
                   type="submit" 
-                  className="w-full h-12 bg-[#FE5733] hover:bg-[#121212] text-white rounded-[4px] font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all cursor-pointer shadow-sm"
+                  className="w-full h-12 bg-[#FE5733] hover:bg-[#121212] text-white rounded-[4px] font-bold uppercase tracking-widest text-xs flex items-center justify-center gap-2 transition-all"
                 >
                   <Send className="w-4 h-4" /> Send Message
                 </button>
@@ -152,56 +155,40 @@ export default function ContactPage() {
               </form>
 
               {status === 'success' && (
-                <div className="bg-[#121212] text-white text-xs font-bold uppercase tracking-widest p-4 rounded-[4px] flex items-center gap-3 border-l-4 border-green-500 animate-slide-in">
+                <div className="mt-4 bg-[#121212] text-white text-xs font-bold uppercase tracking-widest p-4 rounded-[4px] flex items-center gap-3 border-l-4 border-green-500">
                   <CheckCircle className="w-5 h-5 text-green-500 shrink-0" />
-                  Your report has been submitted to Mahendranagar admins! We will reply via email.
+                  Message sent successfully! We'll get back to you soon.
                 </div>
               )}
 
             </div>
 
-            {/* Right Visual Map Column */}
-            <div className="lg:col-span-3 space-y-6">
-              
-              {/* Map Layout Mock placeholder (elegant SVG styled) */}
-              <div className="bg-white p-6 border border-[#121212]/5 rounded-[4px] shadow-sm text-center">
-                <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] text-left mb-4">Location Map</h4>
-                
-                <div className="aspect-square bg-[#F5F5F0]/80 rounded-[4px] overflow-hidden flex flex-col justify-center items-center relative border border-[#121212]/10 p-4">
-                  
-                  {/* Visual Roads */}
-                  <div className="absolute w-[3px] h-full bg-[#121212]/15 left-1/4"></div>
-                  <div className="absolute w-[3px] h-full bg-[#121212]/15 left-3/4"></div>
-                  <div className="absolute h-[3px] w-full bg-[#121212]/15 top-1/3"></div>
-                  <div className="absolute h-[3px] w-full bg-[#121212]/15 top-2/3"></div>
-                  
-                  {/* Road Names */}
-                  <span className="absolute text-[8px] font-mono font-bold text-[#121212]/30 uppercase tracking-widest left-2 top-2">Gali No. 2</span>
-                  <span className="absolute text-[8px] font-mono font-bold text-[#121212]/30 uppercase tracking-widest right-2 bottom-2">Madan Chowk Main Rd</span>
-                  
-                  {/* Flag point */}
-                  <div className="relative z-10 flex flex-col items-center">
-                    <div className="w-6 h-6 bg-[#FE5733] border-2 border-white rounded-full flex items-center justify-center text-white scale-125 shadow-md animate-bounce">
-                      <MapPin className="w-3.5 h-3.5" />
-                    </div>
-                    <span className="mt-3 bg-[#121212] text-[#F5F5F0] text-[8px] font-black uppercase tracking-widest px-2 py-1 rounded-[2px] shadow-sm border border-[#F5F5F0]/10">
-                      The Style Zone
-                    </span>
-                  </div>
+          </div>
 
-                  {/* Distance meter */}
-                  <div className="absolute bottom-4 left-4 bg-white/90 border border-[#121212]/10 px-2 py-1 rounded-[2px] text-[8px] font-mono font-bold text-[#121212]">
-                    Scale: 1 : 250m
-                  </div>
-                </div>
-
-                <p className="text-[10px] font-sans text-[#121212]/50 mt-4 leading-relaxed text-left">
-                  Showroom is situated precisely at the intersection of Gali No. 2, Bhimdatta-4, only a 3-minute walking distance from the iconic Madan Chowk pivot.
-                </p>
-              </div>
-
+          {/* Map Section */}
+          <div className="max-w-5xl mx-auto">
+            <div className="bg-white border border-[#121212]/5 rounded-[4px] overflow-hidden pointer-events-none">
+              <iframe
+                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d3559.1234567890123!2d80.12345678901234!3d28.12345678901234!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x0%3A0x0!2zMjjCsDAnNDQuNCJOIDgwwrA3JzI0LjQiIkU!5e0!3m2!1sen!2snp!4v1234567890123"
+                width="100%"
+                height="400"
+                style={{ border: 0 }}
+                allowFullScreen
+                loading="lazy"
+                referrerPolicy="no-referrer-when-downgrade"
+                className="w-full pointer-events-auto"
+              />
             </div>
-
+            <div className="text-center mt-4">
+              <a 
+                href="https://maps.app.goo.gl/wnT364rpT3dJE1gu7"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-xs text-[#121212]/70 hover:text-[#FE5733] font-bold uppercase tracking-widest transition-colors"
+              >
+                Open in Google Maps
+              </a>
+            </div>
           </div>
 
         </div>
