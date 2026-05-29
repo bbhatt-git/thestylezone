@@ -97,25 +97,39 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, error: `Product not found: ${item.name}` }, { status: 404 });
       }
       
-      const variant = db.variants.find(v => v.id === item.variantId);
-      if (!variant) {
-        // Also check if there are any variants for this product at all
-        const productVariants = db.variants.filter(v => v.product_id === item.productId);
-        if (productVariants.length === 0) {
+      // For simple products, we may not have variants - allow order if product exists
+      const productVariants = db.variants.filter(v => v.product_id === item.productId);
+      
+      let variant = null;
+      if (productVariants.length > 0) {
+        // Product has variants - try to find the specific one
+        variant = db.variants.find(v => v.id === item.variantId);
+        if (!variant) {
+          // Try to find a matching variant by size/color as fallback
+          variant = productVariants.find(v => v.size === item.size && v.color === item.color);
+        }
+        if (!variant) {
           return NextResponse.json({ 
             success: false, 
-            error: `No variants found for product: ${item.name}. Please contact support.` 
+            error: `Selected variant not found for: ${item.name}. Available variants: ${productVariants.map(v => `${v.size}/${v.color}`).join(', ')}` 
           }, { status: 404 });
         }
-        return NextResponse.json({ 
-          success: false, 
-          error: `Selected variant not found for: ${item.name}. Available variants: ${productVariants.map(v => `${v.size}/${v.color}`).join(', ')}` 
-        }, { status: 404 });
+      } else {
+        // Simple product without variants - create a virtual variant for ordering
+        variant = {
+          id: item.variantId || `simple_${product.id}`,
+          product_id: product.id,
+          size: item.size || 'M',
+          color: item.color || 'Default',
+          stock: product.stock_total,
+          price_delta: 0
+        };
       }
       
       // Stock check
-      if (variant.stock < item.quantity) {
-        return NextResponse.json({ success: false, error: `Insufficient stock for ${item.name} in size ${variant.size} - ${variant.color}. Only ${variant.stock} left.` }, { status: 400 });
+      const availableStock = productVariants.length > 0 ? variant.stock : product.stock_total;
+      if (availableStock < item.quantity) {
+        return NextResponse.json({ success: false, error: `Insufficient stock for ${item.name} in size ${variant.size} - ${variant.color}. Only ${availableStock} left.` }, { status: 400 });
       }
       
       const activeUnitPrice = product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price;
@@ -255,32 +269,33 @@ export async function POST(req: NextRequest) {
           total: item.total_price.toString()
         }));
 
-        await woocommerce.post("orders", {
-          payment_method: paymentMethod,
-          payment_method_title: paymentMethod.replace(/_/g, ' ').toUpperCase(),
+        const wcOrderData = {
+          payment_method: paymentMethod === 'cash_on_delivery' ? 'cod' : paymentMethod,
+          payment_method_title: paymentMethod === 'cash_on_delivery' ? 'Cash on Delivery' : paymentMethod.replace(/_/g, ' ').toUpperCase(),
           set_paid: paymentMethod !== 'cash_on_delivery',
+          status: 'pending',
           billing: {
-            first_name: customerName,
-            last_name: '',
+            first_name: customerName.split(' ')[0] || customerName,
+            last_name: customerName.split(' ').slice(1).join(' ') || '',
             address_1: shippingAddress,
             city: municipality,
-            state: 'Kanchanpur',
-            postcode: wardNo,
+            state: 'Sudurpashchim',
+            postcode: wardNo.toString(),
             country: 'NP',
-            email: customerEmail || 'noemail@example.com',
+            email: customerEmail || `customer${Date.now()}@example.com`,
             phone: customerPhone
           },
           shipping: {
-            first_name: customerName,
-            last_name: '',
+            first_name: customerName.split(' ')[0] || customerName,
+            last_name: customerName.split(' ').slice(1).join(' ') || '',
             address_1: shippingAddress,
             city: municipality,
-            state: 'Kanchanpur',
-            postcode: wardNo,
+            state: 'Sudurpashchim',
+            postcode: wardNo.toString(),
             country: 'NP'
           },
           line_items: wcLineItems,
-          customer_note: notes,
+          customer_note: notes || '',
           meta_data: [
             {
               key: "session_token",
@@ -302,14 +317,18 @@ export async function POST(req: NextRequest) {
               key: "order_source",
               value: "nextjs_frontend"
             }
-          ],
-          fee_lines: [
-            {
-              name: "Shipping",
-              total: shippingFee.toString()
-            }
           ]
-        });
+        };
+
+        // Only add fee_lines if there's a shipping fee
+        if (shippingFee > 0) {
+          (wcOrderData as any).fee_lines = [{
+            name: "Shipping",
+            total: shippingFee.toString()
+          }];
+        }
+
+        await woocommerce.post("orders", wcOrderData);
         console.log("Order successfully created in WooCommerce");
       }
     } catch (wcError) {

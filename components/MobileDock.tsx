@@ -5,13 +5,12 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
-import { Home, ShoppingBag, Heart, ShoppingCart, MessageSquare } from 'lucide-react';
+import { Home, ShoppingBag, Heart, ShoppingCart, ClipboardList } from 'lucide-react';
 import { motion } from 'motion/react';
 import CartSidebar from '@/components/CartSidebar';
 
 export default function MobileDock() {
   const pathname = usePathname();
-  const [isMounted, setIsMounted] = useState(true);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const totalCartItems = useCart((state) => state.getTotalItems());
   const totalWishItems = useWishlist((state) => state.itemIds.length);
@@ -19,9 +18,9 @@ export default function MobileDock() {
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
     { label: 'Shop', path: '/shop', icon: ShoppingBag },
-    { label: 'Wishlist', path: '/wishlist', icon: Heart, badge: isMounted ? totalWishItems : 0 },
-    { label: 'Cart', path: '/cart', icon: ShoppingCart, badge: isMounted ? totalCartItems : 0, isCart: true },
-    { label: 'Contact', path: '/contact', icon: MessageSquare },
+    { label: 'Orders', path: '/orders', icon: ClipboardList },
+    { label: 'Wishlist', path: '/wishlist', icon: Heart, badge: totalWishItems },
+    { label: 'Cart', path: '/cart', icon: ShoppingCart, badge: totalCartItems, isCart: true },
   ];
 
   return (

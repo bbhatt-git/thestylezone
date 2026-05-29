@@ -1,4 +1,5 @@
 import WooCommerceRestApi from '@woocommerce/woocommerce-rest-api';
+import * as sqlite from './sqlite';
 
 let woocommerceClient: any = null;
 
@@ -192,18 +193,101 @@ export function generateId(): string {
   return 'id_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
 }
 
+// Helper function to get order by order number (using SQLite)
+export function getOrderByNumber(orderNumber: string): any | null {
+  try {
+    return sqlite.getOrderByOrderNumber(orderNumber);
+  } catch (err) {
+    console.warn('Failed to get order from SQLite, using memory data:', err);
+    return memoryData.orders.find(o => o.order_number.toLowerCase() === orderNumber.toLowerCase()) || null;
+  }
+}
+
+// Helper function to get order items by order ID (using SQLite)
+export function getOrderItems(orderId: string): any[] {
+  try {
+    return sqlite.getOrderItemsByOrderId(orderId);
+  } catch (err) {
+    console.warn('Failed to get order items from SQLite, using memory data:', err);
+    return memoryData.orderItems.filter(item => item.order_id === orderId);
+  }
+}
+
 export async function saveDb(db: DbData): Promise<void> {
-  // Update in-memory runtime data
+  // Update in-memory runtime data (for backward compatibility)
   memoryData.orders = db.orders;
   memoryData.orderItems = db.orderItems;
   memoryData.notifications = db.notifications;
   memoryData.coupons = db.coupons;
   memoryData.paymentQrConfigs = db.paymentQrConfigs;
   memoryData.reviews = db.reviews;
+
+  // Persist to SQLite database
+  try {
+    // Save orders
+    for (const order of db.orders) {
+      sqlite.saveOrder(order);
+    }
+
+    // Save order items
+    for (const item of db.orderItems) {
+      sqlite.saveOrderItem(item);
+    }
+
+    // Save coupons
+    for (const coupon of db.coupons) {
+      sqlite.saveCoupon(coupon);
+    }
+
+    // Save notifications
+    for (const notification of db.notifications) {
+      sqlite.saveNotification(notification);
+    }
+
+    // Save reviews
+    for (const review of db.reviews) {
+      sqlite.saveReview(review);
+    }
+
+    // Save payment QR configs
+    for (const config of db.paymentQrConfigs) {
+      sqlite.savePaymentQrConfig(config);
+    }
+  } catch (err) {
+    console.error('Failed to save to SQLite:', err);
+    // Don't throw - we still have memory fallback
+  }
 }
 
 export async function readDb(): Promise<DbData> {
   let db: DbData = { ...memoryData };
+
+  // Try to load persistent data from SQLite
+  try {
+    db.orders = sqlite.getAllOrders();
+    
+    // Load all order items for backward compatibility
+    const allOrderItems: any[] = [];
+    for (const order of db.orders) {
+      const items = sqlite.getOrderItemsByOrderId(order.id);
+      allOrderItems.push(...items);
+    }
+    db.orderItems = allOrderItems;
+    
+    db.notifications = sqlite.getAllNotifications();
+    db.coupons = sqlite.getAllCoupons();
+    db.reviews = sqlite.getAllReviews();
+    db.paymentQrConfigs = sqlite.getPaymentQrConfigs();
+  } catch (err) {
+    console.warn('Failed to load from SQLite, using memory data:', err);
+    // Fall back to memory data if SQLite is not available
+    db.orders = memoryData.orders;
+    db.orderItems = memoryData.orderItems;
+    db.notifications = memoryData.notifications;
+    db.coupons = memoryData.coupons;
+    db.reviews = memoryData.reviews;
+    db.paymentQrConfigs = memoryData.paymentQrConfigs;
+  }
 
   try {
     const api = getWooCommerce();

@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useSessionToken } from '@/hooks/useSessionToken';
+import { useModal } from '@/contexts/ModalContext';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { 
@@ -40,6 +41,7 @@ interface ShippingRate {
 export default function CheckoutPage() {
   const router = useRouter();
   const sessionToken = useSessionToken();
+  const { showModal } = useModal();
   
   const cartItems = useCart((state) => state.items);
   const cartTotal = useCart((state) => state.getTotalPrice());
@@ -216,8 +218,10 @@ export default function CheckoutPage() {
       const data = await res.json();
       if (data.success) {
         setAppliedCoupon(data);
+        showModal('success', 'Coupon Applied!', `Discount code applied successfully. You save Rs ${data.discountAmount.toLocaleString()}!`);
       } else {
         setCouponError(data.error || 'Failed to apply promotional code.');
+        showModal('error', 'Coupon Failed', data.error || 'Failed to apply promotional code.');
       }
     } catch (err) {
       setCouponError('Network error validating discount code.');
@@ -315,12 +319,17 @@ export default function CheckoutPage() {
         
         // 3. Clear shopping bag and redirect!
         clearCart();
-        router.push(`/checkout/success/${data.orderNumber}`);
+        showModal('success', 'Order Placed Successfully!', `Your order ${data.orderNumber} has been confirmed. Thank you for shopping with us!`);
+        setTimeout(() => {
+          router.push(`/checkout/success/${data.orderNumber}`);
+        }, 2000);
       } else {
         setFormErrors({ submit: data.error || 'The server responded with an error. Please retry.' });
+        showModal('error', 'Order Failed', data.error || 'The server responded with an error. Please retry.');
       }
     } catch (e) {
       setFormErrors({ submit: 'Unable to connect with The Style Zone database.' });
+      showModal('error', 'Connection Error', 'Unable to connect with The Style Zone database. Please check your internet connection and try again.');
     } finally {
       setOrderSubmitting(false);
     }

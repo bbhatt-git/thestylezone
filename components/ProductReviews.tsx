@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect, useCallback } from 'react';
 import { Star } from 'lucide-react';
+import { useModal } from '@/contexts/ModalContext';
 
 interface Review {
   id: number;
@@ -17,6 +18,7 @@ interface ProductReviewsProps {
 }
 
 export default function ProductReviews({ productId }: ProductReviewsProps) {
+  const { showModal } = useModal();
   const [reviews, setReviews] = useState<Review[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -93,18 +95,21 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       if (data.success) {
         setSubmitMessage({ type: 'success', text: data.status === 'hold' ? 'Your review was submitted and is pending approval.' : 'Your review was posted successfully!' });
         setForm({ name: '', email: '', rating: 5, comment: '' });
+        showModal('success', 'Review Submitted', data.status === 'hold' ? 'Your review was submitted and is pending approval.' : 'Your review was posted successfully!');
         if (data.status === 'approved') {
           fetchReviews();
         }
       } else {
         setSubmitMessage({ type: 'error', text: data.error || 'Failed to submit review.' });
+        showModal('error', 'Review Failed', data.error || 'Failed to submit review.');
       }
     } catch (err) {
       setSubmitMessage({ type: 'error', text: 'Network error. Please try again later.' });
+      showModal('error', 'Network Error', 'Failed to submit review due to network error. Please try again later.');
     } finally {
       setSubmitting(false);
     }
-  }, [productId, form, fetchReviews]);
+  }, [productId, form, fetchReviews, showModal]);
 
   return (
     <div className="bg-white p-6 md:p-10 rounded-[4px] border border-stone-200 shadow-sm mt-8">

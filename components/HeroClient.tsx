@@ -19,6 +19,7 @@ interface Product {
   is_featured: boolean;
   created_at: string;
   description: string;
+  short_description?: string;
   categories: string[];
   colors: string[];
   sizes: string[];
@@ -141,7 +142,7 @@ export default function HeroClient({ featuredProducts }: HeroClientProps) {
                           {currentProduct.name}
                         </h2>
                         <p className="text-white/80 text-lg leading-relaxed line-clamp-2">
-                          {currentProduct.description || 'Discover the latest in style and comfort with our premium collection.'}
+                          Elevate your everyday style with premium quality fabrics and timeless designs crafted for the modern individual.
                         </p>
                         <div className="flex items-center gap-4 pt-2">
                           <Link 

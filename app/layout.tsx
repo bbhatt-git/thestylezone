@@ -4,6 +4,7 @@ import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
 import './globals.css';
 import ClientAnimationProvider from '@/components/ClientAnimationProvider';
 import MobileDock from '@/components/MobileDock';
+import { ModalProvider } from '@/contexts/ModalContext';
 
 const inter = Inter({
   subsets: ['latin'],
@@ -36,10 +37,12 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
       <body className="antialiased min-h-screen bg-[#F5F5F0] text-[#121212]">
-        <ClientAnimationProvider>
-          {children}
-          <MobileDock />
-        </ClientAnimationProvider>
+        <ModalProvider>
+          <ClientAnimationProvider>
+            {children}
+            <MobileDock />
+          </ClientAnimationProvider>
+        </ModalProvider>
       </body>
     </html>
   );

@@ -12,9 +12,13 @@ export default function Navbar() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
-  const [isMounted, setIsMounted] = useState(true);
+  const [isMounted, setIsMounted] = useState(false);
   const totalCartItems = useCart((state) => state.getTotalItems());
   const totalWishItems = useWishlist((state) => state.itemIds.length);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const isActive = (path: string) => {
     if (path === '/') {
@@ -25,6 +29,7 @@ export default function Navbar() {
 
   const navLinks = [
     { href: '/shop', label: 'Shop' },
+    { href: '/orders', label: 'Orders' },
     { href: '/about', label: 'Our Story' },
     { href: '/contact', label: 'Contact' },
   ];
