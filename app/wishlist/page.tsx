@@ -3,8 +3,20 @@ import { readDb } from '@/lib/db';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import WishlistClient from './WishlistClient';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'My Wishlist | The Style Zone',
+  description: 'Save your favorite fashion items at The Style Zone. Create your wishlist of clothes, hoodies, and accessories to buy later.',
+  keywords: ['wishlist', 'saved items', 'favorite products', 'fashion wishlist', 'save for later'],
+  openGraph: {
+    title: 'My Wishlist | The Style Zone',
+    description: 'Save your favorite fashion items at The Style Zone.',
+    type: 'website',
+  },
+};
 
 export default async function WishlistPage() {
   const db = await readDb();

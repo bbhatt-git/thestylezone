@@ -295,6 +295,11 @@ export default function CheckoutPage() {
       const data = await res.json();
       
       if (data.success) {
+        // Save full order data to sessionStorage for checkout success page
+        if (typeof window !== 'undefined') {
+          sessionStorage.setItem('sz_latest_order', JSON.stringify(data));
+        }
+        
         // Safe check-out persistence
         // 1. Save last-used address for auto fill
         const addressObj = { customerName, customerPhone, customerEmail, shippingAddress, municipality, wardNo };

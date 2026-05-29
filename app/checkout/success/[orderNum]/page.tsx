@@ -1,23 +1,100 @@
-import React from 'react';
+'use client';
+
+import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { readDb, getOrderByNumber, getOrderItems } from '@/lib/db';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { CheckCircle2, ClipboardList, ShoppingBag, Truck, Calendar, MapPin, CreditCard, Clock } from 'lucide-react';
-
-export const dynamic = 'force-dynamic';
 
 interface SuccessPageProps {
   params: Promise<{ orderNum: string }>;
 }
 
-export default async function CheckoutSuccessPage({ params }: SuccessPageProps) {
-  const { orderNum } = await params;
+interface OrderItem {
+  id: string;
+  order_id: string;
+  product_id: string;
+  variant_id: string;
+  name: string;
+  image_url: string;
+  size: string;
+  color: string;
+  quantity: number;
+  unit_price: number;
+  total_price: number;
+}
+
+interface OrderData {
+  orderNumber: string;
+  orderId: string;
+  customer_name: string;
+  customer_phone: string;
+  customer_email: string | null;
+  shipping_address: string;
+  municipality: string;
+  wardNo: string;
+  payment_method: string;
+  payment_status: string;
+  payment_txn_id: string | null;
+  subtotal: number;
+  discount_amount: number;
+  shipping_fee: number;
+  total: number;
+  coupon_code: string | null;
+  notes: string | null;
+  created_at: string;
+  items?: OrderItem[];
+  status?: string;
+}
+
+export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
+  const [orderNum, setOrderNum] = useState<string>('');
+  const [orderData, setOrderData] = useState<OrderData | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const loadOrder = async () => {
+      const resolvedParams = await params;
+      setOrderNum(resolvedParams.orderNum);
+      
+      // Try to get order data from sessionStorage
+      if (typeof window !== 'undefined') {
+        const storedOrder = sessionStorage.getItem('sz_latest_order');
+        if (storedOrder) {
+          try {
+            const parsedOrder = JSON.parse(storedOrder);
+            // Verify the order number matches
+            if (parsedOrder.orderNumber === resolvedParams.orderNum) {
+              setOrderData(parsedOrder);
+            } else {
+              // Order numbers don't match, clear sessionStorage
+              sessionStorage.removeItem('sz_latest_order');
+            }
+          } catch (e) {
+            console.error('Failed to parse stored order data', e);
+            sessionStorage.removeItem('sz_latest_order');
+          }
+        }
+      }
+      setLoading(false);
+    };
+
+    loadOrder();
+  }, [params]);
+
+  if (loading) {
+    return (
+      <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <Clock className="w-8 h-8 text-[#FE5733] animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    );
+  }
   
-  // Try to get order by order number using SQLite first
-  const order = getOrderByNumber(orderNum);
-  
-  if (!order) {
+  if (!orderData) {
     return (
       <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
         <Navbar />
@@ -46,7 +123,7 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
     );
   }
 
-  const orderItems = getOrderItems(order.id);
+  const orderItems = orderData.items || [];
 
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
@@ -62,27 +139,27 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
           
           <div className="space-y-2">
             <span className="text-[10px] bg-[#F5F5F0] text-[#121212] px-3 py-1 rounded-full uppercase tracking-wider font-bold font-mono">
-              {order.payment_method === 'cash_on_delivery' ? 'Order Confirmed' : 'Order Submitted'}
+              {orderData.payment_method === 'cash_on_delivery' ? 'Order Confirmed' : 'Order Submitted'}
             </span>
             <h1 className="text-2xl md:text-3xl font-black text-[#121212] font-display tracking-tight">Thank You for Your Order!</h1>
             <p className="text-sm text-stone-500 max-w-md mx-auto leading-relaxed">
-              Order <span className="font-mono text-[#FE5733] font-bold">{order.order_number}</span> has been received. We&apos;re preparing your items.
+              Order <span className="font-mono text-[#FE5733] font-bold">{orderData.orderNumber}</span> has been received. We&apos;re preparing your items.
             </p>
           </div>
 
           <div className="border-t border-stone-100 pt-4">
-            {order.payment_method === 'cash_on_delivery' ? (
+            {orderData.payment_method === 'cash_on_delivery' ? (
               <div className="bg-green-50 border border-green-200 p-4 rounded-lg max-w-md mx-auto">
                 <p className="text-sm text-green-800 font-medium text-center">
                   <strong className="block mb-1">Order Confirmed — Pay on Delivery</strong>
-                  We&apos;ll dispatch your order to {order.municipality} right away.
+                  We&apos;ll dispatch your order to {orderData.municipality} right away.
                 </p>
               </div>
             ) : (
               <div className="bg-amber-50 border border-amber-200 p-4 rounded-lg max-w-md mx-auto">
                 <p className="text-sm text-amber-800 font-medium text-center">
                   <strong className="block mb-1">Awaiting Payment Verification</strong>
-                  Transaction ID: <span className="font-mono">{order.payment_txn_id}</span>
+                  Transaction ID: <span className="font-mono">{orderData.payment_txn_id}</span>
                 </p>
               </div>
             )}
@@ -100,14 +177,14 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
                 <Calendar className="w-5 h-5 text-stone-400" />
                 <div>
                   <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Date Ordered</p>
-                  <p className="text-[#121212] font-bold">{new Date(order.created_at).toLocaleDateString()}</p>
+                  <p className="text-[#121212] font-bold">{new Date(orderData.created_at).toLocaleDateString()}</p>
                 </div>
               </div>
               <div className="flex gap-3 items-center">
                 <CreditCard className="w-5 h-5 text-stone-400" />
                 <div>
                   <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Payment Method</p>
-                  <p className="text-[#121212] font-bold uppercase">{order.payment_method.replace(/_/g, ' ')}</p>
+                  <p className="text-[#121212] font-bold uppercase">{orderData.payment_method.replace(/_/g, ' ')}</p>
                 </div>
               </div>
             </div>
@@ -117,9 +194,9 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
               <MapPin className="w-5 h-5 text-stone-400 mt-0.5" />
               <div>
                 <p className="text-[10px] text-stone-400 font-bold uppercase tracking-wider">Shipping Address</p>
-                <p className="text-[#121212] font-bold">{order.customer_name}</p>
-                <p className="text-stone-500 text-sm mt-0.5">{order.shipping_address}, {order.municipality}, Ward {order.wardNo}</p>
-                <p className="text-stone-400 text-xs">{order.customer_phone}</p>
+                <p className="text-[#121212] font-bold">{orderData.customer_name}</p>
+                <p className="text-stone-500 text-sm mt-0.5">{orderData.shipping_address}, {orderData.municipality}, Ward {orderData.wardNo}</p>
+                <p className="text-stone-400 text-xs">{orderData.customer_phone}</p>
               </div>
             </div>
           </div>
@@ -145,21 +222,21 @@ export default async function CheckoutSuccessPage({ params }: SuccessPageProps) 
           <div className="border-t border-stone-100 pt-4 flex flex-col items-end gap-2 text-sm">
             <div className="flex justify-between w-full max-w-xs">
               <span className="text-stone-500">Subtotal</span>
-              <span className="text-[#121212] font-mono">Rs {order.subtotal.toLocaleString()}</span>
+              <span className="text-[#121212] font-mono">Rs {orderData.subtotal.toLocaleString()}</span>
             </div>
-            {order.discount_amount > 0 && (
+            {orderData.discount_amount > 0 && (
               <div className="flex justify-between w-full text-[#FE5733]">
                 <span>Discount</span>
-                <span className="font-mono">-Rs {order.discount_amount.toLocaleString()}</span>
+                <span className="font-mono">-Rs {orderData.discount_amount.toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between w-full text-stone-500">
               <span>Shipping</span>
-              <span className="text-[#121212] font-mono">Rs {order.shipping_fee.toLocaleString()}</span>
+              <span className="text-[#121212] font-mono">Rs {orderData.shipping_fee.toLocaleString()}</span>
             </div>
             <div className="flex justify-between w-full max-w-xs text-lg font-black text-[#121212] border-t border-stone-100 pt-2 mt-2">
               <span>Total</span>
-              <span className="text-[#FE5733] font-mono">Rs {order.total.toLocaleString()}</span>
+              <span className="text-[#FE5733] font-mono">Rs {orderData.total.toLocaleString()}</span>
             </div>
           </div>
         </div>

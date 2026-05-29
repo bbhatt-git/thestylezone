@@ -342,7 +342,34 @@ export async function POST(req: NextRequest) {
       total,
       shippingFee,
       discountAmount,
-      status: orderStatus
+      status: orderStatus,
+      // Include full order details for checkout success page
+      customer_name: customerName,
+      customer_phone: customerPhone,
+      customer_email: customerEmail || null,
+      shipping_address: shippingAddress,
+      municipality: municipality,
+      wardNo: wardNo,
+      payment_method: paymentMethod,
+      payment_status: paymentStatus,
+      payment_txn_id: paymentTxnId || null,
+      subtotal: calculatedSubtotal,
+      coupon_code: couponCode || null,
+      notes: notes || null,
+      created_at: new Date().toISOString(),
+      items: orderItemsToSave.map(item => ({
+        id: item.id,
+        order_id: item.order_id,
+        product_id: item.product_id,
+        variant_id: item.variant_id,
+        name: item.name,
+        image_url: item.image_url,
+        size: item.size,
+        color: item.color,
+        quantity: item.quantity,
+        unit_price: item.unit_price,
+        total_price: item.total_price
+      }))
     });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });

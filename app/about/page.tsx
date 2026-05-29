@@ -3,8 +3,20 @@ import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Target, Heart, Eye } from 'lucide-react';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'About Us | The Style Zone Fashion Boutique',
+  description: 'Learn about The Style Zone, your trusted fashion boutique in Mahendranagar, Kanchanpur. Quality clothes, authentic products, and excellent local service since 2020.',
+  keywords: ['about us', 'fashion boutique', 'Mahendranagar', 'Kanchanpur', 'clothing store', 'local business', 'authentic products'],
+  openGraph: {
+    title: 'About Us | The Style Zone Fashion Boutique',
+    description: 'Learn about The Style Zone, your trusted fashion boutique in Mahendranagar, Kanchanpur.',
+    type: 'website',
+  },
+};
 
 export default function AboutPage() {
   return (

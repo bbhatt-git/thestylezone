@@ -5,8 +5,21 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ProductCard from '@/components/ProductCard';
 import HeroClient from '@/components/HeroClient';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'The Style Zone • Fashion Boutique in Mahendranagar, Kanchanpur',
+  description: 'Shop trendy clothes, hoodies, jackets, and fashion accessories at The Style Zone boutique in Mahendranagar, Kanchanpur. Quality apparel with COD delivery across Nepal.',
+  keywords: ['fashion boutique', 'clothing store', 'Mahendranagar', 'Kanchanpur', 'Nepal', 'hoodies', 'jackets', 't-shirts', 'online shopping', 'COD delivery'],
+  openGraph: {
+    title: 'The Style Zone • Fashion Boutique in Mahendranagar',
+    description: 'Shop trendy clothes, hoodies, jackets, and fashion accessories at The Style Zone boutique in Mahendranagar, Kanchanpur.',
+    type: 'website',
+    locale: 'en_US',
+  },
+};
 
 export default async function HomePage() {
   const db = await readDb();

@@ -3,8 +3,20 @@ import { readDb } from '@/lib/db';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import ShopClient from './ShopClient';
+import type { Metadata } from 'next';
 
 export const dynamic = 'force-dynamic';
+
+export const metadata: Metadata = {
+  title: 'Shop All Collections | The Style Zone',
+  description: 'Explore our complete collection of trendy clothes, hoodies, jackets, and fashion accessories. 100% authentic products with COD delivery across Nepal.',
+  keywords: ['shop', 'clothing collection', 'fashion', 'hoodies', 'jackets', 't-shirts', 'accessories', 'online shopping'],
+  openGraph: {
+    title: 'Shop All Collections | The Style Zone',
+    description: 'Explore our complete collection of trendy clothes, hoodies, jackets, and fashion accessories.',
+    type: 'website',
+  },
+};
 
 export default async function ShopPage() {
   const db = await readDb();

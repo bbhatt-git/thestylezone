@@ -1,0 +1,12 @@
+# https://www.robotstxt.org/robotstxt.html
+User-agent: *
+Allow: /
+
+# Disallow admin and checkout areas
+Disallow: /checkout/
+Disallow: /api/
+Disallow: /orders/
+Disallow: /wishlist/
+
+# Sitemap location
+Sitemap: https://thestylezone.com.np/sitemap.xml
