@@ -25,7 +25,7 @@ export default function PrivacyPage() {
               Privacy <span className="text-[#FE5733]">Policy.</span>
             </h1>
             <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
-              Your privacy matters. We're committed to protecting your personal information and being transparent about how we use it.
+              Your privacy matters. We&apos;re committed to protecting your personal information and being transparent about how we use it.
             </p>
             <div className="mt-6 pt-6 border-t border-[#121212]/10">
               <p className="text-xs text-[#121212]/50 font-mono">Last Updated: May 29, 2026</p>
