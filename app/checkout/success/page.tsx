@@ -1,14 +1,11 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { CheckCircle2, ClipboardList, ShoppingBag, Truck, Calendar, MapPin, CreditCard, Clock } from 'lucide-react';
-
-interface SuccessPageProps {
-  params: Promise<{ orderNum: string }>;
-}
 
 interface OrderItem {
   id: string;
@@ -25,8 +22,8 @@ interface OrderItem {
 }
 
 interface OrderData {
-  orderNumber: string;
-  orderId: string;
+  id: string;
+  order_number: string;
   customer_name: string;
   customer_phone: string;
   customer_email: string | null;
@@ -47,40 +44,41 @@ interface OrderData {
   status?: string;
 }
 
-export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
-  const [orderNum, setOrderNum] = useState<string>('');
+function CheckoutSuccessContent() {
+  const searchParams = useSearchParams();
+  const orderId = searchParams.get('order_id');
+  
   const [orderData, setOrderData] = useState<OrderData | null>(null);
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState('');
 
   useEffect(() => {
-    const loadOrder = async () => {
-      const resolvedParams = await params;
-      setOrderNum(resolvedParams.orderNum);
-      
-      // Try to get order data from sessionStorage
-      if (typeof window !== 'undefined') {
-        const storedOrder = sessionStorage.getItem('sz_latest_order');
-        if (storedOrder) {
-          try {
-            const parsedOrder = JSON.parse(storedOrder);
-            // Verify the order number matches
-            if (parsedOrder.orderNumber === resolvedParams.orderNum) {
-              setOrderData(parsedOrder);
-            } else {
-              // Order numbers don't match, clear sessionStorage
-              sessionStorage.removeItem('sz_latest_order');
-            }
-          } catch (e) {
-            console.error('Failed to parse stored order data', e);
-            sessionStorage.removeItem('sz_latest_order');
-          }
-        }
-      }
+    if (!orderId) {
       setLoading(false);
+      setError('Order ID not provided');
+      return;
+    }
+
+    const fetchOrder = async () => {
+      try {
+        const response = await fetch(`/api/orders/${orderId}`);
+        const data = await response.json();
+        
+        if (data.success && data.order) {
+          setOrderData(data.order);
+        } else {
+          setError('Order not found');
+        }
+      } catch (err) {
+        setError('Failed to fetch order details');
+        console.error('Error fetching order:', err);
+      } finally {
+        setLoading(false);
+      }
     };
 
-    loadOrder();
-  }, [params]);
+    fetchOrder();
+  }, [orderId]);
 
   if (loading) {
     return (
@@ -93,8 +91,8 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
       </div>
     );
   }
-  
-  if (!orderData) {
+
+  if (error || !orderData) {
     return (
       <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
         <Navbar />
@@ -105,8 +103,7 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
           <div>
             <h1 className="text-2xl font-bold text-[#121212]">Order Not Found</h1>
             <p className="text-sm text-stone-500 mt-2 max-w-md">
-              We couldn&apos;t find order <span className="font-mono text-[#FE5733]">{orderNum}</span> in our system. 
-              Your order may still be processing. Please check your orders page or contact support.
+              {error || 'We couldn&apos;t find your order. It may still be processing. Please check your orders page or contact support.'}
             </p>
           </div>
           <div className="flex gap-4">
@@ -139,16 +136,16 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
           
           <div className="space-y-2">
             <span className="text-[10px] bg-[#F5F5F0] text-[#121212] px-3 py-1 rounded-full uppercase tracking-wider font-bold font-mono">
-              {orderData.payment_method === 'cash_on_delivery' ? 'Order Confirmed' : 'Order Submitted'}
+              {orderData.payment_method === 'cod' || orderData.payment_method === 'cash_on_delivery' ? 'Order Confirmed' : 'Order Submitted'}
             </span>
             <h1 className="text-2xl md:text-3xl font-black text-[#121212] font-display tracking-tight">Thank You for Your Order!</h1>
             <p className="text-sm text-stone-500 max-w-md mx-auto leading-relaxed">
-              Order <span className="font-mono text-[#FE5733] font-bold">{orderData.orderNumber}</span> has been received. We&apos;re preparing your items.
+              Order <span className="font-mono text-[#FE5733] font-bold">{orderData.order_number}</span> has been received. We&apos;re preparing your items.
             </p>
           </div>
 
           <div className="border-t border-stone-100 pt-4">
-            {orderData.payment_method === 'cash_on_delivery' ? (
+            {orderData.payment_method === 'cod' || orderData.payment_method === 'cash_on_delivery' ? (
               <div className="bg-green-50 border border-green-200 p-4 rounded-lg max-w-md mx-auto">
                 <p className="text-sm text-green-800 font-medium text-center">
                   <strong className="block mb-1">Order Confirmed — Pay on Delivery</strong>
@@ -212,7 +209,7 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
                     <p className="text-sm font-bold text-[#121212]">{item.name}</p>
                     <p className="text-xs text-stone-400">Qty: {item.quantity} | Size: {item.size} | Color: {item.color}</p>
                   </div>
-                  <span className="text-sm font-bold text-[#121212] font-mono">Rs {item.total_price.toLocaleString()}</span>
+                  <span className="text-sm font-bold text-[#121212] font-mono">Rs {(item.total_price || 0).toLocaleString()}</span>
                 </div>
               ))}
             </div>
@@ -222,37 +219,31 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
           <div className="border-t border-stone-100 pt-4 flex flex-col items-end gap-2 text-sm">
             <div className="flex justify-between w-full max-w-xs">
               <span className="text-stone-500">Subtotal</span>
-              <span className="text-[#121212] font-mono">Rs {orderData.subtotal.toLocaleString()}</span>
+              <span className="text-[#121212] font-mono">Rs {(orderData.subtotal || 0).toLocaleString()}</span>
             </div>
-            {orderData.discount_amount > 0 && (
+            {(orderData.discount_amount || 0) > 0 && (
               <div className="flex justify-between w-full text-[#FE5733]">
                 <span>Discount</span>
-                <span className="font-mono">-Rs {orderData.discount_amount.toLocaleString()}</span>
+                <span className="font-mono">-Rs {(orderData.discount_amount || 0).toLocaleString()}</span>
               </div>
             )}
             <div className="flex justify-between w-full text-stone-500">
               <span>Shipping</span>
-              <span className="text-[#121212] font-mono">Rs {orderData.shipping_fee.toLocaleString()}</span>
+              <span className="text-[#121212] font-mono">Rs {(orderData.shipping_fee || 0).toLocaleString()}</span>
             </div>
             <div className="flex justify-between w-full max-w-xs text-lg font-black text-[#121212] border-t border-stone-100 pt-2 mt-2">
               <span>Total</span>
-              <span className="text-[#FE5733] font-mono">Rs {orderData.total.toLocaleString()}</span>
+              <span className="text-[#FE5733] font-mono">Rs {(orderData.total || 0).toLocaleString()}</span>
             </div>
           </div>
         </div>
 
         {/* 3. ACTION BUTTONS */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 max-w-md mx-auto">
-          <Link
-            href="/orders"
-            className="bg-[#121212] hover:bg-[#FE5733] text-white rounded-lg px-6 py-3 text-sm font-bold uppercase tracking-widest text-center transition-colors"
-          >
+        <div className="grid grid-cols-2 gap-4">
+          <Link href="/orders" className="bg-[#121212] hover:bg-[#FE5733] text-white rounded-lg p-4 text-sm font-bold uppercase tracking-widest transition-colors text-center">
             View My Orders
           </Link>
-          <Link
-            href="/shop"
-            className="border border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white rounded-lg px-6 py-3 text-sm font-bold uppercase tracking-widest text-center transition-colors"
-          >
+          <Link href="/shop" className="border border-[#121212] text-[#121212] hover:bg-[#121212] hover:text-white rounded-lg p-4 text-sm font-bold uppercase tracking-widest transition-colors text-center">
             Continue Shopping
           </Link>
         </div>
@@ -261,5 +252,21 @@ export default function CheckoutSuccessPage({ params }: SuccessPageProps) {
 
       <Footer />
     </div>
+  );
+}
+
+export default function CheckoutSuccessPage() {
+  return (
+    <Suspense fallback={
+      <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
+        <Navbar />
+        <div className="flex-grow flex items-center justify-center">
+          <Clock className="w-8 h-8 text-[#FE5733] animate-spin" />
+        </div>
+        <Footer />
+      </div>
+    }>
+      <CheckoutSuccessContent />
+    </Suspense>
   );
 }

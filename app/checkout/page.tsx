@@ -295,38 +295,34 @@ export default function CheckoutPage() {
       const data = await res.json();
       
       if (data.success) {
-        // Save full order data to sessionStorage for checkout success page
+        // Save WooCommerce order ID to localStorage for guest order history
         if (typeof window !== 'undefined') {
-          sessionStorage.setItem('sz_latest_order', JSON.stringify(data));
+          const guestOrders = localStorage.getItem('sz_guest_orders');
+          let orderIds: string[] = [];
+          if (guestOrders) {
+            try {
+              orderIds = JSON.parse(guestOrders);
+            } catch (e) {
+              orderIds = [];
+            }
+          }
+          
+          // Add new order ID if not already in the list (use WooCommerce orderId)
+          if (data.orderId && !orderIds.includes(data.orderId)) {
+            orderIds.push(data.orderId);
+            localStorage.setItem('sz_guest_orders', JSON.stringify(orderIds));
+          }
         }
         
-        // Safe check-out persistence
-        // 1. Save last-used address for auto fill
+        // Save last-used address for auto fill
         const addressObj = { customerName, customerPhone, customerEmail, shippingAddress, municipality, wardNo };
         localStorage.setItem('tsz_last_address', JSON.stringify(addressObj));
         
-        // 2. Save individual local orders in tsz_orders lookup list
-        const currentOrders = localStorage.getItem('tsz_orders');
-        let orderList = [];
-        if (currentOrders) {
-          try {
-            orderList = JSON.parse(currentOrders);
-          } catch (e) {
-            orderList = [];
-          }
-        }
-        orderList.push({
-          order_number: data.orderNumber,
-          session_token: sessionToken,
-          created_at: new Date().toISOString()
-        });
-        localStorage.setItem('tsz_orders', JSON.stringify(orderList));
-        
-        // 3. Clear shopping bag and redirect!
+        // Clear shopping bag and redirect!
         clearCart();
         showModal('success', 'Order Placed Successfully!', `Your order ${data.orderNumber} has been confirmed. Thank you for shopping with us!`);
         setTimeout(() => {
-          router.push(`/checkout/success/${data.orderNumber}`);
+          router.push(`/checkout/success?order_id=${data.orderId}`);
         }, 2000);
       } else {
         setFormErrors({ submit: data.error || 'The server responded with an error. Please retry.' });
