@@ -21,6 +21,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
       return;
     }
 
+    // Skip animation on mobile/tablet (screens smaller than 1024px)
+    if (typeof window !== 'undefined' && window.innerWidth < 1024) {
+      previousPathname.current = pathname;
+      return;
+    }
+
     // Only animate on route changes
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({
