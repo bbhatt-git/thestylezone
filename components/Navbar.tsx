@@ -35,7 +35,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white border-b border-[#121212]/10 shadow-sm">
+    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm dark:bg-zinc-900/80">
       <nav className="max-w-[1560px] mx-auto px-6 md:px-10 h-16 grid grid-cols-3 items-center">
         
         {/* Left: Mobile Menu Toggle / Desktop Links */}

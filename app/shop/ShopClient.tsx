@@ -239,7 +239,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               placeholder="e.g. Hoodie, Dress, Jacket..."
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-xs h-10 bg-stone-50 border border-stone-300 rounded-[4px] pl-10 pr-4 focus:outline-none focus:border-[#FE5733] text-[#121212] placeholder:text-[#121212]/40 font-medium transition-colors"
+              className="w-full text-xs h-10 bg-stone-50 border border-stone-300 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] pl-10 pr-4 outline-none text-[#121212] placeholder:text-stone-400 font-medium transition-all duration-200 ease-in-out"
             />
             <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
           </div>
@@ -253,10 +253,10 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-[10px] font-bold uppercase tracking-wider px-2.5 py-1.5 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
+                className={`text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
                   selectedCategory === cat 
-                    ? 'bg-[#FE5733] border-[#FE5733] text-white' 
-                    : 'bg-transparent border-stone-300 hover:border-[#121212] text-stone-800 hover:bg-stone-50'
+                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
+                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
                 }`}
               >
                 {cat}
@@ -273,10 +273,10 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <button
                 key={sz}
                 onClick={() => setSelectedSize(sz)}
-                className={`text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
+                className={`min-w-10 h-10 text-[10px] font-bold tracking-wide rounded-sm transition-all border cursor-pointer ${
                   selectedSize === sz 
-                    ? 'bg-[#121212] border-[#121212] text-white' 
-                    : 'bg-transparent border-stone-300 hover:border-[#121212] text-stone-800 hover:bg-stone-50'
+                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
+                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
                 }`}
               >
                 {sz}
@@ -293,10 +293,10 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <button
                 key={col}
                 onClick={() => setSelectedColor(col)}
-                className={`text-[10px] font-bold tracking-wide px-2.5 py-1.5 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
+                className={`text-[10px] font-bold tracking-wide px-3 py-2 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
                   selectedColor === col 
-                    ? 'bg-[#121212] border-[#121212] text-white' 
-                    : 'bg-transparent border-stone-300 hover:border-[#121212] text-stone-800 hover:bg-stone-50'
+                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
+                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
                 }`}
               >
                 {col}

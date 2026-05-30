@@ -117,7 +117,7 @@ export default function ContactPage() {
                     value={name}
                     onChange={(e) => setName(e.target.value)}
                     placeholder="Your name" 
-                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none" 
+                    className="w-full text-xs h-10 border border-stone-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-stone-400 outline-none transition-all duration-200 ease-in-out" 
                   />
                 </div>
 
@@ -129,7 +129,7 @@ export default function ContactPage() {
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="your@email.com" 
-                    className="w-full text-xs h-10 border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none" 
+                    className="w-full text-xs h-10 border border-stone-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 bg-[#F5F5F0]/20 rounded-[4px] px-3 font-bold text-[#121212] placeholder:text-stone-400 outline-none transition-all duration-200 ease-in-out" 
                   />
                 </div>
 
@@ -141,7 +141,7 @@ export default function ContactPage() {
                     value={message}
                     onChange={(e) => setMessage(e.target.value)}
                     placeholder="How can we help you?" 
-                    className="w-full text-xs border border-[#121212]/10 focus:border-[#FE5733] bg-[#F5F5F0]/20 rounded-[4px] p-3 font-bold text-[#121212] placeholder:text-[#121212]/30 outline-none resize-none" 
+                    className="w-full text-xs border border-stone-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 bg-[#F5F5F0]/20 rounded-[4px] p-3 font-bold text-[#121212] placeholder:text-stone-400 outline-none resize-none transition-all duration-200 ease-in-out" 
                   />
                 </div>
 

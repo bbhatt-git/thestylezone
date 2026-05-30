@@ -32,31 +32,43 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   const price = product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price;
   const originalPrice = product.sale_price !== null && product.sale_price !== undefined ? product.base_price : null;
+  
+  // Get secondary image for hover effect
+  const primaryImage = product.images[0] || 'https://picsum.photos/seed/placeholder/600/800';
+  const secondaryImage = product.images[1] || primaryImage;
 
   return (
     <div className={`group relative flex flex-col h-full bg-transparent transition-all duration-500 ${product.stock_total <= 0 ? 'opacity-60 grayscale' : ''}`}>
-      <div className="relative aspect-[3/4] bg-stone-100 overflow-hidden mb-5">
+      <div className="relative aspect-[3/4] bg-stone-100 overflow-hidden rounded-lg mb-3 md:mb-5">
 
         {/* Sale and New badges */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
           {originalPrice && product.discount_pct && (
-            <span className="bg-white/90 backdrop-blur-sm text-[#121212] text-[10px] font-medium px-3 py-1 uppercase tracking-[0.2em] shadow-sm">
+            <span className="bg-white/95 backdrop-blur-sm text-[#121212] text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em] shadow-sm border border-black/10">
               Sale {product.discount_pct}%
             </span>
           )}
           {product.stock_total <= 0 && (
-            <span className="bg-stone-500/90 backdrop-blur-sm text-white text-[10px] font-medium px-3 py-1 uppercase tracking-[0.2em] shadow-sm">
+            <span className="bg-zinc-900/95 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em] shadow-sm">
               Sold Out
             </span>
           )}
         </div>
 
-        <Link href={`/shop/${product.slug}`} className="block h-full w-full">
+        <Link href={`/shop/${product.slug}`} className="block h-full w-full relative">
+          {/* Primary Image - visible by default, hidden on hover */}
           {/* eslint-disable-next-line @next/next/no-img-element */}
           <img
-            src={product.images[0] || 'https://picsum.photos/seed/placeholder/600/800'}
+            src={primaryImage}
             alt={product.name}
-            className="w-full h-full object-cover transition-transform duration-1000 ease-[cubic-bezier(0.25,0.46,0.45,0.94)] group-hover:scale-110"
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out group-hover:opacity-0"
+          />
+          {/* Secondary Image - hidden by default, visible on hover */}
+          {/* eslint-disable-next-line @next/next/no-img-element */}
+          <img
+            src={secondaryImage}
+            alt={`${product.name} alternate view`}
+            className="absolute inset-0 w-full h-full object-cover transition-opacity duration-500 ease-in-out opacity-0 group-hover:opacity-100 group-hover:scale-105 transition-transform duration-700"
           />
         </Link>
 
@@ -79,14 +91,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-col flex-grow">
-        <h3 className={`text-sm font-medium tracking-tight line-clamp-1 mb-2 ${product.stock_total <= 0 ? 'text-stone-500' : 'text-[#121212]'}`}>
-          <Link href={`/shop/${product.slug}`} className={`transition-colors ${product.stock_total <= 0 ? 'hover:text-stone-600' : 'hover:text-[#FE5733]'}`}>
+        <h3 className={`text-sm font-normal tracking-tight line-clamp-1 mb-2 ${product.stock_total <= 0 ? 'text-stone-500' : 'text-zinc-600'}`}>
+          <Link href={`/shop/${product.slug}`} className={`transition-colors ${product.stock_total <= 0 ? 'hover:text-stone-600' : 'hover:text-zinc-900'}`}>
             {product.name}
           </Link>
         </h3>
 
         <div className="mt-auto flex items-baseline gap-3">
-          <span className={`text-sm font-medium tracking-wide ${product.stock_total <= 0 ? 'text-stone-500' : 'text-[#121212]'}`}>Rs {price.toLocaleString()}</span>
+          <span className={`text-sm font-semibold tracking-wide ${product.stock_total <= 0 ? 'text-stone-500' : 'text-zinc-900'}`}>Rs {price.toLocaleString()}</span>
           {originalPrice && (
             <span className="text-xs text-stone-400 line-through">Rs {originalPrice.toLocaleString()}</span>
           )}

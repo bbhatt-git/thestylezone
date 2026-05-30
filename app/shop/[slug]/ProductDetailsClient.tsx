@@ -68,7 +68,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
 
   return (
     <div className="flex flex-col gap-12">
-      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start bg-white p-6 md:p-10 rounded-[4px] border border-stone-200 shadow-sm">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 lg:gap-16 items-start bg-white p-6 md:p-10 rounded-[4px] border border-black/5 shadow-sm">
         
         {/* Product Images Column */}
         <div className="lg:col-span-6 space-y-4">
@@ -114,7 +114,7 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
           </div>
 
           {/* Pricing */}
-          <div className="border-y border-stone-200 py-6 flex items-baseline gap-4">
+          <div className="border-y border-black/5 py-6 flex items-baseline gap-4">
             <span className="text-3xl font-black text-[#121212] font-display">Rs {price.toLocaleString()}</span>
             {originalPrice && (
               <>
@@ -144,10 +144,10 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                     key={sz}
                     onClick={() => setSelectedSize(sz)}
                     disabled={product.stock_total <= 0}
-                    className={`min-w-12 h-12 text-xs font-bold uppercase tracking-wider rounded-[4px] border-2 cursor-pointer transition-all duration-300 ${
+                    className={`min-w-12 h-12 text-xs font-bold uppercase tracking-wider rounded-[4px] border-2 cursor-pointer transition-all duration-200 ease-out ${
                       selectedSize === sz
-                        ? 'bg-[#FE5733] border-[#FE5733] text-white shadow-md'
-                        : 'bg-transparent border-stone-300 hover:border-[#FE5733] hover:text-[#FE5733] text-stone-800 hover:-translate-y-0.5'
+                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95'
+                        : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
                     } ${product.stock_total <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                   >
                     {sz}
@@ -167,10 +167,10 @@ export default function ProductDetailsClient({ product }: ProductDetailsClientPr
                     key={col}
                     onClick={() => setSelectedColor(col)}
                     disabled={product.stock_total <= 0}
-                    className={`px-4 h-11 text-xs font-bold uppercase tracking-wider rounded-[4px] border-2 cursor-pointer transition-all duration-300 ${
+                    className={`px-4 h-11 text-xs font-bold uppercase tracking-wider rounded-[4px] border-2 cursor-pointer transition-all duration-200 ease-out ${
                       selectedColor === col
-                        ? 'bg-[#FE5733] border-[#FE5733] text-white shadow-md'
-                        : 'bg-transparent border-stone-300 hover:border-[#FE5733] hover:text-[#FE5733] text-stone-800 hover:-translate-y-0.5'
+                        ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95'
+                        : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
                     } ${product.stock_total <= 0 ? 'opacity-50 cursor-not-allowed grayscale' : ''}`}
                   >
                     {col}

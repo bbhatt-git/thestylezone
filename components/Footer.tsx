@@ -107,7 +107,7 @@ export default function Footer() {
                         if (errorMsg) setErrorMsg('');
                       }}
                       placeholder="Email address" 
-                      className="w-full px-4 py-3 bg-[#121212]/50 rounded-sm text-white text-xs placeholder-stone-500 border border-stone-700 focus:outline-none focus:border-[#FE5733] transition-all"
+                      className="w-full px-4 py-3 bg-[#121212]/50 rounded-sm text-white text-xs placeholder-stone-500 border border-stone-700 focus:border-zinc-400 focus:ring-2 focus:ring-zinc-400 focus:ring-offset-2 focus:ring-offset-[#121212] outline-none transition-all duration-200 ease-in-out"
                     />
                   </div>
                   <button 
@@ -167,7 +167,7 @@ export default function Footer() {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={item.label}
-                    className="w-10 h-10 rounded-full bg-[#121212]/50 border border-stone-700 flex items-center justify-center text-stone-400 hover:text-[#FE5733] hover:border-transparent transition-all duration-300 relative group"
+                    className="w-10 h-10 rounded-full bg-[#121212]/50 border border-stone-700 flex items-center justify-center text-stone-400 hover:text-[#FE5733] hover:border-transparent hover:bg-zinc-800 transition-all duration-300 relative group"
                   >
                     <div className="absolute inset-0 rounded-full scale-0 group-hover:scale-100 bg-[#FE5733]/20 transition-all duration-300 z-0"></div>
                     <span className="relative z-10 transition-colors duration-300">

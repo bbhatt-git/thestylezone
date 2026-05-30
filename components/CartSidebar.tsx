@@ -28,7 +28,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       {/* Sidebar */}
       <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-stone-200">
+        <div className="flex items-center justify-between p-6 border-b border-black/5">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-[#FE5733]" />
             <h2 className="text-lg font-bold text-[#121212] uppercase tracking-wider">Your Bag</h2>
@@ -59,8 +59,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.variantId} className="flex gap-4 p-4 bg-stone-50 rounded-[4px] border border-stone-200">
-                <div className="w-20 h-24 bg-white rounded-[4px] overflow-hidden shrink-0 border border-stone-200">
+              <div key={item.variantId} className="flex gap-4 p-4 bg-stone-50 rounded-[4px] border border-black/5">
+                <div className="w-20 h-24 bg-white rounded-[4px] overflow-hidden shrink-0 border border-black/5">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                 </div>
@@ -71,7 +71,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-2 mt-3">
-                    <div className="flex items-center border border-stone-200 rounded-[4px] bg-white">
+                    <div className="flex items-center border border-black/10 rounded-[4px] bg-white">
                       <button
                         onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
@@ -91,10 +91,10 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                     </div>
                     <button
                       onClick={() => removeItem(item.productId, item.variantId)}
-                      className="p-2 hover:bg-red-50 rounded-full transition-colors"
+                      className="p-2 hover:bg-red-50 rounded-full transition-colors group"
                       aria-label="Remove item"
                     >
-                      <Trash2 className="w-4 h-4 text-red-500" />
+                      <Trash2 className="w-4 h-4 text-red-500 group-hover:rotate-12 group-hover:scale-110 transition-transform duration-200" />
                     </button>
                   </div>
                 </div>
@@ -105,7 +105,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-stone-200 p-6 space-y-4 bg-stone-50">
+          <div className="border-t border-black/5 p-6 space-y-4 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
             <div className="flex justify-between text-sm">
               <span className="text-stone-600">Subtotal</span>
               <span className="font-bold text-[#121212]">Rs {totalPrice.toLocaleString()}</span>

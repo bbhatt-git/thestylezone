@@ -52,9 +52,9 @@ export default function MobileDock() {
                   />
                 )}
 
-                <div className="relative z-10 flex flex-col items-center">
+                <div className="relative z-10 flex flex-col items-center space-y-0.5">
                   <Icon 
-                    className={`w-5 h-5 transition-colors duration-200 ${
+                    className={`w-4 h-4 transition-colors duration-200 ${
                       isActive ? 'text-white' : 'text-stone-400 group-hover:text-white'
                     }`} 
                     strokeWidth={isActive ? 2.5 : 2}
@@ -62,13 +62,13 @@ export default function MobileDock() {
                   
                   {/* Badge count */}
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
+                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
                       {item.badge}
                     </span>
                   )}
 
                   <span 
-                    className={`text-[8px] font-bold tracking-wider uppercase mt-1 transition-colors duration-200 ${
+                    className={`text-[8px] font-bold tracking-wider uppercase transition-colors duration-200 ${
                       isActive ? 'text-white' : 'text-stone-400/80 group-hover:text-white'
                     }`}
                   >
@@ -91,9 +91,9 @@ export default function MobileDock() {
                   />
                 )}
 
-                <div className="relative z-10 flex flex-col items-center">
+                <div className="relative z-10 flex flex-col items-center space-y-0.5">
                   <Icon 
-                    className={`w-5 h-5 transition-colors duration-200 ${
+                    className={`w-4 h-4 transition-colors duration-200 ${
                       isActive ? 'text-white' : 'text-stone-400 group-hover:text-white'
                     }`} 
                     strokeWidth={isActive ? 2.5 : 2}
@@ -101,13 +101,13 @@ export default function MobileDock() {
                   
                   {/* Badge count */}
                   {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1.5 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
+                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
                       {item.badge}
                     </span>
                   )}
 
                   <span 
-                    className={`text-[8px] font-bold tracking-wider uppercase mt-1 transition-colors duration-200 ${
+                    className={`text-[8px] font-bold tracking-wider uppercase transition-colors duration-200 ${
                       isActive ? 'text-white' : 'text-stone-400/80 group-hover:text-white'
                     }`}
                   >

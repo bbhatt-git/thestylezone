@@ -359,7 +359,7 @@ export default function CheckoutPage() {
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 flex-grow space-y-6">
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4 md:py-10 flex-grow space-y-6">
         
         {/* Progress Tracker Stepper Header */}
         <div className="bg-white border border-stone-200 rounded-[4px] p-4 flex justify-between items-center max-w-3xl mx-auto text-xs font-bold text-stone-400">
@@ -384,8 +384,8 @@ export default function CheckoutPage() {
           {/* LEFT: STEP RENDERERS */}
           <div className="lg:col-span-7">
             {step === 'address' && (
-              <div className="bg-white border border-stone-200 rounded-[4px] p-6 lg:p-8 shadow-sm space-y-6 animate-fade-in">
-                <div className="flex items-center gap-2 border-b border-stone-200 pb-3">
+              <div className="bg-white border border-black/5 rounded-[4px] p-4 md:p-6 lg:p-8 shadow-sm space-y-6 animate-fade-in">
+                <div className="flex items-center gap-2 border-b border-black/5 pb-3">
                   <MapPin className="w-5 h-5 text-stone-400" />
                   <h2 className="text-base font-black text-[#121212] uppercase tracking-wider">Shipping Address</h2>
                 </div>
@@ -396,10 +396,12 @@ export default function CheckoutPage() {
                     <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider">Customers Full Name *</label>
                     <input
                       type="text"
+                      inputMode="text"
+                      autoComplete="name"
                       placeholder="e.g. Bhupesh Bhatt"
                       value={customerName}
                       onChange={(e) => setCustomerName(e.target.value)}
-                      className="w-full h-11 bg-stone-50 border border-stone-200 rounded-[4px] px-4 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                      className="w-full h-11 bg-stone-50 border border-black/10 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] px-4 text-xs font-medium outline-none transition-all duration-200 ease-in-out"
                     />
                     {formErrors.customerName && <p className="text-[10px] text-red-500 font-medium">{formErrors.customerName}</p>}
                   </div>
@@ -409,11 +411,13 @@ export default function CheckoutPage() {
                     <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider">Nepal Phone Number *</label>
                     <input
                       type="tel"
+                      inputMode="tel"
+                      autoComplete="tel"
                       placeholder="e.g. 98XXXXXXXX"
                       maxLength={10}
                       value={customerPhone}
                       onChange={(e) => setCustomerPhone(e.target.value)}
-                      className="w-full h-11 bg-stone-50 border border-stone-200 rounded-[4px] px-4 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                      className="w-full h-11 bg-stone-50 border border-black/10 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] px-4 text-xs font-medium outline-none transition-all duration-200 ease-in-out"
                     />
                     {formErrors.customerPhone && <p className="text-[10px] text-red-500 font-medium">{formErrors.customerPhone}</p>}
                   </div>
@@ -423,10 +427,12 @@ export default function CheckoutPage() {
                     <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider">Email Address (Optional)</label>
                     <input
                       type="email"
+                      inputMode="email"
+                      autoComplete="email"
                       placeholder="e.g. name@domain.com"
                       value={customerEmail}
                       onChange={(e) => setCustomerEmail(e.target.value)}
-                      className="w-full h-11 bg-stone-50 border border-stone-200 rounded-[4px] px-4 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                      className="w-full h-11 bg-stone-50 border border-black/10 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] px-4 text-xs font-medium outline-none transition-all duration-200 ease-in-out"
                     />
                     {formErrors.customerEmail && <p className="text-[10px] text-red-500 font-medium">{formErrors.customerEmail}</p>}
                   </div>
@@ -436,10 +442,12 @@ export default function CheckoutPage() {
                     <label className="block text-[11px] font-bold text-stone-500 uppercase tracking-wider">Street Shipping Address *</label>
                     <input
                       type="text"
+                      inputMode="text"
+                      autoComplete="street-address"
                       placeholder="e.g. Gali No. 3, Main Marg, Mahendranagar"
                       value={shippingAddress}
                       onChange={(e) => setShippingAddress(e.target.value)}
-                      className="w-full h-11 bg-stone-50 border border-stone-200 rounded-[4px] px-4 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                      className="w-full h-11 bg-stone-50 border border-black/10 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] px-4 text-xs font-medium outline-none transition-all duration-200 ease-in-out"
                     />
                     {formErrors.shippingAddress && <p className="text-[10px] text-red-500 font-medium">{formErrors.shippingAddress}</p>}
                   </div>
@@ -531,17 +539,17 @@ export default function CheckoutPage() {
                       rows={3}
                       value={notes}
                       onChange={(e) => setNotes(e.target.value)}
-                      className="w-full bg-stone-50 border border-stone-200 rounded-[4px] p-4 text-xs font-medium focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                      className="w-full bg-stone-50 border border-black/10 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] p-4 text-xs font-medium outline-none transition-all duration-200 ease-in-out"
                     />
                   </div>
                 </div>
 
-                <div className="pt-4 border-t border-stone-200 flex justify-end">
+                <div className="pt-6 border-t border-black/5 flex justify-end">
                   <button
                     onClick={handleNextStep}
-                    className="bg-[#FE5733] hover:bg-[#e04825] text-white rounded-[4px] font-bold h-11 px-8 text-xs tracking-wider uppercase flex items-center gap-1 transition-all cursor-pointer shadow-sm hover:shadow"
+                    className="bg-[#FE5733] hover:bg-[#e04825] text-white rounded-[4px] font-black h-13 px-10 text-sm tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    Next: Review Order <ChevronRight className="w-4 h-4" />
+                    Next: Review Order <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -550,13 +558,13 @@ export default function CheckoutPage() {
             {step === 'review' && (
               <div className="bg-white border border-stone-200 rounded-[4px] p-6 lg:p-8 shadow-sm animate-fade-in">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-6 pb-4 border-b border-stone-200">
+                <div className="flex items-center justify-between mb-6 pb-4 border-b border-black/5">
                   <button 
                     onClick={handleBackStep}
-                    className="text-sm font-bold text-stone-500 hover:text-[#FE5733] flex items-center gap-2 transition-colors"
+                    className="text-xs font-medium text-stone-400 hover:text-stone-600 flex items-center gap-2 transition-colors"
                     aria-label="Back to address step"
                   >
-                    <ArrowLeft className="w-4 h-4" /> Edit Address
+                    <ArrowLeft className="w-3 h-3" /> Edit Address
                   </button>
                   <h2 className="text-xl font-black text-[#121212] uppercase tracking-widest">Review Your Order</h2>
                 </div>
@@ -655,12 +663,12 @@ export default function CheckoutPage() {
                 </div>
 
                 {/* Action Button */}
-                <div className="mt-8 pt-6 border-t border-stone-200 flex justify-end">
+                <div className="mt-8 pt-6 border-t border-black/5 flex justify-end">
                   <button
                     onClick={handleNextStep}
-                    className="bg-[#FE5733] hover:bg-[#e04825] text-white rounded-[4px] font-bold h-12 px-12 text-sm tracking-wider uppercase flex items-center gap-2 transition-all cursor-pointer shadow-md hover:shadow-lg"
+                    className="bg-[#FE5733] hover:bg-[#e04825] text-white rounded-[4px] font-black h-14 px-14 text-base tracking-wider uppercase flex items-center gap-3 transition-all cursor-pointer shadow-lg hover:shadow-xl transform hover:-translate-y-0.5"
                   >
-                    Proceed to Payment <ChevronRight className="w-4 h-4" />
+                    Proceed to Payment <ChevronRight className="w-5 h-5" />
                   </button>
                 </div>
               </div>
@@ -688,7 +696,7 @@ export default function CheckoutPage() {
                   {/* eSewa */}
                   <button
                     onClick={() => setPaymentMethod('esewa')}
-                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'esewa' ? 'border-green-500 bg-green-50/10' : 'border-stone-200 hover:border-stone-300'}`}
+                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'esewa' ? 'border-green-500 bg-green-50 shadow-md scale-[1.02]' : 'border-black/10 hover:border-black/20 hover:bg-stone-50'}`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="text-xs font-extrabold text-[#121212]">eSewa</span>
@@ -705,7 +713,7 @@ export default function CheckoutPage() {
                   {/* Khalti */}
                   <button
                     onClick={() => setPaymentMethod('khalti')}
-                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'khalti' ? 'border-purple-600 bg-purple-50/10' : 'border-stone-200 hover:border-stone-300'}`}
+                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'khalti' ? 'border-purple-600 bg-purple-50 shadow-md scale-[1.02]' : 'border-black/10 hover:border-black/20 hover:bg-stone-50'}`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="text-xs font-extrabold text-[#121212]">Khalti</span>
@@ -722,7 +730,7 @@ export default function CheckoutPage() {
                   {/* COD */}
                   <button
                     onClick={() => setPaymentMethod('cash_on_delivery')}
-                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'cash_on_delivery' ? 'border-[#FE5733] bg-[#FE5733]/5' : 'border-stone-200 hover:border-stone-300'}`}
+                    className={`p-4 border-2 rounded-[4px] text-left transition-all relative flex flex-col justify-between h-24 cursor-pointer outline-hidden ${paymentMethod === 'cash_on_delivery' ? 'border-[#FE5733] bg-[#FE5733]/5 shadow-md scale-[1.02]' : 'border-black/10 hover:border-black/20 hover:bg-stone-50'}`}
                   >
                     <div className="flex items-center justify-between w-full">
                       <span className="text-xs font-extrabold text-[#121212]">Cash on Delivery</span>
@@ -797,7 +805,7 @@ export default function CheckoutPage() {
                           placeholder="e.g. 000ABC123456"
                           value={paymentTxnId}
                           onChange={(e) => setPaymentTxnId(e.target.value)}
-                          className="w-full h-11 bg-white border border-stone-200 rounded-[4px] px-4 text-xs font-mono focus:outline-none focus:ring-1 focus:ring-[#FE5733] focus:border-[#FE5733]"
+                          className="w-full h-11 bg-white border border-stone-200 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] px-4 text-xs font-mono outline-none transition-all duration-200 ease-in-out"
                           required
                         />
                         <p className="text-[10px] text-stone-400 leading-relaxed font-medium">After paying exact Rs {grandTotal.toLocaleString()}, copy the Transaction ID from payment history details statement and paste it here.</p>
@@ -828,7 +836,7 @@ export default function CheckoutPage() {
                     <button
                       onClick={handlePlaceOrder}
                       disabled={orderSubmitting}
-                      className="w-full md:w-auto bg-[#FE5733] hover:bg-[#e04825] text-white font-bold rounded-[4px] h-12.5 px-10 text-xs tracking-wider uppercase flex items-center justify-center gap-1.3 transition-all cursor-pointer shadow-md shadow-[#FE5733]/10 disabled:opacity-50"
+                      className="w-full md:w-auto bg-[#FE5733] hover:bg-[#e04825] text-white font-black rounded-[4px] h-14 px-16 text-base tracking-wider uppercase flex items-center justify-center gap-3 transition-all cursor-pointer shadow-xl shadow-[#FE5733]/20 disabled:opacity-50 disabled:cursor-not-allowed transform hover:-translate-y-0.5 disabled:transform-none"
                     >
                       {orderSubmitting ? 'Placing Order...' : 'Confirm & Place Order'}
                     </button>

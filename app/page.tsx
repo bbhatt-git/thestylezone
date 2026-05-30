@@ -44,13 +44,13 @@ export default async function HomePage() {
         <HeroClient featuredProducts={featuredProducts} />
 
         {/* Bento Grid Categories */}
-        <section className="py-12 px-6 md:px-10 bg-[#F5F5F0]">
+        <section className="py-8 md:py-12 px-6 md:px-10 bg-[#F5F5F0]">
           <div className="max-w-[1560px] mx-auto">
-            <div className="mb-10">
+            <div className="mb-8 md:mb-10">
               <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
                 EXPLORE • COLLECTIONS
               </p>
-              <h2 className="text-3xl md:text-4xl font-black uppercase tracking-tighter text-[#121212] font-display">
+              <h2 className="text-2xl md:text-4xl font-black uppercase tracking-tighter text-[#121212] font-display">
                 Shop by <span className="text-[#FE5733]">Category.</span>
               </h2>
             </div>
@@ -65,6 +65,7 @@ export default async function HomePage() {
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
                   />
                   <div className="absolute inset-0 bg-[#121212]/50 transition-all duration-700 group-hover:bg-transparent" />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute inset-0 flex items-center justify-center">
                   <div className="w-0 h-full bg-gradient-to-r from-[#FE5733] via-[#ff6b4a] to-[#FE5733] transition-all duration-700 group-hover:w-full opacity-80" style={{ clipPath: 'polygon(0 0, 100% 0, 100% 100%, 0 100%)' }} />
@@ -89,6 +90,7 @@ export default async function HomePage() {
                     alt="Jackets" 
                     className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110 group-hover:rotate-2"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute inset-0 bg-[#121212]/0 group-hover:bg-[#121212]/70 transition-all duration-700" />
                 <div className="absolute inset-0 flex flex-col justify-center items-center p-6 text-center relative z-10">
@@ -120,6 +122,7 @@ export default async function HomePage() {
                     alt="T-Shirts" 
                     className="w-full h-full object-cover transition-all duration-700 group-hover:grayscale group-hover:brightness-75"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute inset-0 bg-[#FE5733]/0 group-hover:bg-[#FE5733]/20 transition-all duration-700" />
                 <div className="absolute inset-0 flex flex-col justify-center items-center p-6 text-center relative z-10">
@@ -144,6 +147,7 @@ export default async function HomePage() {
                     alt="Accessories" 
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-105"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute inset-0 bg-gradient-to-r from-[#121212]/0 via-[#121212]/60 to-[#121212]/0 transition-all duration-700" />
                 <div className="absolute inset-0 bg-gradient-to-br from-purple-500/0 via-pink-500/0 to-cyan-500/0 group-hover:from-purple-500/30 group-hover:via-pink-500/30 group-hover:to-cyan-500/30 transition-all duration-700" />
@@ -170,6 +174,7 @@ export default async function HomePage() {
                     alt="Pants" 
                     className="w-full h-full object-cover transition-all duration-700 group-hover:scale-110"
                   />
+                  <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
                 </div>
                 <div className="absolute inset-0 bg-[#121212]/0 group-hover:bg-[#121212]/60 transition-all duration-700" style={{
                   clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)'
