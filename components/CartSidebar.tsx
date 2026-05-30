@@ -19,18 +19,12 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     }
 
     return () => {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     };
   }, [isOpen]);
 
@@ -41,13 +35,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         <div 
           className="fixed inset-0 bg-black/50 z-[95] transition-opacity duration-300"
           onClick={onClose}
-          onWheel={(e) => e.stopPropagation()}
-          onTouchMove={(e) => e.stopPropagation()}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}
+         style={{ touchAction: 'pan-y' }}
+      >
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-stone-200 shrink-0">
           <div className="flex items-center gap-2">
@@ -65,7 +59,13 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4 overscroll-contain">
+        <div className="flex-1 overflow-y-auto overflow-x-hidden p-6 space-y-4"
+             style={{ 
+               WebkitOverflowScrolling: 'touch',
+               msOverflowStyle: 'none',
+               scrollbarWidth: 'auto'
+             }}
+        >
           {items.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-12 h-12 text-stone-300 mx-auto mb-4" />

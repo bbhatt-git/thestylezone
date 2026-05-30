@@ -28,18 +28,12 @@ export default function SearchOverlay({ isOpen, onClose, allProducts }: SearchOv
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
-      document.body.style.position = 'fixed';
-      document.body.style.width = '100%';
     } else {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     }
 
     return () => {
       document.body.style.overflow = '';
-      document.body.style.position = '';
-      document.body.style.width = '';
     };
   }, [isOpen]);
 
@@ -90,13 +84,13 @@ export default function SearchOverlay({ isOpen, onClose, allProducts }: SearchOv
       <div
         className="fixed inset-0 bg-black/60 z-[60] backdrop-blur-sm transition-opacity duration-300"
         onClick={onClose}
-        onWheel={(e) => e.stopPropagation()}
-        onTouchMove={(e) => e.stopPropagation()}
       />
 
       {/* Search overlay */}
       <div className="fixed inset-0 z-[70] flex items-start justify-center pt-20 md:pt-32 px-4">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[80vh]">
+        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[80vh]"
+             style={{ touchAction: 'pan-y' }}
+        >
           
           {/* Search input header */}
           <div className="p-6 border-b border-black/5 shrink-0">
@@ -120,7 +114,13 @@ export default function SearchOverlay({ isOpen, onClose, allProducts }: SearchOv
           </div>
 
           {/* Search results */}
-          <div className="flex-1 overflow-y-auto overscroll-contain">
+          <div className="flex-1 overflow-y-auto"
+               style={{ 
+                 WebkitOverflowScrolling: 'touch',
+                 msOverflowStyle: 'none',
+                 scrollbarWidth: 'auto'
+               }}
+          >
             {!searchQuery ? (
               <>
                 {/* Trending Searches */}
