@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
-import { ShoppingBag, Heart, Menu, X, Search } from 'lucide-react';
+import { ShoppingBag, Heart, Menu, X } from 'lucide-react';
 import CartSidebar from '@/components/CartSidebar';
 
 export default function Navbar() {
@@ -99,18 +99,6 @@ export default function Navbar() {
         {/* Right: Icons */}
         <div className="flex items-center justify-end gap-4">
           <Link 
-            href="/shop" 
-            className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 ${
-              pathname === '/shop' 
-                ? 'text-red-600 bg-red-50' 
-                : 'text-[#121212] hover:text-red-600'
-            }`} 
-            aria-label="Search Products"
-          >
-            <Search className={`w-5 h-5 stroke-[2] transition-all duration-300 ${pathname === '/shop' ? 'scale-110' : 'group-hover:scale-110'}`} />
-          </Link>
-
-          <Link 
             href="/wishlist" 
             className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 ${
               isActive('/wishlist') 
@@ -129,7 +117,7 @@ export default function Navbar() {
 
           <button
             onClick={() => setIsCartOpen(true)}
-            className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 ${
+            className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 hidden md:flex ${
               isCartOpen
                 ? 'text-red-600 bg-red-50'
                 : 'text-[#121212] hover:text-red-600'

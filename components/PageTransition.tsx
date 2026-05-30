@@ -27,6 +27,12 @@ export default function PageTransition({ children }: PageTransitionProps) {
       return;
     }
 
+    // Skip animation for order success page
+    if (pathname === '/checkout/success' || pathname.includes('/checkout/success')) {
+      previousPathname.current = pathname;
+      return;
+    }
+
     // Only animate on route changes
     const ctx = gsap.context(() => {
       const tl = gsap.timeline({

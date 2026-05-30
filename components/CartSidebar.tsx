@@ -39,7 +39,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-[55] transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 z-[95] transition-opacity duration-300"
           onClick={onClose}
           onWheel={(e) => e.stopPropagation()}
           onTouchMove={(e) => e.stopPropagation()}
@@ -47,7 +47,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
       )}
 
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[100] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         {/* Header */}
         <div className="flex items-center justify-between p-6 border-b border-stone-200 shrink-0">
           <div className="flex items-center gap-2">
