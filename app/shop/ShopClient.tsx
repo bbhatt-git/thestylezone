@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useTransition, useMemo } from 'react';
 import ProductCard from '@/components/ProductCard';
 import PriceSliderClient from '@/components/PriceSliderClient';
+import SearchOverlay from '@/components/SearchOverlay';
 import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 
 interface Product {
@@ -53,6 +54,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
   const productsPerPage = 12;
   
   // Simulated loading state for the skeleton shimmer effect during filtering
@@ -234,14 +236,21 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
         <div className="space-y-2">
           <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Search Keywords</label>
           <div className="relative">
-            <input 
-              type="text"
-              placeholder="e.g. Hoodie, Dress, Jacket..."
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              className="w-full text-xs h-10 bg-stone-50 border border-stone-300 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] pl-10 pr-4 outline-none text-[#121212] placeholder:text-stone-400 font-medium transition-all duration-200 ease-in-out"
-            />
-            <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3" />
+            <div 
+              className="cursor-pointer"
+              onClick={() => setIsSearchOpen(true)}
+            >
+              <input 
+                type="text"
+                placeholder="e.g. Hoodie, Dress, Jacket..."
+                value={searchTerm}
+                onChange={(e) => setSearchTerm(e.target.value)}
+                onFocus={() => setIsSearchOpen(true)}
+                className="w-full text-xs h-10 bg-stone-50 border border-stone-300 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] pl-10 pr-4 outline-none text-[#121212] placeholder:text-stone-400 font-medium transition-all duration-200 ease-in-out cursor-pointer"
+                readOnly
+              />
+              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3 pointer-events-none" />
+            </div>
           </div>
         </div>
 
@@ -448,6 +457,12 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
         )}
 
       </div>
+
+      <SearchOverlay 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)}
+        allProducts={initialProducts}
+      />
     </div>
   );
 }

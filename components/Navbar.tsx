@@ -5,7 +5,7 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
-import { ShoppingBag, Heart, Menu, X } from 'lucide-react';
+import { ShoppingBag, Heart, Menu, X, Search } from 'lucide-react';
 import CartSidebar from '@/components/CartSidebar';
 
 export default function Navbar() {
@@ -35,7 +35,7 @@ export default function Navbar() {
   ];
 
   return (
-    <header className="sticky top-0 z-50 w-full bg-white/80 backdrop-blur-md border-b border-gray-100 shadow-sm dark:bg-zinc-900/80">
+    <header className="sticky top-0 z-50 w-full bg-white border-b border-[#121212]/10 shadow-sm">
       <nav className="max-w-[1560px] mx-auto px-6 md:px-10 h-16 grid grid-cols-3 items-center">
         
         {/* Left: Mobile Menu Toggle / Desktop Links */}
@@ -98,6 +98,18 @@ export default function Navbar() {
 
         {/* Right: Icons */}
         <div className="flex items-center justify-end gap-4">
+          <Link 
+            href="/shop" 
+            className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 ${
+              pathname === '/shop' 
+                ? 'text-red-600 bg-red-50' 
+                : 'text-[#121212] hover:text-red-600'
+            }`} 
+            aria-label="Search Products"
+          >
+            <Search className={`w-5 h-5 stroke-[2] transition-all duration-300 ${pathname === '/shop' ? 'scale-110' : 'group-hover:scale-110'}`} />
+          </Link>
+
           <Link 
             href="/wishlist" 
             className={`relative group flex items-center p-2 -mr-2 md:mr-0 rounded-sm transition-all duration-300 ${

@@ -2,6 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import SearchOverlay from '@/components/SearchOverlay';
 
 interface Product {
   id: string;
@@ -33,6 +34,7 @@ export default function HeroClient({ featuredProducts }: HeroClientProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [searchQuery, setSearchQuery] = useState('');
   const [isAnimating, setIsAnimating] = useState(false);
+  const [isSearchOpen, setIsSearchOpen] = useState(false);
 
   // Auto-scroll functionality
   useEffect(() => {
@@ -79,19 +81,32 @@ export default function HeroClient({ featuredProducts }: HeroClientProps) {
             </p>
 
             <div className="relative max-w-md">
-              <input
-                type="search"
-                placeholder="Search products..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="h-14 w-full rounded-sm border border-stone-300 bg-white pe-24 pl-12 text-sm text-[#121212] placeholder:text-stone-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 outline-none transition-all duration-200 ease-in-out"
-              />
-              <svg className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
+              <div 
+                className="cursor-pointer"
+                onClick={() => setIsSearchOpen(true)}
+              >
+                <input
+                  type="search"
+                  placeholder="Search products..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onFocus={() => setIsSearchOpen(true)}
+                  className="h-14 w-full rounded-sm border border-stone-300 bg-white pe-24 pl-12 text-sm text-[#121212] placeholder:text-stone-400 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 outline-none transition-all duration-200 ease-in-out cursor-pointer"
+                  readOnly
+                />
+                <svg className="absolute left-4 top-1/2 size-5 -translate-y-1/2 text-stone-400 pointer-events-none" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                </svg>
+              </div>
               <Link 
                 href={`/shop?search=${encodeURIComponent(searchQuery)}`}
                 className="absolute end-2 top-1/2 -translate-y-1/2 inline-flex cursor-pointer items-center justify-center rounded-sm bg-[#121212] px-6 py-2 text-xs font-bold uppercase tracking-widest text-white hover:bg-[#FE5733] transition-colors h-10 whitespace-nowrap"
+                onClick={(e) => {
+                  e.stopPropagation();
+                  if (searchQuery) {
+                    setIsSearchOpen(false);
+                  }
+                }}
               >
                 Search
               </Link>
@@ -209,6 +224,12 @@ export default function HeroClient({ featuredProducts }: HeroClientProps) {
 
         </div>
       </div>
+
+      <SearchOverlay 
+        isOpen={isSearchOpen} 
+        onClose={() => setIsSearchOpen(false)}
+        allProducts={featuredProducts}
+      />
     </section>
   );
 }

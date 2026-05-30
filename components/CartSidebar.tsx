@@ -1,6 +1,6 @@
 'use client';
 
-import React from 'react';
+import React, { useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
 import { X, ShoppingBag, Trash2, Plus, Minus, ArrowRight } from 'lucide-react';
@@ -15,20 +15,41 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const totalPrice = getTotalPrice();
   const totalItems = getTotalItems();
 
+  // Lock body scroll when cart is open
+  useEffect(() => {
+    if (isOpen) {
+      document.body.style.overflow = 'hidden';
+      document.body.style.position = 'fixed';
+      document.body.style.width = '100%';
+    } else {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    }
+
+    return () => {
+      document.body.style.overflow = '';
+      document.body.style.position = '';
+      document.body.style.width = '';
+    };
+  }, [isOpen]);
+
   return (
     <>
       {/* Overlay */}
       {isOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-50 transition-opacity duration-300"
+          className="fixed inset-0 bg-black/50 z-[55] transition-opacity duration-300"
           onClick={onClose}
+          onWheel={(e) => e.stopPropagation()}
+          onTouchMove={(e) => e.stopPropagation()}
         />
       )}
 
       {/* Sidebar */}
-      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-50 transform transition-transform duration-300 ease-in-out ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
+      <div className={`fixed top-0 right-0 h-full w-full max-w-md bg-white shadow-2xl z-[60] transform transition-transform duration-300 ease-in-out flex flex-col ${isOpen ? 'translate-x-0' : 'translate-x-full'}`}>
         {/* Header */}
-        <div className="flex items-center justify-between p-6 border-b border-black/5">
+        <div className="flex items-center justify-between p-6 border-b border-stone-200 shrink-0">
           <div className="flex items-center gap-2">
             <ShoppingBag className="w-5 h-5 text-[#FE5733]" />
             <h2 className="text-lg font-bold text-[#121212] uppercase tracking-wider">Your Bag</h2>
@@ -44,7 +65,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         </div>
 
         {/* Cart Items */}
-        <div className="flex-1 overflow-y-auto p-6 space-y-4">
+        <div className="flex-1 overflow-y-auto p-6 space-y-4 overscroll-contain">
           {items.length === 0 ? (
             <div className="text-center py-12">
               <ShoppingBag className="w-12 h-12 text-stone-300 mx-auto mb-4" />
@@ -59,8 +80,8 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
             </div>
           ) : (
             items.map((item) => (
-              <div key={item.variantId} className="flex gap-4 p-4 bg-stone-50 rounded-[4px] border border-black/5">
-                <div className="w-20 h-24 bg-white rounded-[4px] overflow-hidden shrink-0 border border-black/5">
+              <div key={item.variantId} className="flex gap-4 p-4 bg-stone-50 rounded-[4px] border border-stone-200">
+                <div className="w-20 h-24 bg-white rounded-[4px] overflow-hidden shrink-0 border border-stone-200">
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img src={item.imageUrl} alt={item.name} className="w-full h-full object-cover" />
                 </div>
@@ -71,7 +92,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
                   
                   {/* Quantity Controls */}
                   <div className="flex items-center gap-2 mt-3">
-                    <div className="flex items-center border border-black/10 rounded-[4px] bg-white">
+                    <div className="flex items-center border border-stone-200 rounded-[4px] bg-white">
                       <button
                         onClick={() => updateQuantity(item.productId, item.variantId, item.quantity - 1)}
                         disabled={item.quantity <= 1}
@@ -105,7 +126,7 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
 
         {/* Footer */}
         {items.length > 0 && (
-          <div className="border-t border-black/5 p-6 space-y-4 bg-white shadow-[0_-4px_20px_rgba(0,0,0,0.05)]">
+          <div className="border-t border-stone-200 p-6 space-y-4 shrink-0">
             <div className="flex justify-between text-sm">
               <span className="text-stone-600">Subtotal</span>
               <span className="font-bold text-[#121212]">Rs {totalPrice.toLocaleString()}</span>
