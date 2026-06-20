@@ -177,17 +177,26 @@ export interface DbData {
 
 // In-memory runtime data for non-WooCommerce synced entities (cart fallback, temporary states)
 // This strictly avoids mock seed data or local JSON files.
-const memoryData: DbData = {
-  products: [],
-  categories: [],
-  variants: [],
-  orders: [],
-  orderItems: [],
-  notifications: [],
-  coupons: [],
-  paymentQrConfigs: [],
-  reviews: []
-};
+const globalDb = globalThis as unknown as { __TSZ_DB__: DbData; __TSZ_CACHE__: { timestamp: number; data: DbData | null } };
+
+if (!globalDb.__TSZ_DB__) {
+  globalDb.__TSZ_DB__ = {
+    products: [],
+    categories: [],
+    variants: [],
+    orders: [],
+    orderItems: [],
+    notifications: [],
+    coupons: [],
+    paymentQrConfigs: [],
+    reviews: []
+  };
+}
+if (!globalDb.__TSZ_CACHE__) {
+  globalDb.__TSZ_CACHE__ = { timestamp: 0, data: null };
+}
+
+const memoryData: DbData = globalDb.__TSZ_DB__;
 
 export function generateId(): string {
   return 'id_' + Math.random().toString(36).substring(2, 11) + Date.now().toString(36);
@@ -213,6 +222,18 @@ export async function readDb(): Promise<DbData> {
   }
 
   try {
+    const CACHE_TTL = 60 * 1000 * 5; // 5 minutes cache
+    const now = Date.now();
+    
+    // Use cache if available and fresh
+    if (globalDb.__TSZ_CACHE__.data && (now - globalDb.__TSZ_CACHE__.timestamp < CACHE_TTL)) {
+      const cached = globalDb.__TSZ_CACHE__.data;
+      db.products = cached.products;
+      db.categories = cached.categories;
+      db.variants = cached.variants;
+      return db;
+    }
+
     const api = getWooCommerce();
     
     // Use Promise.allSettled to prevent AggregateError when WooCommerce is unreachable
@@ -381,9 +402,26 @@ export async function readDb(): Promise<DbData> {
       console.warn('WooCommerce products fetch failed:', productsResult.reason?.message || productsResult.reason);
     }
 
+    // Save to cache
+    globalDb.__TSZ_CACHE__ = {
+      timestamp: Date.now(),
+      data: {
+        ...db,
+        products: db.products,
+        categories: db.categories,
+        variants: db.variants
+      }
+    };
+
   } catch (err) {
     console.error('WooCommerce REST sync failed:', err);
-    console.warn('Returning empty database state due to API unavailability.');
+    console.warn('Returning cached database state due to API unavailability.');
+    if (globalDb.__TSZ_CACHE__.data) {
+      const cached = globalDb.__TSZ_CACHE__.data;
+      db.products = cached.products;
+      db.categories = cached.categories;
+      db.variants = cached.variants;
+    }
   }
 
   return db;

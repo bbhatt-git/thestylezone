@@ -33,6 +33,11 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
   const addItem = useCart(state => state.addItem);
   const { toggleWishlist, hasItem } = useWishlist();
   const isLiked = hasItem(product.id);
+  const [isMounted, setIsMounted] = useState(false);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   // Group unique colors from variants
   const uniqueColorsMap: { [key: string]: string } = {};
@@ -115,9 +120,9 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
     <div className="space-y-6">
       
       {/* 1. PRICE METRICS AREA */}
-      <div className="space-y-2 bg-zinc-50 border border-zinc-100 rounded-3xl p-6 mb-8">
+      <div className="space-y-2 bg-stone-50 border border-stone-100 rounded-xl p-6 mb-8">
         <div className="flex flex-wrap items-center gap-3">
-          <span className="text-4xl font-black text-zinc-950 tracking-tight">
+          <span className="text-4xl font-black text-stone-950 tracking-tight">
             Rs {currentUnitPrice.toLocaleString()}
           </span>
           {currentOriginalPrice && (
@@ -141,8 +146,8 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
       {/* 2. COLOR PICKER */}
       {uniqueColors.length > 0 && (
         <div className="space-y-2.5">
-          <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
-            <span>Color: <strong className="text-zinc-900 font-extrabold font-sans">{selectedColor}</strong></span>
+          <label className="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center justify-between">
+            <span>Color: <strong className="text-stone-900 font-extrabold font-sans">{selectedColor}</strong></span>
           </label>
           <div className="flex gap-2">
             {uniqueColors.map((color) => {
@@ -153,7 +158,7 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
                 <button
                   key={color.name}
                   onClick={() => setSelectedColor(color.name)}
-                  className={`w-8 h-8 rounded-full border border-zinc-300 outline-hidden transition-all cursor-pointer ${borderStyles}`}
+                  className={`w-8 h-8 rounded-full border border-stone-300 outline-hidden transition-all cursor-pointer ${borderStyles}`}
                   style={{ backgroundColor: `#${color.hex}` }}
                   title={color.name}
                   aria-label={`Select color ${color.name}`}
@@ -166,10 +171,10 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
 
       {/* 3. SIZE SELECTOR WITH INVENTORY CHECKS */}
       <div className="space-y-2.5">
-        <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider flex items-center justify-between">
-          <span>Size Option: <strong className="text-zinc-900 font-extrabold font-sans">{selectedSize}</strong></span>
+        <label className="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center justify-between">
+          <span>Size Option: <strong className="text-stone-900 font-extrabold font-sans">{selectedSize}</strong></span>
           {activeVariant && (
-            <span className={`text-[10px] font-bold ${maxStockLimit > 3 ? 'text-zinc-400' : 'text-red-500 font-extrabold'}`}>
+            <span className={`text-[10px] font-bold ${maxStockLimit > 3 ? 'text-stone-400' : 'text-red-500 font-extrabold'}`}>
               {maxStockLimit > 0 ? `Stock Left: ${maxStockLimit}` : 'Out of Stock'}
             </span>
           )}
@@ -181,14 +186,14 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
             const sizeInStock = vOpt && vOpt.stock > 0;
             const isSelected = selectedSize === size;
             
-            let btnClass = 'border-zinc-200 text-zinc-800 bg-white hover:border-zinc-400';
+            let btnClass = 'border-stone-200 text-stone-800 bg-white hover:border-stone-400';
             if (isSelected) {
-              btnClass = 'bg-zinc-900 text-white border-zinc-900 font-bold';
+              btnClass = 'bg-stone-900 text-white border-stone-900 font-bold';
             } else if (!vOpt) {
                 // Size doesn't exist for this color
                 btnClass = 'hidden';
             } else if (!sizeInStock) {
-              btnClass = 'opacity-30 border-dashed border-zinc-200 text-zinc-300 pointer-events-none cursor-not-allowed';
+              btnClass = 'opacity-30 border-dashed border-stone-200 text-stone-300 pointer-events-none cursor-not-allowed';
             }
             
             if (!vOpt) return null;
@@ -198,7 +203,7 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
                 key={size}
                 disabled={!sizeInStock}
                 onClick={() => setSelectedSize(size)}
-                className={`text-xs font-heavy tracking-wider h-11 px-4 sm:px-6 rounded-full border transition-all cursor-pointer flex items-center justify-center min-w-14 sm:min-w-16 ${btnClass}`}
+                className={`text-xs font-heavy tracking-wider h-11 px-4 sm:px-6 rounded-xl border transition-all cursor-pointer flex items-center justify-center min-w-14 sm:min-w-16 ${btnClass}`}
               >
                 {size}
               </button>
@@ -210,23 +215,23 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
       {/* 4. QUANTITY CONTROLLER STEPPER */}
       {maxStockLimit > 0 && (
         <div className="space-y-2.5">
-          <label className="text-xs font-bold text-zinc-500 uppercase tracking-wider block">Quantity Selection</label>
-          <div className="flex items-center border border-zinc-200 rounded-full w-fit bg-zinc-50 p-1 shadow-xs">
+          <label className="text-xs font-bold text-stone-500 uppercase tracking-wider block">Quantity Selection</label>
+          <div className="flex items-center border border-stone-200 rounded-full w-fit bg-stone-50 p-1 shadow-xs">
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); setQuantity(prev => Math.max(1, prev - 1)); }}
               disabled={quantity <= 1}
-              className="w-8 h-8 rounded-full bg-white hover:bg-zinc-200 border border-zinc-200 flex items-center justify-center text-zinc-700 transition-colors disabled:opacity-30 cursor-pointer"
+              className="w-8 h-8 rounded-full bg-white hover:bg-stone-200 border border-stone-200 flex items-center justify-center text-stone-700 transition-colors disabled:opacity-30 cursor-pointer"
               aria-label="Reduce quantity"
             >
               <Minus className="w-4 h-4" />
             </button>
-            <span className="w-12 text-center text-sm font-bold font-sans text-zinc-900">{quantity}</span>
+            <span className="w-12 text-center text-sm font-bold font-sans text-stone-900">{quantity}</span>
             <button
               type="button"
               onClick={(e) => { e.preventDefault(); setQuantity(prev => Math.min(maxStockLimit, prev + 1)); }}
               disabled={quantity >= maxStockLimit}
-              className="w-8 h-8 rounded-full bg-white hover:bg-zinc-200 border border-zinc-200 flex items-center justify-center text-zinc-700 transition-colors disabled:opacity-30 cursor-pointer"
+              className="w-8 h-8 rounded-full bg-white hover:bg-stone-200 border border-stone-200 flex items-center justify-center text-stone-700 transition-colors disabled:opacity-30 cursor-pointer"
               aria-label="Increase quantity"
             >
               <Plus className="w-4 h-4" />
@@ -240,18 +245,18 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
         {maxStockLimit <= 0 ? (
           <button
             disabled
-            className="flex-1 bg-zinc-200 text-zinc-400 h-12 rounded-full text-xs font-black uppercase tracking-wider cursor-not-allowed"
+            className="flex-1 bg-stone-200 text-stone-400 h-12 rounded-full text-xs font-black uppercase tracking-wider cursor-not-allowed"
           >
             Out of Stock
           </button>
         ) : (
           <button
             onClick={handleAddToCart}
-            className={`flex-1 ${added ? 'bg-zinc-700' : 'bg-zinc-900 hover:bg-black'} text-white h-12 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-300 shadow-xl cursor-pointer px-3 sm:px-6`}
+            className={`flex-1 ${added ? 'bg-stone-700' : 'bg-stone-900 hover:bg-black'} text-white h-12 rounded-full text-[11px] sm:text-xs font-black uppercase tracking-widest flex items-center justify-center gap-1.5 sm:gap-2 transition-all duration-300 shadow-xl cursor-pointer px-3 sm:px-6`}
           >
             {added ? (
               <>
-                <Check className="w-4 h-4 animate-bounce shrink-0" /> Added!
+                <Check className="w-4 h-4 shrink-0" /> Added!
               </>
             ) : (
               <>
@@ -265,26 +270,26 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
           {/* Heart Wishlist Toggler */}
           <button
             onClick={() => toggleWishlist(product.id)}
-            className="w-12 h-12 rounded-full border border-zinc-200 hover:border-zinc-400 bg-white shadow-xs flex items-center justify-center transition-all cursor-pointer shrink-0"
-            aria-label={isLiked ? "Remove from wishlist" : "Add to wishlist"}
+            className="w-12 h-12 rounded-full border border-stone-200 hover:border-stone-400 bg-white shadow-xs flex items-center justify-center transition-all cursor-pointer shrink-0"
+            aria-label={isMounted && isLiked ? "Remove from wishlist" : "Add to wishlist"}
           >
-            <Heart className={`w-5 h-5 ${isLiked ? 'fill-red-500 text-red-500 scale-105' : 'text-zinc-500'}`} />
+            <Heart className={`w-5 h-5 ${isMounted && isLiked ? 'fill-red-500 text-red-500 scale-105' : 'text-stone-500'}`} />
           </button>
 
           {/* Share Button */}
           <button
             onClick={handleShareClick}
-            className="w-12 h-12 rounded-full border border-zinc-200 hover:border-zinc-400 bg-white shadow-xs flex items-center justify-center transition-all cursor-pointer relative shrink-0"
+            className="w-12 h-12 rounded-full border border-stone-200 hover:border-stone-400 bg-white shadow-xs flex items-center justify-center transition-all cursor-pointer relative shrink-0"
             aria-label="Share style"
           >
             {copiedShare ? (
-              <Check className="w-5 h-5 text-green-500 animate-pulse" />
+              <Check className="w-5 h-5 text-green-500" />
             ) : (
-              <Share2 className="w-5 h-5 text-zinc-500" />
+              <Share2 className="w-5 h-5 text-stone-500" />
             )}
             
             {copiedShare && (
-              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-zinc-900 text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap animate-bounce">
+              <span className="absolute bottom-full left-1/2 transform -translate-x-1/2 mb-2 bg-stone-900 text-white text-[9px] font-bold px-2 py-1 rounded shadow-md whitespace-nowrap">
                 Link Copied!
               </span>
             )}

@@ -18,7 +18,7 @@ export default function PrivacyPage() {
           
           {/* Header Section */}
           <div className="max-w-2xl mx-auto mb-16 animate-on-scroll text-center">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
               THE STYLE ZONE • PRIVACY
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
@@ -28,7 +28,7 @@ export default function PrivacyPage() {
               Your privacy matters. We&apos;re committed to protecting your personal information and being transparent about how we use it.
             </p>
             <div className="mt-6 pt-6 border-t border-[#121212]/10">
-              <p className="text-xs text-[#121212]/50 font-mono">Last Updated: May 29, 2026</p>
+              <p className="text-xs text-[#121212]/50 ">Last Updated: May 29, 2026</p>
             </div>
           </div>
 

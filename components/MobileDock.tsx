@@ -12,8 +12,13 @@ import CartSidebar from '@/components/CartSidebar';
 export default function MobileDock() {
   const pathname = usePathname();
   const [isCartOpen, setIsCartOpen] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);
   const totalCartItems = useCart((state) => state.getTotalItems());
   const totalWishItems = useWishlist((state) => state.itemIds.length);
+
+  useEffect(() => {
+    setIsMounted(true);
+  }, []);
 
   const navItems = [
     { label: 'Home', path: '/', icon: Home },
@@ -61,8 +66,8 @@ export default function MobileDock() {
                   />
                   
                   {/* Badge count */}
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
+                  {isMounted && item.badge !== undefined && item.badge > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold  h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
                       {item.badge}
                     </span>
                   )}
@@ -100,8 +105,8 @@ export default function MobileDock() {
                   />
                   
                   {/* Badge count */}
-                  {item.badge !== undefined && item.badge > 0 && (
-                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold font-mono h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
+                  {isMounted && item.badge !== undefined && item.badge > 0 && (
+                    <span className="absolute -top-1 -right-2 bg-[#FE5733] text-white text-[8px] font-bold  h-4 min-w-[16px] px-1 rounded-full flex items-center justify-center border border-[#121212]">
                       {item.badge}
                     </span>
                   )}

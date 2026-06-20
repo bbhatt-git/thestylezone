@@ -3,8 +3,8 @@
 import React, { useState, useEffect, useTransition, useMemo } from 'react';
 import ProductCard from '@/components/ProductCard';
 import PriceSliderClient from '@/components/PriceSliderClient';
-import SearchOverlay from '@/components/SearchOverlay';
 import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
+import { useRouter } from 'next/navigation';
 
 interface Product {
   id: string;
@@ -54,32 +54,21 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   const [isMobileFilterOpen, setIsMobileFilterOpen] = useState(false);
   const [isSortDropdownOpen, setIsSortDropdownOpen] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
-  const [isSearchOpen, setIsSearchOpen] = useState(false);
+  const router = useRouter();
   const productsPerPage = 12;
   
   // Simulated loading state for the skeleton shimmer effect during filtering
   const [isPending, startTransition] = useTransition();
   const [isFiltering, setIsFiltering] = useState(false);
 
-  // Simulate shimmer loading on filter/search updates
+  // Update filtering state immediately
   useEffect(() => {
-    let active = true;
-    Promise.resolve().then(() => {
-      if (active) {
-        setIsFiltering(true);
-      }
-    });
-
+    setIsFiltering(true);
     const timer = setTimeout(() => {
-      if (active) {
-        setIsFiltering(false);
-      }
-    }, 450);
+      setIsFiltering(false);
+    }, 50); // minimal delay just to show reaction
 
-    return () => {
-      active = false;
-      clearTimeout(timer);
-    };
+    return () => clearTimeout(timer);
   }, [searchTerm, selectedCategory, selectedSize, selectedColor, minPrice, maxPrice, sortBy]);
 
   // Close sort dropdown when clicking outside
@@ -157,10 +146,10 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
       
       {/* Mobile Filter and Sort Bar */}
-      <div className="lg:hidden flex items-center gap-2 bg-white p-3 rounded-[4px] border border-[#121212]/5 shadow-sm">
+      <div className="lg:hidden flex items-center gap-2 bg-white p-3 border-2 border-black">
         <button 
           onClick={() => setIsMobileFilterOpen(true)}
-          className="flex items-center justify-center gap-2 text-xs font-bold uppercase tracking-wider bg-[#121212] text-white px-3 py-2 rounded-sm hover:bg-[#FE5733] transition-colors flex-1 whitespace-nowrap"
+          className="btn btn-primary flex items-center justify-center gap-2 text-xs uppercase tracking-widest flex-1 whitespace-nowrap"
         >
           <SlidersHorizontal className="w-4 h-4" />
           Filter
@@ -168,7 +157,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
         <div className="relative flex-1">
           <button 
             onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-            className="sort-dropdown-button w-full flex items-center justify-between gap-2 text-xs font-bold uppercase tracking-wider bg-[#F5F5F0]/50 border border-[#121212]/10 px-3 py-2 rounded-sm hover:border-[#FE5733] transition-colors text-[#121212] whitespace-nowrap"
+            className="btn btn-ghost sort-dropdown-button w-full flex items-center justify-between gap-2 text-xs uppercase tracking-widest whitespace-nowrap"
           >
             <span className="truncate">
               {sortBy === 'latest' && 'New'}
@@ -179,7 +168,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             <ChevronDown className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
           {isSortDropdownOpen && (
-            <div className="sort-dropdown absolute top-full left-0 right-0 mt-1 bg-white border border-[#121212]/10 rounded-sm shadow-lg z-50">
+            <div className="sort-dropdown absolute top-full left-0 right-0 mt-1 bg-white border-2 border-black shadow-2xl z-50">
               {[
                 { value: 'latest', label: 'New' },
                 { value: 'price-low', label: 'Price: Low' },
@@ -192,8 +181,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
                     setSortBy(option.value);
                     setIsSortDropdownOpen(false);
                   }}
-                  className={`w-full text-left text-xs font-bold uppercase tracking-wider px-3 py-2 hover:bg-[#F5F5F0]/50 transition-colors whitespace-nowrap ${
-                    sortBy === option.value ? 'text-[#FE5733]' : 'text-[#121212]'
+                  className={`w-full text-left text-xs font-bold uppercase tracking-widest px-4 py-3 hover:bg-black hover:text-white transition-colors whitespace-nowrap ${
+                    sortBy === option.value ? 'bg-black text-white' : 'text-black'
                   }`}
                 >
                   {option.label}
@@ -213,16 +202,16 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
       )}
 
       <div className={`
-        fixed top-0 bottom-0 left-0 z-[70] w-4/5 max-w-[320px] bg-white overflow-y-auto shadow-2xl p-6 pt-20
+        fixed top-0 bottom-0 left-0 z-[70] w-4/5 max-w-[320px] bg-white overflow-y-auto shadow-2xl p-4 pt-16
         transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
-        lg:static lg:translate-x-0 lg:w-full lg:max-w-none lg:h-auto lg:overflow-visible lg:shadow-sm lg:p-6 lg:pt-6 lg:rounded-[4px] lg:border lg:border-[#121212]/5 lg:bg-white lg:z-0
-        lg:col-span-3 space-y-8
+        lg:static lg:translate-x-0 lg:w-full lg:max-w-none lg:h-auto lg:overflow-visible lg:shadow-none lg:p-8 lg:pt-8 lg:border-2 lg:border-black lg:bg-white lg:z-0
+        lg:col-span-3 space-y-10
         ${isMobileFilterOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between pb-4 border-b border-[#121212]/5">
+        <div className="flex items-center justify-between pb-2 border-b border-black/10">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-4 h-4 text-[#FE5733]" />
-            <h3 className="text-sm font-bold uppercase tracking-wider text-[#121212]">Filter Catalogs</h3>
+            <SlidersHorizontal className="w-4 h-4 text-black" />
+            <h3 className="text-xs font-semibold uppercase tracking-wide text-black">Filters</h3>
           </div>
           <button 
             className="lg:hidden p-2 -mr-2 text-stone-400 hover:text-[#121212] transition-colors"
@@ -234,38 +223,31 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Search */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Search Keywords</label>
+          <label className="text-[10px] font-semibold uppercase tracking-[0.25em] text-black/50">Search</label>
           <div className="relative">
-            <div 
-              className="cursor-pointer"
-              onClick={() => setIsSearchOpen(true)}
-            >
-              <input 
-                type="text"
-                placeholder="e.g. Hoodie, Dress, Jacket..."
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                onFocus={() => setIsSearchOpen(true)}
-                className="w-full text-xs h-10 bg-stone-50 border border-stone-300 focus:border-zinc-900 focus:ring-2 focus:ring-zinc-900 focus:ring-offset-2 rounded-[4px] pl-10 pr-4 outline-none text-[#121212] placeholder:text-stone-400 font-medium transition-all duration-200 ease-in-out cursor-pointer"
-                readOnly
-              />
-              <Search className="w-4 h-4 text-stone-400 absolute left-3.5 top-3 pointer-events-none" />
-            </div>
+            <Search className="w-4 h-4 text-black/40 absolute left-3 top-1/2 -translate-y-1/2" />
+            <input
+              type="text"
+              placeholder="Search"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
+              className="w-full h-10 pl-10 pr-3 text-xs bg-transparent border border-black/10 rounded-md text-black focus:border-black focus:ring-0 outline-none transition-all duration-200"
+            />
           </div>
         </div>
 
         {/* Categories */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Collection / Category</label>
+          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Collection</label>
           <div className="flex flex-wrap gap-1.5">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`text-[10px] font-bold uppercase tracking-wider px-3 py-2 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
+                className={`btn btn-sm h-8 text-xs uppercase tracking-wide transition-all whitespace-nowrap ${
                   selectedCategory === cat 
-                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
-                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
+                    ? 'bg-black border-black text-white' 
+                    : 'bg-white border-black/20 hover:border-black text-black'
                 }`}
               >
                 {cat}
@@ -276,16 +258,16 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Sizing */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Sizing Filter</label>
+          <label className="text-[10px] font-bold uppercase tracking-widest text-black/50">Sizing Filter</label>
           <div className="flex flex-wrap gap-1.5">
             {allSizes.map((sz) => (
               <button
                 key={sz}
                 onClick={() => setSelectedSize(sz)}
-                className={`min-w-10 h-10 text-[10px] font-bold tracking-wide rounded-sm transition-all border cursor-pointer ${
+                className={`btn btn-sm min-w-[48px] h-8 text-xs uppercase tracking-wide transition-all ${
                   selectedSize === sz 
-                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
-                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
+                    ? 'bg-black border-black text-white' 
+                    : 'bg-white border-black/20 hover:border-black text-black'
                 }`}
               >
                 {sz}
@@ -296,33 +278,44 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Colorway */}
         <div className="space-y-2">
-          <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Colorways</label>
+          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Colors</label>
           <div className="flex flex-wrap gap-1.5">
             {allColors.map((col) => (
               <button
                 key={col}
                 onClick={() => setSelectedColor(col)}
-                className={`text-[10px] font-bold tracking-wide px-3 py-2 rounded-sm transition-all border cursor-pointer whitespace-nowrap ${
-                  selectedColor === col 
-                    ? 'bg-zinc-900 border-zinc-900 text-white shadow-md scale-95' 
-                    : 'bg-white border-stone-300 hover:border-zinc-400 hover:text-zinc-900 text-stone-800 hover:scale-105 active:scale-95'
+                className={`flex items-center justify-center rounded-full w-8 h-8 border transition-all ${
+                  selectedColor === col
+                    ? 'border-black bg-black'
+                    : 'border-black/10 bg-white hover:border-black'
                 }`}
+                aria-label={col}
+                title={col}
               >
-                {col}
+                <span
+                  className="block w-4 h-4 rounded-full"
+                  style={{
+                    backgroundColor: col.toLowerCase(),
+                    boxShadow: col.toLowerCase() === 'white' ? '0 0 0 1px #000 inset' : undefined,
+                  }}
+                />
               </button>
             ))}
           </div>
         </div>
 
         {/* Price Slider */}
-        <PriceSliderClient 
-          min={0}
-          max={highestPriceInStore}
-          onChange={(min, max) => {
-            setMinPrice(min);
-            setMaxPrice(max);
-          }}
-        />
+        <div className="space-y-2">
+          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Price</label>
+          <PriceSliderClient 
+            min={0}
+            max={highestPriceInStore}
+            onChange={(min, max) => {
+              setMinPrice(min);
+              setMaxPrice(max);
+            }}
+          />
+        </div>
 
         <button 
           onClick={() => {
@@ -334,9 +327,9 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             setMaxPrice(highestPriceInStore);
             setSortBy('latest');
           }}
-          className="w-full text-center py-3 border border-[#FE5733]/20 text-[#FE5733] hover:bg-[#FE5733] hover:text-white transition-all duration-300 rounded-sm text-xs font-bold uppercase tracking-wider cursor-pointer whitespace-nowrap"
+          className="btn btn-ghost w-full text-xs uppercase tracking-[0.1em]"
         >
-          Reset All Filters
+          Reset All
         </button>
       </div>
 
@@ -344,8 +337,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
       <div className="lg:col-span-9 space-y-6">
         
         {/* Sorting and Layout Preferences */}
-        <div className="hidden lg:flex flex-col sm:flex-row justify-between items-center bg-white p-4 rounded-[4px] border border-[#121212]/5 shadow-sm gap-4">
-          <p className="text-xs font-mono font-bold text-[#121212]/60">
+        <div className="hidden lg:flex flex-col sm:flex-row justify-between items-center bg-transparent pb-4 border-b border-black/10 mb-6 gap-4">
+          <p className="text-[10px] font-black tracking-widest uppercase text-black/40">
             SHOWING {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, sortedProducts.length)} OF {sortedProducts.length} PRODUCTS
           </p>
 
@@ -354,13 +347,13 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             <div className="relative">
               <button 
                 onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                className="sort-dropdown-button flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-[#F5F5F0]/50 border border-[#121212]/10 px-3 py-2 rounded-sm hover:border-[#FE5733] transition-colors text-[#121212] whitespace-nowrap"
+                className="sort-dropdown-button flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide bg-white border border-black/10 px-4 py-2 hover:border-black transition-colors text-black whitespace-nowrap"
               >
                 Sort By
                 <ChevronDown className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSortDropdownOpen && (
-                <div className="sort-dropdown absolute top-full right-0 mt-1 bg-white border border-[#121212]/10 rounded-sm shadow-lg z-50 min-w-[180px]">
+                <div className="sort-dropdown absolute top-full right-0 mt-1 bg-white border-2 border-black shadow-2xl z-50 min-w-[180px]">
                   {[
                     { value: 'latest', label: 'New Arrivals' },
                     { value: 'price-low', label: 'Price: Low to High' },
@@ -373,8 +366,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
                         setSortBy(option.value);
                         setIsSortDropdownOpen(false);
                       }}
-                      className={`w-full text-left text-xs font-bold uppercase tracking-wider px-3 py-2 hover:bg-[#F5F5F0]/50 transition-colors whitespace-nowrap ${
-                        sortBy === option.value ? 'text-[#FE5733]' : 'text-[#121212]'
+                      className={`w-full text-left text-[10px] font-bold uppercase tracking-widest px-4 py-3 hover:bg-black hover:text-white transition-colors whitespace-nowrap ${
+                        sortBy === option.value ? 'bg-black text-white' : 'text-black'
                       }`}
                     >
                       {option.label}
@@ -423,23 +416,23 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="flex items-center justify-center gap-2">
+          <div className="flex flex-wrap items-center justify-center gap-2">
             <button
               onClick={handlePreviousPage}
               disabled={currentPage === 1}
-              className="px-4 py-2 text-xs font-bold uppercase tracking-wider border border-[#121212]/10 rounded-sm hover:bg-[#121212] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#121212] transition-colors whitespace-nowrap"
+              className="btn btn-ghost btn-sm px-4 py-2 text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Previous
             </button>
-            <div className="flex items-center gap-1">
+            <div className="flex flex-wrap items-center gap-1">
               {Array.from({ length: totalPages }, (_, i) => i + 1).map((page) => (
                 <button
                   key={page}
                   onClick={() => handlePageChange(page)}
-                  className={`w-10 h-10 text-xs font-bold uppercase tracking-wider rounded-sm transition-colors ${
+                  className={`btn btn-sm w-10 h-10 text-xs uppercase tracking-widest ${
                     currentPage === page
-                      ? 'bg-[#121212] text-white'
-                      : 'bg-[#F5F5F0]/50 text-[#121212] hover:bg-[#121212] hover:text-white'
+                      ? 'bg-[#121212] text-white border-[#121212]'
+                      : 'bg-[#F5F5F0]/50 text-[#121212] border-black/10 hover:bg-[#121212] hover:text-white'
                   }`}
                 >
                   {page}
@@ -449,7 +442,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             <button
               onClick={handleNextPage}
               disabled={currentPage === totalPages}
-              className="px-4 py-2 text-xs font-bold uppercase tracking-wider border border-[#121212]/10 rounded-sm hover:bg-[#121212] hover:text-white disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:bg-transparent disabled:hover:text-[#121212] transition-colors whitespace-nowrap"
+              className="btn btn-ghost btn-sm px-4 py-2 text-xs uppercase tracking-widest disabled:opacity-50 disabled:cursor-not-allowed"
             >
               Next
             </button>
@@ -458,11 +451,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
       </div>
 
-      <SearchOverlay 
-        isOpen={isSearchOpen} 
-        onClose={() => setIsSearchOpen(false)}
-        allProducts={initialProducts}
-      />
+      {/* Search now lives at /search */}
     </div>
   );
 }

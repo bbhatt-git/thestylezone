@@ -186,7 +186,7 @@ export async function POST(req: NextRequest) {
     }
     
     // 5. Shipping Fee Calculation
-    const shippingFee = 0; // Free shipping for Kanchanpur
+    const shippingFee = Number(process.env.NEXT_PUBLIC_SHIPPING_COST || process.env.NEXT_SHIPPING_COST || 100);
     const total = calculatedSubtotal - discountAmount + shippingFee;
     
     // 6. Deduct inventory stocks

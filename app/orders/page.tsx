@@ -114,78 +114,77 @@ export default function GuestOrdersPage() {
   };
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
+    <div className="flex flex-col min-h-screen bg-[#F5F5F0] text-black">
       <Navbar />
 
-      <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 md:py-10 flex-grow space-y-6">
+      <main className="max-w-7xl mx-auto px-6 md:px-10 py-16 flex-grow space-y-10 w-full">
         
         {/* Breadcrumbs */}
-        <div className="flex items-center gap-1.5 text-xs text-zinc-400 font-medium">
-          <Link href="/" className="hover:text-brand">Home</Link>
+        <div className="flex items-center gap-2 text-xs text-black/50 font-bold uppercase tracking-widest mb-4">
+          <Link href="/" className="hover:text-black transition-colors">Home</Link>
           <ChevronRight className="w-3 h-3" />
-          <span className="text-stone-500 font-bold">Guest Order Center</span>
+          <span className="text-black">Orders</span>
         </div>
 
-        <div className="space-y-1 max-w-lg">
-          <h1 className="text-xl md:text-3xl font-black text-[#121212] tracking-tight font-sans">Guest Order Center</h1>
-          <p className="text-xs text-stone-400 font-medium">Track your boutique shipments and pending payments verification queue securely from Mahendranagar.</p>
+        <div className="space-y-4 max-w-3xl border-b border-black/10 pb-8">
+          <p className="text-xs font-black uppercase tracking-[0.4em] text-[#FE5733]">Guest Orders</p>
+          <h1 className="text-4xl md:text-5xl font-black text-black tracking-tight uppercase font-display">Track your order history</h1>
+          <p className="text-sm text-black/70 leading-relaxed">View recent guest orders, shipment status, and order details from any device. Keep your shopping experience smooth and easy to revisit.</p>
         </div>
 
         {loading ? (
-          <div className="h-96 flex flex-col items-center justify-center text-xs text-stone-400">
-            <Clock className="w-8 h-8 text-[#FE5733] animate-spin mb-1.5" />
+          <div className="h-96 flex flex-col items-center justify-center text-xs font-bold uppercase tracking-widest text-black/50">
+            <Clock className="w-8 h-8 text-black animate-spin mb-4" />
             <span>Checking order history status...</span>
           </div>
         ) : error ? (
-          <div className="bg-red-50 border border-red-150 p-6 rounded-[4px] max-w-xl mx-auto text-center space-y-3">
+          <div className="bg-red-50 border-2 border-red-200 p-8 shadow-2xl max-w-xl mx-auto text-center space-y-4">
             <ClipboardList className="w-8 h-8 text-red-500 mx-auto" />
-            <p className="text-xs text-red-700 font-bold">{error}</p>
+            <p className="text-xs text-red-600 font-black uppercase tracking-widest">{error}</p>
           </div>
         ) : orders.length === 0 ? (
-          <div className="bg-white border border-stone-200 rounded-[4px] p-16 text-center space-y-4 shadow-sm max-w-xl mx-auto py-20 flex flex-col items-center justify-center">
-            <div className="w-16 h-16 bg-stone-50 border border-stone-200 text-stone-400 rounded-full flex items-center justify-center">
+          <div className="bg-white border border-black/10 rounded-[4px] p-14 text-center max-w-2xl mx-auto shadow-xl">
+            <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FE5733]/10 text-[#FE5733]">
               <ClipboardList className="w-8 h-8" />
             </div>
-            <div>
-              <h3 className="text-base font-bold text-[#121212]">No Orders Found</h3>
-              <p className="text-xs text-stone-400 mt-1 max-w-xs leading-relaxed">You haven&apos;t placed any guest orders on this device yet. Start shopping to see your orders here.</p>
-            </div>
-            <div>
-              <Link href="/shop" className="bg-[#121212] text-white rounded-[4px] text-xs font-bold px-6 py-2.5 inline-block">
-                Start Browsing Fashion
-              </Link>
-            </div>
+            <h3 className="text-2xl font-black text-black uppercase tracking-tight mb-3">No orders yet</h3>
+            <p className="text-sm text-black/60 max-w-lg mx-auto leading-relaxed">
+              Your guest order history is empty. Add something to your bag and return here to track its delivery progress.
+            </p>
+            <Link
+              href="/shop"
+              className="btn btn-primary mt-8 inline-flex items-center justify-center text-xs uppercase tracking-widest px-6 py-3"
+            >
+              Shop Products
+            </Link>
           </div>
         ) : (
-          <div className="space-y-4">
-            <h3 className="text-xs uppercase font-extrabold tracking-widest text-stone-400 px-1">Your Orders ({orders.length})</h3>
+          <div className="space-y-6">
+            <h3 className="text-xs uppercase font-black tracking-widest text-black/50 px-1">Your Orders ({orders.length})</h3>
             
             <div className="space-y-4">
               {orders.map((order) => (
-                <div key={order.id} className="bg-white border border-stone-200 rounded-[4px] p-6 shadow-sm">
-                  <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                    <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 bg-[#FE5733] text-white rounded-full flex items-center justify-center">
-                        <Package className="w-6 h-6" />
+                <div key={order.id} className="bg-white border border-black/10 p-6 md:p-7 shadow-sm hover:shadow-md transition-all">
+                  <div className="flex flex-col gap-4 md:gap-0 md:flex-row md:items-start md:justify-between">
+                    <div className="space-y-3">
+                      <p className="text-sm font-black uppercase tracking-[0.35em] text-black/50">Order #{order.order_number}</p>
+                      <div className="flex flex-wrap items-center gap-2">
+                        {getStatusBadge(order.status)}
+                        <span className="text-sm font-semibold text-black">Rs {(order.total || 0).toLocaleString()}</span>
                       </div>
-                      <div>
-                        <p className="text-sm font-bold text-[#121212]">{order.order_number}</p>
-                        <div className="flex items-center gap-2 mt-1">
-                          {getStatusBadge(order.status)}
-                          <span className="text-xs text-stone-400">• Rs {(order.total || 0).toLocaleString()}</span>
-                        </div>
-                      </div>
+                      <p className="text-xs text-black/50">{new Date(order.created_at).toLocaleDateString()}</p>
+                      <p className="text-xs text-black/60">Paid with {order.payment_method}</p>
                     </div>
-                    
-                    <div className="flex flex-col items-start md:items-end gap-2">
-                      <p className="text-xs text-stone-400">
-                        {new Date(order.created_at).toLocaleDateString()}
-                      </p>
-                      <Link 
+
+                    <div className="flex flex-col items-start gap-3 md:items-end">
+                      <div className="text-right text-xs uppercase tracking-[0.35em] text-black/40">
+                        <p>{order.payment_status}</p>
+                      </div>
+                      <Link
                         href={`/checkout/success?order_id=${order.id}`}
-                        className="bg-[#121212] hover:bg-[#FE5733] text-white rounded-[4px] text-xs font-bold px-4 py-2 whitespace-nowrap transition-colors"
+                        className="btn btn-primary text-xs uppercase tracking-widest px-4 py-2"
                       >
-                        Track Order
+                        Track order
                       </Link>
                     </div>
                   </div>

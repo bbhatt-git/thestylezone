@@ -38,9 +38,13 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       const data = await res.json();
       if (data.success) {
         setReviews(data.reviews);
+        setError('');
+      } else {
+        setError(data.error || 'Failed to load reviews');
       }
     } catch (err) {
       console.error('Failed to load reviews', err);
+      setError('Network error. Failed to load reviews.');
     } finally {
       setLoading(false);
     }
@@ -53,11 +57,19 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
       try {
         const res = await fetch(`/api/reviews?product_id=${productId}`);
         const data = await res.json();
-        if (data.success && isMounted) {
-          setReviews(data.reviews);
+        if (isMounted) {
+          if (data.success) {
+            setReviews(data.reviews);
+            setError('');
+          } else {
+            setError(data.error || 'Failed to load reviews');
+          }
         }
       } catch (err) {
         console.error('Failed to load reviews', err);
+        if (isMounted) {
+          setError('Network error. Failed to load reviews.');
+        }
       } finally {
         if (isMounted) {
           setLoading(false);
@@ -121,16 +133,45 @@ export default function ProductReviews({ productId }: ProductReviewsProps) {
         {/* Reviews List */}
         <div className="space-y-6">
           {loading ? (
-            <p className="text-sm text-stone-500">Loading reviews...</p>
+            <div className="space-y-6">
+              {[1, 2, 3].map((i) => (
+                <div key={i} className="border-b border-stone-100 pb-6">
+                  <div className="flex items-center justify-between mb-3">
+                    <div className="h-4 bg-stone-200 w-24 rounded animate-pulse" />
+                    <div className="h-3 bg-stone-200 w-16 rounded animate-pulse" />
+                  </div>
+                  <div className="h-3 bg-stone-200 w-20 rounded animate-pulse mb-4" />
+                  <div className="space-y-2">
+                    <div className="h-4 bg-stone-200 w-full rounded animate-pulse" />
+                    <div className="h-4 bg-stone-200 w-3/4 rounded animate-pulse" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : error ? (
+            <div className="bg-red-50 p-6 rounded-[4px] border border-red-100 text-center">
+              <p className="text-sm font-bold text-red-600 mb-2">Oops!</p>
+              <p className="text-xs text-red-500 mb-4">{error}</p>
+              <button 
+                onClick={fetchReviews}
+                className="text-xs font-bold uppercase tracking-widest text-red-600 border-b border-red-200 hover:border-red-600 pb-0.5 transition-colors"
+              >
+                Try Again
+              </button>
+            </div>
           ) : reviews.length === 0 ? (
-            <p className="text-sm text-stone-500 italic">No reviews yet. Be the first to review this product!</p>
+            <div className="text-center py-12 px-6 bg-stone-50 rounded-[4px] border border-stone-200 border-dashed">
+              <Star className="w-8 h-8 text-stone-300 mx-auto mb-3" />
+              <p className="text-sm font-bold text-stone-600 mb-1">No Reviews Yet</p>
+              <p className="text-xs text-stone-500">Be the first to share your thoughts about this product!</p>
+            </div>
           ) : (
             <div className="space-y-6">
               {reviews.map((rev) => (
                 <div key={rev.id} className="border-b border-stone-100 pb-6 last:border-0">
                   <div className="flex items-center justify-between mb-2">
                     <h5 className="text-sm font-bold text-[#121212] uppercase tracking-wide">{rev.reviewer}</h5>
-                    <span className="text-[10px] text-stone-400 font-mono">
+                    <span className="text-[10px] text-stone-400 ">
                       {new Date(rev.date_created).toLocaleDateString()}
                     </span>
                   </div>

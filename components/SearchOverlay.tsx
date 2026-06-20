@@ -88,7 +88,7 @@ export default function SearchOverlay({ isOpen, onClose, allProducts }: SearchOv
 
       {/* Search overlay */}
       <div className="fixed inset-0 z-[70] flex items-start justify-center pt-20 md:pt-32 px-4">
-        <div className="w-full max-w-3xl bg-white rounded-2xl shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[80vh]"
+        <div className="w-full max-w-3xl bg-white rounded-xl shadow-2xl overflow-hidden transform transition-all duration-300 flex flex-col max-h-[80vh]"
              style={{ touchAction: 'pan-y' }}
         >
           
@@ -186,7 +186,7 @@ export default function SearchOverlay({ isOpen, onClose, allProducts }: SearchOv
                             onClick={onClose}
                             className="flex gap-4 p-3 bg-stone-50 hover:bg-stone-100 rounded-xl transition-all duration-200 group"
                           >
-                            <div className="w-20 h-24 bg-white rounded-lg overflow-hidden shrink-0 border border-black/5">
+                            <div className="w-20 h-24 bg-white rounded-xl overflow-hidden shrink-0 border border-black/5">
                               <img
                                 src={product.images[0] || 'https://picsum.photos/seed/placeholder/200/240'}
                                 alt={product.name}

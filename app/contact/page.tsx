@@ -31,7 +31,7 @@ export default function ContactPage() {
           
           {/* Header - Same as privacy/terms */}
           <div className="max-w-2xl mx-auto mb-16 text-center animate-on-scroll">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
               THE STYLE ZONE • CONTACT
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
@@ -72,7 +72,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Phone</h4>
-                    <p className="text-sm text-[#121212]/70 font-mono">+977 984-8123456</p>
+                    <p className="text-sm text-[#121212]/70 ">+977 984-8123456</p>
                   </div>
                 </div>
 
@@ -82,7 +82,7 @@ export default function ContactPage() {
                   </div>
                   <div>
                     <h4 className="text-xs font-bold uppercase tracking-wider text-[#121212] mb-1">Email</h4>
-                    <p className="text-sm text-[#121212]/70 font-mono">contact@thestylezone.com.np</p>
+                    <p className="text-sm text-[#121212]/70 ">contact@thestylezone.com.np</p>
                   </div>
                 </div>
 

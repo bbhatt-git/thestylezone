@@ -29,7 +29,7 @@ export default async function WishlistPage() {
         <div className="max-w-[1560px] mx-auto">
           
           <div className="mb-12">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">THE STYLE ZONE • WISHLIST</p>
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">THE STYLE ZONE • WISHLIST</p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display">
               My <span className="text-[#FE5733]">Favorites.</span>
             </h1>

@@ -1,16 +1,75 @@
 @import "tailwindcss";
 
 @theme {
-  --color-brand-beige: #F5F5F0;
-  --color-brand-dark: #121212;
-  --color-brand-orange: #FE5733;
+  --color-brand-bg: #FFFFFF;
+  --color-brand-dark: #000000;
+  --color-brand-gray: #111111;
+  --color-brand-light: #F9F9F9;
+  --color-brand-accent: #FE5733; /* Keeps the vibrant brand accent */
 }
 
 body {
-  background-color: #F5F5F0;
-  color: #121212;
-  font-family: var(--font-sans), sans-serif;
+  background-color: var(--color-brand-bg);
+  color: var(--color-brand-dark);
+  font-family: var(--font-sans), Inter, sans-serif;
+  font-size: 1rem;
+  line-height: 1.75;
   overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), serif;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  font-weight: 500;
+}
+
+.font-nav {
+  font-family: var(--font-nav), var(--font-sans), Inter, sans-serif;
+}
+
+h1 {
+  font-size: clamp(2.4rem, 4vw, 4rem);
+}
+
+h2 {
+  font-size: clamp(2rem, 3.5vw, 3rem);
+}
+
+h3 {
+  font-size: clamp(1.6rem, 3vw, 2.2rem);
+}
+
+.font-display {
+  font-family: var(--font-display), serif;
+}
+
+/* Custom Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #d6d3d1;
+  border-radius: 4px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #a8a29e;
+}
+
+/* Base interactive elements focus state */
+:focus-visible {
+  outline: 2px solid #1c1917;
+  outline-offset: 2px;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-display), serif;
 }
 
 @keyframes marquee {
@@ -26,6 +85,16 @@ body {
 
 .animate-marquee:hover {
   animation-play-state: paused;
+}
+
+@keyframes heroFadeUp {
+  from { opacity: 0; transform: translateY(28px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes progressBar {
+  from { transform: scaleX(0); }
+  to   { transform: scaleX(1); }
 }
 
 /* WordPress HTML Formatting Support */
@@ -336,6 +405,25 @@ body {
 .description-html .wp-block-button a:hover,
 .prose .wp-block-button a:hover {
   background-color: #e04825;
+}
+
+/* Standardized button components for consistent padding and roundness */
+@layer components {
+  .btn {
+    @apply inline-flex items-center justify-center rounded-md px-4 py-2 text-sm font-medium transition-colors;
+  }
+
+  .btn-primary {
+    @apply bg-[#FE5733] text-white hover:bg-[#e04825];
+  }
+
+  .btn-ghost {
+    @apply bg-white border border-black/10 text-black hover:bg-black/5;
+  }
+
+  .btn-sm {
+    @apply px-3 py-1.5 text-sm rounded-md;
+  }
 }
 
 .wordpress-content .wp-block-quote,

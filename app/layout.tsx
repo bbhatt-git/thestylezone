@@ -1,6 +1,6 @@
 import React from 'react';
 import type { Metadata } from 'next';
-import { Inter, Space_Grotesk, JetBrains_Mono } from 'next/font/google';
+import { Inter, Cormorant_Garamond, Space_Grotesk } from 'next/font/google';
 import './globals.css';
 import ClientAnimationProvider from '@/components/ClientAnimationProvider';
 import PageTransition from '@/components/PageTransition';
@@ -12,14 +12,14 @@ const inter = Inter({
   variable: '--font-sans',
 });
 
-const spaceGrotesk = Space_Grotesk({
+const cormorant = Cormorant_Garamond({
   subsets: ['latin'],
   variable: '--font-display',
 });
 
-const jetbrainsMono = JetBrains_Mono({
+const spaceGrotesk = Space_Grotesk({
   subsets: ['latin'],
-  variable: '--font-mono',
+  variable: '--font-nav',
 });
 
 export const metadata: Metadata = {
@@ -87,7 +87,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en" className={`${inter.variable} ${spaceGrotesk.variable} ${jetbrainsMono.variable}`}>
+    <html lang="en" className={`${inter.variable} ${cormorant.variable} ${spaceGrotesk.variable}`}>
       <head>
         {/* Structured Data */}
         <script

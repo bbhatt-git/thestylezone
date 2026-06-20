@@ -22,22 +22,22 @@ export default async function ShopPage() {
   const db = await readDb();
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
+    <div className="flex flex-col min-h-screen bg-[#F9F9F9] text-black">
       <Navbar />
 
-      <main className="flex-grow px-6 md:px-10 pt-8 md:pt-12 pb-8 md:pb-12">
-        <div className="max-w-[1560px] mx-auto">
+      <main className="flex-grow px-6 md:px-10 pt-12 md:pt-24 pb-12 md:pb-24">
+        <div className="max-w-[1560px] mx-auto pb-10 mb-10">
           
           {/* Page Title */}
-          <div className="mb-8 md:mb-12">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
-              THE STYLE ZONE • COLLECTION
+          <div className="mb-8 md:mb-10">
+            <p className="text-xs font-bold tracking-widest text-black/50 uppercase mb-3">
+              Shop the latest drops
             </p>
-            <h1 className="text-3xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display">
-              All <span className="text-[#FE5733]">Collections.</span>
+            <h1 className="text-3xl md:text-4xl font-black tracking-tight text-black font-display leading-tight">
+              Discover fresh styles and everyday essentials.
             </h1>
-            <p className="text-sm opacity-60 max-w-xl mt-2 leading-relaxed">
-              Explore 100% authentic curated apparel synced directly from our WooCommerce store. Filter by category, price, size, and color below.
+            <p className="text-sm text-stone-600 mt-5 max-w-2xl leading-relaxed">
+              Browse the full range of products, filter by category, size, color, or price, and shop with confidence.
             </p>
           </div>
 

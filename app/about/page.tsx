@@ -28,7 +28,7 @@ export default function AboutPage() {
           
           {/* Header */}
           <div className="max-w-2xl mb-16">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
               THE STYLE ZONE • MAHENDRANAGAR
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
@@ -93,7 +93,7 @@ export default function AboutPage() {
           {/* Location Focus Info Card */}
           <div className="bg-[#121212] text-[#F5F5F0] p-8 md:p-12 rounded-[4px] flex flex-col md:flex-row justify-between items-start md:items-center gap-8 shadow-sm">
             <div className="max-w-2xl space-y-3">
-              <p className="text-xs font-bold text-[#FE5733] uppercase tracking-wider font-mono">VISIT OUR SHOP</p>
+              <p className="text-xs font-bold text-[#FE5733] uppercase tracking-wider ">VISIT OUR SHOP</p>
               <h4 className="text-2xl md:text-3xl font-black uppercase tracking-tighter font-display">Find us in Mahendranagar</h4>
               <p className="text-xs md:text-sm text-[#F5F5F0]/70 leading-relaxed">
                 Come to our store to see the clothes in person, try different sizes, and get help from our staff. We&apos;re located at Gali No. 2 near Madan Chowk in Bhimdatta Municipality.

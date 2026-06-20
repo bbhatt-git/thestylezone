@@ -18,7 +18,7 @@ export default function TermsPage() {
           
           {/* Header Section */}
           <div className="max-w-2xl mx-auto mb-16 animate-on-scroll text-center">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 font-mono">
+            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
               THE STYLE ZONE • TERMS
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
@@ -28,7 +28,7 @@ export default function TermsPage() {
               Please read these terms carefully before using The Style Zone website and making purchases.
             </p>
             <div className="mt-6 pt-6 border-t border-[#121212]/10">
-              <p className="text-xs text-[#121212]/50 font-mono">Last Updated: May 29, 2026</p>
+              <p className="text-xs text-[#121212]/50 ">Last Updated: May 29, 2026</p>
             </div>
           </div>
 
@@ -73,11 +73,11 @@ export default function TermsPage() {
             {/* Section 4 */}
             <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
               <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">4. Shipping & Delivery</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                Free shipping within Kanchanpur district. Standard delivery timelines apply for other regions based on courier service availability.
-              </p>
+              <div className="text-stone-600 space-y-3 font-sans">
+                We offer a flat-rate shipping fee across our delivery zones. Standard delivery timelines apply based on courier service availability.
+              </div>
               <p className="text-xs text-[#121212]/60">
-                <span className="font-bold text-[#121212]">Free Delivery Zones:</span> Bhimdatta Municipality and surrounding areas in Kanchanpur
+                <span className="font-bold text-[#121212]">Delivery Zones:</span> Kanchanpur and surrounding areas (Nationwide delivery coming soon)
               </p>
             </div>
 

@@ -109,7 +109,7 @@ export default function ReviewSection({ productId, initialReviews, onReviewSubmi
               />
             ))}
           </div>
-          <p className="text-xs text-zinc-500 font-medium font-mono">Based on {totalReviews} reviews</p>
+          <p className="text-xs text-zinc-500 font-medium ">Based on {totalReviews} reviews</p>
         </div>
 
         {/* Rating Breakdown Stack Bars */}
@@ -128,7 +128,7 @@ export default function ReviewSection({ productId, initialReviews, onReviewSubmi
                     style={{ width: `${percent}%` }}
                   />
                 </div>
-                <span className="w-8 text-right text-zinc-400 font-medium font-mono">{count}</span>
+                <span className="w-8 text-right text-zinc-400 font-medium ">{count}</span>
               </div>
             );
           })}
@@ -157,7 +157,7 @@ export default function ReviewSection({ productId, initialReviews, onReviewSubmi
                   <div className="flex-1 space-y-1">
                     <div className="flex items-center justify-between">
                       <h5 className="text-xs font-bold text-zinc-950 truncate max-w-[150px]">{r.reviewer_name}</h5>
-                      <span className="text-[10px] text-zinc-500 font-mono">{new Date(r.created_at).toLocaleDateString()}</span>
+                      <span className="text-[10px] text-zinc-500 ">{new Date(r.created_at).toLocaleDateString()}</span>
                     </div>
                     
                     <div className="flex items-center gap-0.5">

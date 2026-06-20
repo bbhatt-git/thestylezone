@@ -33,20 +33,38 @@ interface WishlistClientProps {
 
 export default function WishlistClient({ allProducts }: WishlistClientProps) {
   const { itemIds } = useWishlist();
+  const [isMounted, setIsMounted] = React.useState(false);
 
-  // Find products that are wishlisted
-  const wishlistedProducts = allProducts.filter((p) => itemIds.includes(p.id));
+  React.useEffect(() => {
+    setIsMounted(true);
+  }, []);
+
+  const wishlistedProducts = allProducts.filter((product) => itemIds.includes(product.id));
+
+  if (!isMounted) {
+    return (
+      <div className="flex justify-center items-center py-32 w-full">
+        <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-black"></div>
+      </div>
+    );
+  }
 
   if (wishlistedProducts.length === 0) {
     return (
-      <div className="text-center py-24 bg-white border border-[#121212]/5 rounded-[4px] max-w-md mx-auto p-8 shadow-sm">
-        <Heart className="w-12 h-12 text-[#121212]/20 mx-auto mb-4" />
-        <h3 className="text-lg font-bold uppercase tracking-tight text-[#121212]">Wishlist is Empty</h3>
-        <p className="text-xs text-[#121212]/50 mt-1 max-w-sm mx-auto leading-relaxed mb-8">
-          Save items that speak to your style by tapping the heart icon on any product page.
+      <div className="bg-white border border-black/10 rounded-[4px] shadow-xl p-10 max-w-2xl mx-auto text-center">
+        <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-full bg-[#FE5733]/10 text-[#FE5733]">
+          <Heart className="w-10 h-10" />
+        </div>
+        <p className="text-xs font-bold uppercase tracking-[0.35em] text-[#FE5733] mb-3">Wishlist</p>
+        <h3 className="text-3xl font-black uppercase tracking-tight text-black mb-3">No favorites saved yet</h3>
+        <p className="text-sm text-black/60 max-w-lg mx-auto leading-relaxed">
+          Save pieces while you browse and come back here anytime to view all of your favorite looks in one place.
         </p>
-        <Link href="/shop" className="bg-[#121212] text-white px-8 py-4 rounded-[4px] font-bold uppercase text-xs tracking-widest hover:bg-[#FE5733] transition-all duration-300">
-          Browse Products
+        <Link
+          href="/shop"
+          className="btn btn-primary mt-8 inline-flex items-center justify-center text-xs uppercase tracking-widest px-6 py-3"
+        >
+          Explore the shop
         </Link>
       </div>
     );
@@ -54,13 +72,18 @@ export default function WishlistClient({ allProducts }: WishlistClientProps) {
 
   return (
     <div className="space-y-6">
-      <div className="flex justify-between items-center bg-white p-4 rounded-[4px] border border-[#121212]/5 shadow-sm">
-        <p className="text-xs font-mono font-bold text-[#121212]/60">
-          HEARTED ITEMS ({wishlistedProducts.length})
-        </p>
-        <Link href="/shop" className="text-xs font-bold uppercase tracking-widest text-[#121212] hover:text-[#FE5733] flex items-center gap-2">
-          <ArrowLeft className="w-4 h-4" /> Back to Shop
-        </Link>
+      <div className="bg-white border border-black/10 rounded-[4px] shadow-sm p-6 md:p-8 flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+        <div>
+          <p className="text-xs uppercase tracking-[0.35em] text-[#FE5733] font-black mb-2">Wishlist</p>
+          <h2 className="text-3xl font-black uppercase tracking-tight text-black">My Favorites</h2>
+          <p className="text-sm text-black/60 mt-3 max-w-2xl leading-relaxed">A curated view of the items you have saved. Manage your favorites and continue shopping from here.</p>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="text-xs font-black uppercase tracking-[0.35em] text-black/40">{wishlistedProducts.length} item{wishlistedProducts.length === 1 ? '' : 's'}</span>
+          <Link href="/shop" className="btn btn-ghost text-xs uppercase tracking-widest">
+            Back to shop
+          </Link>
+        </div>
       </div>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">

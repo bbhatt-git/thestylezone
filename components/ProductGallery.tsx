@@ -39,7 +39,7 @@ export default function ProductGallery({ images, name }: ProductGalleryProps) {
     <div className="flex flex-col gap-4">
       {/* Primary visual frame with magnifier zoom */}
       <div 
-        className="relative bg-zinc-50 border border-zinc-100 rounded-3xl aspect-[3/4] overflow-hidden cursor-zoom-in"
+        className="relative bg-stone-50 border border-stone-100 rounded-xl aspect-[3/4] overflow-hidden cursor-zoom-in"
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
       >
@@ -68,7 +68,7 @@ export default function ProductGallery({ images, name }: ProductGalleryProps) {
             <button
               key={index}
               onClick={() => setActiveImageIndex(index)}
-              className={`relative aspect-[3/4] w-20 rounded-xl overflow-hidden border-2 bg-zinc-50 transition-all flex-none cursor-pointer ${activeImageIndex === index ? 'border-brand' : 'border-transparent opacity-70 hover:opacity-100'}`}
+              className={`relative aspect-[3/4] w-20 rounded-xl overflow-hidden border-2 bg-stone-50 transition-all flex-none cursor-pointer ${activeImageIndex === index ? 'border-stone-800' : 'border-transparent opacity-70 hover:opacity-100'}`}
               aria-label={`View image ${index + 1}`}
             >
               {/* eslint-disable-next-line @next/next/no-img-element */}

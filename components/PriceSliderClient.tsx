@@ -102,7 +102,7 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
     <div className="space-y-3">
       <div className="flex justify-between items-baseline">
         <label className="text-[10px] font-bold uppercase tracking-widest text-stone-700">Price Range</label>
-        <span className="text-xs font-bold text-[#FE5733] font-mono">
+        <span className="text-xs font-bold text-[#FE5733] ">
           Rs {minVal.toLocaleString()} - Rs {maxVal.toLocaleString()}
         </span>
       </div>
@@ -137,7 +137,7 @@ export default function PriceSliderClient({ min, max, onChange }: PriceSliderCli
         />
       </div>
       
-      <div className="flex justify-between text-[10px] font-mono text-stone-600">
+      <div className="flex justify-between text-[10px]  text-stone-600">
         <span>Rs {min.toLocaleString()}</span>
         <span>Rs {max.toLocaleString()}</span>
       </div>
