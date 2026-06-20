@@ -43,9 +43,3 @@ next-env.d.ts
 # OS
 .DS_Store
 Thumbs.db
-
-SANITY-STUDIO
-/SANITY-STUDIO
-
-SANITY-STUDIO/studio-tsz
-/SANITY-STUDIO/studio-tsz
