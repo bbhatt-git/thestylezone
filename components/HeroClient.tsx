@@ -3,6 +3,7 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
+import { getHeroSlides } from '@/lib/sanity';
 
 interface Product {
   id: string;
@@ -19,7 +20,7 @@ interface HeroClientProps {
   allProducts: Product[];
 }
 
-const SLIDES = [
+const DEFAULT_SLIDES = [
   {
     id: 'slide-1',
     headline: 'Dressed for\nEvery Chapter',
@@ -51,8 +52,30 @@ const SLIDE_DURATION = 6000;
 export default function HeroClient({ featuredProducts, allProducts }: HeroClientProps) {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
-  
+  const [slides, setSlides] = useState(DEFAULT_SLIDES);
   const [progressKey, setProgressKey] = useState(0);
+
+  useEffect(() => {
+    async function loadSlides() {
+      try {
+        const sanitySlides = await getHeroSlides();
+        if (sanitySlides && sanitySlides.length > 0) {
+          const formattedSlides = sanitySlides.map((s: any) => ({
+            id: s._id,
+            headline: s.headline,
+            ctaText: s.ctaText,
+            ctaLink: s.ctaLink,
+            imageUrl: s.imageUrl,
+            overlayOpacity: s.overlayOpacity || 0.45,
+          }));
+          setSlides(formattedSlides);
+        }
+      } catch (error) {
+        console.error('Failed to load hero slides from Sanity, using defaults:', error);
+      }
+    }
+    loadSlides();
+  }, []);
 
   const goToSlide = useCallback((index: number) => {
     if (isAnimating) return;
@@ -63,26 +86,26 @@ export default function HeroClient({ featuredProducts, allProducts }: HeroClient
   }, [isAnimating]);
 
   const nextSlide = useCallback(() => {
-    goToSlide((currentSlide + 1) % SLIDES.length);
-  }, [currentSlide, goToSlide]);
+    goToSlide((currentSlide + 1) % slides.length);
+  }, [currentSlide, goToSlide, slides.length]);
 
   const prevSlide = useCallback(() => {
-    goToSlide((currentSlide - 1 + SLIDES.length) % SLIDES.length);
-  }, [currentSlide, goToSlide]);
+    goToSlide((currentSlide - 1 + slides.length) % slides.length);
+  }, [currentSlide, goToSlide, slides.length]);
 
   useEffect(() => {
     const timer = setInterval(nextSlide, SLIDE_DURATION);
     return () => clearInterval(timer);
   }, [nextSlide]);
 
-  const slide = SLIDES[currentSlide];
+  const slide = slides[currentSlide];
 
   return (
     <>
       <section className="relative w-full h-[93vh] min-h-[500px] max-h-[900px] overflow-hidden bg-black">
 
         {/* ── Background slides ── */}
-        {SLIDES.map((s, i) => (
+        {slides.map((s, i) => (
           <div
             key={s.id}
             className="absolute inset-0 w-full h-full transition-all duration-[1400ms] ease-[cubic-bezier(0.22,1,0.36,1)]"
@@ -150,7 +173,7 @@ export default function HeroClient({ featuredProducts, allProducts }: HeroClient
 
         {/* ── Slide indicators (dots) ── */}
         <div className="absolute bottom-8 left-1/2 -translate-x-1/2 flex items-center gap-3 z-10">
-          {SLIDES.map((_, i) => (
+          {slides.map((_, i) => (
             <button
               key={i}
               onClick={() => goToSlide(i)}

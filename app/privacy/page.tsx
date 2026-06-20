@@ -2,13 +2,15 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Shield, FileText } from 'lucide-react';
+import { getPrivacyPolicy } from '@/lib/sanity';
 
 export const metadata = {
   title: 'Privacy Policy | The Style Zone',
   description: 'Learn how we collect, store, and safeguard your personal information when using our website.',
 };
 
-export default function PrivacyPage() {
+export default async function PrivacyPage() {
+  const privacyContent = await getPrivacyPolicy();
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
@@ -22,7 +24,7 @@ export default function PrivacyPage() {
               THE STYLE ZONE • PRIVACY
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              Privacy <span className="text-[#FE5733]">Policy.</span>
+              {privacyContent?.title || 'Privacy'} <span className="text-[#FE5733]">Policy.</span>
             </h1>
             <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
               Your privacy matters. We&apos;re committed to protecting your personal information and being transparent about how we use it.
@@ -34,7 +36,16 @@ export default function PrivacyPage() {
 
           {/* Content Sections */}
           <div className="max-w-4xl mx-auto space-y-6">
-            
+            {privacyContent?.content ? (
+              <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll prose prose-sm max-w-none">
+                {privacyContent.content.map((block: any, index: number) => (
+                  <p key={index} className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
+                    {block.children?.map((child: any) => child.text).join('') || ''}
+                  </p>
+                ))}
+              </div>
+            ) : (
+              <>
             {/* Section 1 */}
             <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
               <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">1. Information We Collect</h2>
@@ -91,7 +102,8 @@ export default function PrivacyPage() {
                 You have the right to access, correct, or delete your personal information. Contact us to exercise these rights or opt-out of marketing communications.
               </p>
             </div>
-
+            </>
+            )}
           </div>
 
           {/* Contact Section */}

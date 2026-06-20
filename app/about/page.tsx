@@ -4,6 +4,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { ShieldCheck, Target, Heart, Eye } from 'lucide-react';
 import type { Metadata } from 'next';
+import { getAboutContent } from '@/lib/sanity';
 
 export const dynamic = 'force-dynamic';
 
@@ -18,7 +19,8 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AboutPage() {
+export default async function AboutPage() {
+  const aboutContent = await getAboutContent();
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
@@ -32,7 +34,7 @@ export default function AboutPage() {
               THE STYLE ZONE • MAHENDRANAGAR
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              Our Archival <span className="text-[#FE5733]">Story.</span>
+              {aboutContent?.title || 'Our Archival'} <span className="text-[#FE5733]">Story.</span>
             </h1>
             <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
               The Style Zone is a fashion boutique in Bhimdatta Municipality (Mahendranagar), Kanchanpur, Nepal. We sell clothes, hoodies, jackets, and accessories online and in our physical store.
@@ -51,15 +53,27 @@ export default function AboutPage() {
             </div>
 
             <div className="space-y-6">
-              <h3 className="text-xl md:text-3xl font-bold uppercase tracking-tight font-display text-[#121212]">
-                Real Inventory, Real Products
-              </h3>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed font-sans">
-                The Style Zone connects directly to our WooCommerce store system. Every product you see online is actually in stock at our Mahendranagar shop. No fake listings, no placeholder images - just real clothes you can buy and wear.
-              </p>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed font-sans">
-                We offer hoodies, jackets, t-shirts, and fashion accessories with different sizes and colors. Our inventory updates automatically so you always see what&apos;s available right now.
-              </p>
+              {aboutContent?.content ? (
+                <div className="prose prose-sm max-w-none">
+                  {aboutContent.content.map((block: any, index: number) => (
+                    <p key={index} className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
+                      {block.children?.map((child: any) => child.text).join('') || ''}
+                    </p>
+                  ))}
+                </div>
+              ) : (
+                <>
+                <h3 className="text-xl md:text-3xl font-bold uppercase tracking-tight font-display text-[#121212]">
+                  Real Inventory, Real Products
+                </h3>
+                <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed font-sans">
+                  The Style Zone connects directly to our WooCommerce store system. Every product you see online is actually in stock at our Mahendranagar shop. No fake listings, no placeholder images - just real clothes you can buy and wear.
+                </p>
+                <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed font-sans">
+                  We offer hoodies, jackets, t-shirts, and fashion accessories with different sizes and colors. Our inventory updates automatically so you always see what&apos;s available right now.
+                </p>
+                </>
+              )}
             </div>
           </div>
 
