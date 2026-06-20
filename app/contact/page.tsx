@@ -1,29 +1,15 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Mail, Phone, MapPin, Clock, Send, CheckCircle } from 'lucide-react';
-import { getContactContent } from '@/lib/sanity';
 
 export default function ContactPage() {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [message, setMessage] = useState('');
   const [status, setStatus] = useState<'idle' | 'success'>('idle');
-  const [contactContent, setContactContent] = useState<any>(null);
-
-  useEffect(() => {
-    async function loadContent() {
-      try {
-        const content = await getContactContent();
-        setContactContent(content);
-      } catch (error) {
-        console.error('Failed to load contact content from Sanity:', error);
-      }
-    }
-    loadContent();
-  }, []);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -49,7 +35,7 @@ export default function ContactPage() {
               THE STYLE ZONE • CONTACT
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              {contactContent?.title || 'Get in'} <span className="text-[#FE5733]">Touch.</span>
+              Get in <span className="text-[#FE5733]">Touch.</span>
             </h1>
             <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
               Visit our boutique in Mahendranagar or reach out online. We're here to help you find your perfect style.
@@ -65,16 +51,6 @@ export default function ContactPage() {
                 Contact Information
               </h3>
               
-              {contactContent?.content ? (
-                <div className="prose prose-sm max-w-none">
-                  {contactContent.content.map((block: any, index: number) => (
-                    <p key={index} className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
-                      {block.children?.map((child: any) => child.text).join('') || ''}
-                    </p>
-                  ))}
-                </div>
-              ) : (
-                <>
               <div className="space-y-6">
                 <div className="flex items-start gap-4">
                   <div className="w-10 h-10 bg-[#F5F5F0] rounded-[4px] flex items-center justify-center shrink-0">
@@ -123,8 +99,6 @@ export default function ContactPage() {
                   </div>
                 </div>
               </div>
-              </>
-              )}
             </div>
 
             {/* Contact Form Card */}

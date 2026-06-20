@@ -2,15 +2,13 @@ import React from 'react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { FileText } from 'lucide-react';
-import { getTermsOfService } from '@/lib/sanity';
 
 export const metadata = {
   title: 'Terms of Service | The Style Zone',
   description: 'Understand the terms, guidelines, and conditions for ordering from The Style Zone online.',
 };
 
-export default async function TermsPage() {
-  const termsContent = await getTermsOfService();
+export default function TermsPage() {
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
@@ -24,7 +22,7 @@ export default async function TermsPage() {
               THE STYLE ZONE • TERMS
             </p>
             <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              {termsContent?.title || 'Terms of'} <span className="text-[#FE5733]">Service.</span>
+              Terms of <span className="text-[#FE5733]">Service.</span>
             </h1>
             <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
               Please read these terms carefully before using The Style Zone website and making purchases.
@@ -36,16 +34,7 @@ export default async function TermsPage() {
 
           {/* Content Sections */}
           <div className="max-w-4xl mx-auto space-y-6">
-            {termsContent?.content ? (
-              <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll prose prose-sm max-w-none">
-                {termsContent.content.map((block: any, index: number) => (
-                  <p key={index} className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
-                    {block.children?.map((child: any) => child.text).join('') || ''}
-                  </p>
-                ))}
-              </div>
-            ) : (
-              <>
+            
             {/* Section 1 */}
             <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
               <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">1. Order Placement & Acceptance</h2>
@@ -99,8 +88,7 @@ export default async function TermsPage() {
                 The Style Zone shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products or services. Product images are representative and actual colors may vary slightly.
               </p>
             </div>
-            </>
-            )}
+
           </div>
 
           {/* Footer Info */}
