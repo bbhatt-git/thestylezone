@@ -215,59 +215,6 @@ export async function saveDb(db: DbData): Promise<void> {
 export async function readDb(): Promise<DbData> {
   let db: DbData = { ...memoryData };
 
-  // Use Sanity if configured
-  if (process.env.NEXT_PUBLIC_SANITY_PROJECT_ID && process.env.USE_SANITY === 'true') {
-    try {
-      const [sanityProducts, sanityCategories] = await Promise.all([
-        getSanityProducts(),
-        getSanityCategories(),
-      ]);
-
-      db.products = sanityProducts.map((p: any) => ({
-        id: p._id,
-        name: p.name,
-        slug: p.slug.current,
-        description: p.description || '',
-        short_description: p.shortDescription || '',
-        category_id: p.category?._id || '',
-        brand: p.brand || 'The Style Zone',
-        gender: p.gender || 'unisex',
-        base_price: p.basePrice || 0,
-        sale_price: p.salePrice || null,
-        discount_pct: p.discountPct || 0,
-        images: p.images?.map((img: any) => img.asset.url) || [],
-        tags: p.tags || [],
-        is_active: true,
-        is_featured: p.isFeatured || false,
-        stock_total: p.stockTotal || 0,
-        rating_avg: p.ratingAvg || 0,
-        rating_count: p.ratingCount || 0,
-        categories: p.category ? [p.category.name] : [],
-        colors: p.colors || [],
-        sizes: p.sizes || [],
-        sku: p.sku || '',
-        created_at: p._createdAt || new Date().toISOString(),
-        updated_at: p._updatedAt || new Date().toISOString(),
-      }));
-
-      db.categories = sanityCategories.map((c: any) => ({
-        id: c._id,
-        name: c.name,
-        slug: c.slug.current,
-        parent_id: null,
-        image_url: c.image?.asset.url || null,
-        gender: c.gender || 'unisex',
-        sort_order: c.sortOrder || 0,
-        is_active: true,
-        created_at: c._createdAt || new Date().toISOString(),
-      }));
-
-      return db;
-    } catch (error) {
-      console.error('Sanity fetch failed, falling back to WooCommerce:', error);
-    }
-  }
-
   // Skip WooCommerce sync if disabled
   if (process.env.DISABLE_WOOCOMMERCE_SYNC === 'true') {
     console.warn('WooCommerce sync is disabled via DISABLE_WOOCOMMERCE_SYNC environment variable.');
