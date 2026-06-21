@@ -10,8 +10,32 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export const metadata: Metadata = {
-  title: 'The Style Zone • Fashion Boutique',
-  description: 'Shop trendy clothes, hoodies, jackets, and fashion accessories at The Style Zone boutique.',
+  title: "The Style Zone | Women's Boutique, Mahendranagar",
+  description:
+    "The Style Zone is Mahendranagar's leading women's clothing boutique, founded by Sanbi Bist. Discover the latest kurtis, kurti sets, cargo jeans, and combo sets. Shop in-store at or get doorstep delivery across Nepal.",
+  keywords: [
+    "women's clothing Mahendranagar",
+    "ladies boutique Kanchanpur Nepal",
+    "kurti set Mahendranagar",
+    "women's fashion boutique Nepal",
+    "kurta shop Kanchanpur",
+    "combo sets Nepal boutique",
+    "cargo jeans women Nepal",
+    "women's clothing store Bhimdattanagar",
+    "online women's boutique Nepal delivery",
+    "The Style Zone Mahendranagar",
+    "Saraswati Bist boutique Nepal",
+    `Sanbi Bist boutique Nepal`,
+    "Fashion Hub Mahendranagar",
+    "ladies wear Far-Western Nepal",
+    "Kanchanpur women's clothing delivery",
+  ],
+  openGraph: {
+    title: "The Style Zone | Women's Boutique, Mahendranagar",
+    description:
+      "A youth-led women's boutique in Mahendranagar founded by Sanbi Bist. Trendy kurti sets, combos, and western pieces — from NPR 899. In-store or delivered across Nepal.",
+    type: 'website',
+  },
 };
 
 export default async function HomePage() {

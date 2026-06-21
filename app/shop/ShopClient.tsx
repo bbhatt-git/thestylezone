@@ -146,7 +146,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
     <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-start">
       
       {/* Mobile Filter and Sort Bar */}
-      <div className="lg:hidden flex items-center gap-2 bg-white p-3 border-2 border-black">
+      <div className="lg:hidden flex items-center gap-2 bg-white rounded-[5px] p-2 border-2 border-black/10">
         <button 
           onClick={() => setIsMobileFilterOpen(true)}
           className="btn btn-primary flex items-center justify-center gap-2 text-xs uppercase tracking-widest flex-1 whitespace-nowrap"
@@ -157,18 +157,18 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
         <div className="relative flex-1">
           <button 
             onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-            className="btn btn-ghost sort-dropdown-button w-full flex items-center justify-between gap-2 text-xs uppercase tracking-widest whitespace-nowrap"
+            className="btn btn-ghost sort-dropdown-button w-full px-2 flex items-center justify-between gap-1 text-xs uppercase tracking-tight whitespace-nowrap"
           >
             <span className="truncate">
-              {sortBy === 'latest' && 'New'}
-              {sortBy === 'price-low' && 'Price: Low'}
-              {sortBy === 'price-high' && 'Price: High'}
+              {sortBy === 'latest' && 'New Arrivals'}
+              {sortBy === 'price-low' && 'Price: Low to High'}
+              {sortBy === 'price-high' && 'Price: High to Low'}
               {sortBy === 'rating' && 'Top Rated'}
             </span>
             <ChevronDown className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
           </button>
           {isSortDropdownOpen && (
-            <div className="sort-dropdown absolute top-full left-0 right-0 mt-1 bg-white border-2 border-black shadow-2xl z-50">
+            <div className="sort-dropdown absolute top-full left-0 right-0 mt-1 rounded-[5px] bg-white border-2 border-black shadow-2xl z-50 tracking-tight">
               {[
                 { value: 'latest', label: 'New' },
                 { value: 'price-low', label: 'Price: Low' },
@@ -181,8 +181,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
                     setSortBy(option.value);
                     setIsSortDropdownOpen(false);
                   }}
-                  className={`w-full text-left text-xs font-bold uppercase tracking-widest px-4 py-3 hover:bg-black hover:text-white transition-colors whitespace-nowrap ${
-                    sortBy === option.value ? 'bg-black text-white' : 'text-black'
+                  className={`w-full text-left text-xs font-bold uppercase tracking-tight px-4 py-2 hover:bg-black hover:text-white transition-colors whitespace-nowrap ${
+                    sortBy === option.value ? 'bg-black/80 text-white' : 'text-black'
                   }`}
                 >
                   {option.label}
@@ -202,13 +202,13 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
       )}
 
       <div className={`
-        fixed top-0 bottom-0 left-0 z-[70] w-4/5 max-w-[320px] bg-white overflow-y-auto shadow-2xl p-4 pt-16
+        fixed top-0 bottom-0 left-0 z-[70] w-4/5 max-w-[320px] bg-white overflow-y-auto shadow-2xl p-4 pt-5
         transform transition-transform duration-300 ease-[cubic-bezier(0.16,1,0.3,1)]
-        lg:static lg:translate-x-0 lg:w-full lg:max-w-none lg:h-auto lg:overflow-visible lg:shadow-none lg:p-8 lg:pt-8 lg:border-2 lg:border-black lg:bg-white lg:z-0
+        lg:static lg:translate-x-0 lg:w-full lg:max-w-none lg:h-auto lg:overflow-visible lg:shadow-none lg:p-8 lg:pt-8 lg:border-2 lg:border-black rounded-[6px] lg:bg-white lg:z-0
         lg:col-span-3 space-y-10
         ${isMobileFilterOpen ? 'translate-x-0' : '-translate-x-full'}
       `}>
-        <div className="flex items-center justify-between pb-2 border-b border-black/10">
+        <div className="flex items-center justify-between pb-1 border-b border-black/10">
           <div className="flex items-center gap-2">
             <SlidersHorizontal className="w-4 h-4 text-black" />
             <h3 className="text-xs font-semibold uppercase tracking-wide text-black">Filters</h3>
@@ -238,13 +238,13 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Categories */}
         <div className="space-y-2">
-          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Collection</label>
+          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Categories</label>
           <div className="flex flex-wrap gap-1.5">
             {categories.map((cat) => (
               <button
                 key={cat}
                 onClick={() => setSelectedCategory(cat)}
-                className={`btn btn-sm h-8 text-xs uppercase tracking-wide transition-all whitespace-nowrap ${
+                className={`btn btn-sm h-7 text-xs px-3 mx-0 tracking-wide transition-all whitespace-nowrap ${
                   selectedCategory === cat 
                     ? 'bg-black border-black text-white' 
                     : 'bg-white border-black/20 hover:border-black text-black'
@@ -264,7 +264,7 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <button
                 key={sz}
                 onClick={() => setSelectedSize(sz)}
-                className={`btn btn-sm min-w-[48px] h-8 text-xs uppercase tracking-wide transition-all ${
+                className={`btn btn-sm h-7 text-xs px-3 mx-0 uppercase tracking-wide transition-all ${
                   selectedSize === sz 
                     ? 'bg-black border-black text-white' 
                     : 'bg-white border-black/20 hover:border-black text-black'
@@ -284,9 +284,9 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
               <button
                 key={col}
                 onClick={() => setSelectedColor(col)}
-                className={`flex items-center justify-center rounded-full w-8 h-8 border transition-all ${
+                className={`flex items-center justify-center rounded-full w-7 h-7 border transition-all ${
                   selectedColor === col
-                    ? 'border-black bg-black'
+                    ? 'border-black bg-black/20'
                     : 'border-black/10 bg-white hover:border-black'
                 }`}
                 aria-label={col}
@@ -306,7 +306,6 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
         {/* Price Slider */}
         <div className="space-y-2">
-          <label className="text-[10px] font-semibold uppercase tracking-[0.15em] text-black/50">Price</label>
           <PriceSliderClient 
             min={0}
             max={highestPriceInStore}
@@ -337,8 +336,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
       <div className="lg:col-span-9 space-y-6">
         
         {/* Sorting and Layout Preferences */}
-        <div className="hidden lg:flex flex-col sm:flex-row justify-between items-center bg-transparent pb-4 border-b border-black/10 mb-6 gap-4">
-          <p className="text-[10px] font-black tracking-widest uppercase text-black/40">
+        <div className="hidden lg:flex flex-col sm:flex-row justify-between items-center bg-transparent pb-2 border-b border-black/20 mb-8 gap-4">
+          <p className="text-[12px] font-semibold tracking-widest uppercase text-black/40">
             SHOWING {indexOfFirstProduct + 1}-{Math.min(indexOfLastProduct, sortedProducts.length)} OF {sortedProducts.length} PRODUCTS
           </p>
 
@@ -347,13 +346,13 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
             <div className="relative">
               <button 
                 onClick={() => setIsSortDropdownOpen(!isSortDropdownOpen)}
-                className="sort-dropdown-button flex items-center gap-2 text-[10px] font-bold uppercase tracking-wide bg-white border border-black/10 px-4 py-2 hover:border-black transition-colors text-black whitespace-nowrap"
+                className="sort-dropdown-button flex items-center gap-2 text-[12px] font-semibold uppercase tracking-wide bg-white rounded-[5px] border border-black/10 px-3 py-1 hover:border-black transition-colors text-black whitespace-nowrap"
               >
                 Sort By
                 <ChevronDown className={`w-4 h-4 transition-transform ${isSortDropdownOpen ? 'rotate-180' : ''}`} />
               </button>
               {isSortDropdownOpen && (
-                <div className="sort-dropdown absolute top-full right-0 mt-1 bg-white border-2 border-black shadow-2xl z-50 min-w-[180px]">
+                <div className="sort-dropdown absolute top-full right-0 mt-1 rounded-[5px] bg-white border-2 border-black shadow-2xl z-50 min-w-[180px]">
                   {[
                     { value: 'latest', label: 'New Arrivals' },
                     { value: 'price-low', label: 'Price: Low to High' },
@@ -366,8 +365,8 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
                         setSortBy(option.value);
                         setIsSortDropdownOpen(false);
                       }}
-                      className={`w-full text-left text-[10px] font-bold uppercase tracking-widest px-4 py-3 hover:bg-black hover:text-white transition-colors whitespace-nowrap ${
-                        sortBy === option.value ? 'bg-black text-white' : 'text-black'
+                      className={`w-full text-left text-[10px] font-bold uppercase tracking-widest px-4 py-3 hover:bg-black/40 hover:text-white transition-colors whitespace-nowrap ${
+                        sortBy === option.value ? 'bg-black/80 text-white' : 'text-black'
                       }`}
                     >
                       {option.label}
@@ -450,8 +449,6 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
         )}
 
       </div>
-
-      {/* Search now lives at /search */}
     </div>
   );
 }

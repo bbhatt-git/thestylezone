@@ -1,115 +1,158 @@
-import React from 'react';
+import fs from 'fs';
+import path from 'path';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { Shield, FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'Privacy Policy | The Style Zone',
-  description: 'Learn how we collect, store, and safeguard your personal information when using our website.',
+  description: 'Learn how we collect, store, and safeguard your personal information.',  
+  keywords: [
+    "women's clothing Mahendranagar",
+    "ladies boutique Kanchanpur Nepal",
+    "kurti set Mahendranagar",
+    "women's fashion boutique Nepal",
+    "kurta shop Kanchanpur",
+    "combo sets Nepal boutique",
+    "cargo jeans women Nepal",
+    "women's clothing store Bhimdattanagar",
+    "online women's boutique Nepal delivery",
+    "The Style Zone Mahendranagar",
+    "Saraswati Bist boutique Nepal",
+    `Sanbi Bist boutique Nepal`,
+    "Fashion Hub Mahendranagar",
+    "ladies wear Far-Western Nepal",
+    "Kanchanpur women's clothing delivery",
+  ],
+  openGraph: {
+    title: "Privacy Policy | The Style Zone",
+    description:
+      "Learn how we collect, store, and safeguard your personal information.",
+    type: 'website',
+  },
 };
 
+function parseMarkdown(raw: string) {
+  const lines = raw.split('\n');
+  const sections: { id: string; title: string; lines: string[] }[] = [];
+  let current: (typeof sections)[0] | null = null;
+  for (const line of lines) {
+    const h2 = line.match(/^## (.+)/);
+    if (h2) {
+      if (current) sections.push(current);
+      const title = h2[1].trim().replace(/^\d+\.\s+/, '');
+      const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      current = { id, title, lines: [] };
+    } else if (current) {
+      current.lines.push(line);
+    }
+  }
+  if (current) sections.push(current);
+  return sections;
+}
+
+function inlineFormat(t: string) {
+  return t.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:600;color:#111111">$1</strong>');
+}
+
+function renderLines(lines: string[]) {
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    if (line.trim().startsWith('- ')) {
+      const items: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+        items.push(lines[i].trim().slice(2));
+        i++;
+      }
+      nodes.push(
+        <ul key={i} className="list-disc list-inside pl-2 space-y-2 mt-3">
+          {items.map((item, j) => (
+            <li key={j} className="text-gray-600 leading-relaxed font-sans text-sm md:text-base"
+              dangerouslySetInnerHTML={{ __html: inlineFormat(item) }} />
+          ))}
+        </ul>
+      );
+      continue;
+    }
+    nodes.push(
+      <p key={i}
+        className="text-gray-600 leading-relaxed font-sans text-sm md:text-base mt-3"
+        dangerouslySetInnerHTML={{ __html: inlineFormat(line.trim()) }}
+      />
+    );
+    i++;
+  }
+  return nodes;
+}
+
 export default function PrivacyPage() {
+  const filePath = path.join(process.cwd(), 'public', 'legal', 'privacy-policy.md');
+  const raw = fs.readFileSync(filePath, 'utf-8');
+  const sections = parseMarkdown(raw);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
 
-      <main className="flex-grow py-16 px-6 md:px-10">
-        <div className="max-w-[1560px] mx-auto">
-          
-          {/* Header Section */}
-          <div className="max-w-2xl mx-auto mb-16 animate-on-scroll text-center">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
-              THE STYLE ZONE • PRIVACY
+      <main className="flex-grow py-12 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg p-8 md:p-12">
+
+            {/* Title */}
+            <div className="text-center mb-10">
+              <p className="text-xs font-bold tracking-[0.25em] text-[#FE5733] uppercase mb-3 font-sans">
+                The Style Zone
+              </p>
+              <p className="font-sans text-3xl md:text-4xl font-extrabold text-gray-800">
+                Privacy <span className="text-[#FE5733]">Policy</span>
+              </p>
+              <p className="text-sm text-gray-400 mt-3 font-sans">Last updated: May 29, 2026</p>
+            </div>
+
+            {/* Intro */}
+            <p className="text-sm md:text-base text-gray-600 leading-relaxed font-sans mb-8">
+              Your privacy matters to us. This policy explains how we collect, use, and protect your information — written in plain language with no legal jargon. By shopping with us, you agree to the terms outlined below.
             </p>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              Privacy <span className="text-[#FE5733]">Policy.</span>
-            </h1>
-            <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
-              Your privacy matters. We&apos;re committed to protecting your personal information and being transparent about how we use it.
-            </p>
-            <div className="mt-6 pt-6 border-t border-[#121212]/10">
-              <p className="text-xs text-[#121212]/50 ">Last Updated: May 29, 2026</p>
-            </div>
-          </div>
 
-          {/* Content Sections */}
-          <div className="max-w-4xl mx-auto space-y-6">
-            
-            {/* Section 1 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">1. Information We Collect</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                We collect information you provide directly when you interact with our services, including your name, email address, phone number, shipping address, and payment details.
-              </p>
-              <p className="text-xs text-[#121212]/60">
-                <span className="font-bold text-[#121212]">Technical Data:</span> IP address, device type, browser information, and session data for analytics and security purposes.
-              </p>
+            <div className="border-b border-gray-200 mb-8" />
+
+            {/* Sections */}
+            <div className="space-y-8">
+              {sections.map((s, idx) => (
+                <section key={s.id} id={s.id}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FE5733] shrink-0" />
+                    <p className="text-base md:text-lg font-bold text-gray-800 font-sans">
+                      {s.title}
+                    </p>
+                  </div>
+                  <div className="pl-5">
+                    {renderLines(s.lines)}
+                  </div>
+                  {idx < sections.length - 1 && (
+                    <div className="border-b border-gray-100 mt-8" />
+                  )}
+                </section>
+              ))}
             </div>
 
-            {/* Section 2 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">2. Data Security</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                We implement industry-standard security measures to protect your personal information against unauthorized access, alteration, or disclosure.
-              </p>
-              <ul className="space-y-2 text-xs text-[#121212]/70">
-                <li>SSL/TLS encryption for all data transmissions</li>
-                <li>Secure payment gateways (no raw card data storage)</li>
-                <li>Regular security audits and system updates</li>
-              </ul>
-            </div>
-
-            {/* Section 3 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">3. How We Use Your Information</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                Your information helps us process orders, improve our services, and provide relevant communication about your purchases.
-              </p>
-              <p className="text-xs text-[#121212]/70">
-                <span className="font-bold text-[#121212]">Order Processing:</span> Payment, shipping, and customer service
-              </p>
-              <p className="text-xs text-[#121212]/70 mt-2">
-                <span className="font-bold text-[#121212]">Communication:</span> Order updates and support (with consent)
-              </p>
-            </div>
-
-            {/* Section 4 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">4. Cookies & Tracking</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                We use cookies to maintain your shopping cart, remember preferences, and analyze site traffic to improve your experience.
-              </p>
-              <p className="text-xs text-[#121212]/60">
-                <span className="font-bold text-[#121212]">Essential Cookies:</span> Required for basic functionality including checkout and cart management.
-              </p>
-            </div>
-
-            {/* Section 5 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">5. Your Privacy Rights</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
-                You have the right to access, correct, or delete your personal information. Contact us to exercise these rights or opt-out of marketing communications.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Contact Section */}
-          <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-[#121212]/10 animate-on-scroll">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* CTA */}
+            <div className="mt-12 bg-[#121212] rounded-lg p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-[#121212]/70 mb-1">Have questions about your privacy?</p>
-                <p className="text-xs text-[#121212]/50">Our team is here to help.</p>
+                <p className="text-base font-bold text-white font-sans">Questions about this policy?</p>
+                <p className="text-sm text-white/40 mt-1 font-sans">Our team is happy to help clarify anything.</p>
               </div>
-              <a 
-                href="/contact" 
-                className="bg-[#FE5733] hover:bg-[#121212] text-white px-8 py-4 shrink-0 transition-colors uppercase tracking-widest text-xs font-bold rounded-sm"
+              <a
+                href="/contact"
+                className="shrink-0 bg-[#FE5733] hover:bg-white hover:text-[#121212] text-white font-bold font-sans uppercase tracking-wider text-xs px-8 py-3 rounded-lg transition-all duration-200 whitespace-nowrap text-center"
               >
-                Contact Us
+                Get in Touch
               </a>
             </div>
-          </div>
 
+          </div>
         </div>
       </main>
 

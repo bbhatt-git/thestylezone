@@ -1,112 +1,158 @@
-import React from 'react';
+import fs from 'fs';
+import path from 'path';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
-import { FileText } from 'lucide-react';
 
 export const metadata = {
   title: 'Terms of Service | The Style Zone',
-  description: 'Understand the terms, guidelines, and conditions for ordering from The Style Zone online.',
+  description: 'Understand the terms, guidelines, and conditions for ordering from The Style Zone.',
+    keywords: [
+    "women's clothing Mahendranagar",
+    "ladies boutique Kanchanpur Nepal",
+    "kurti set Mahendranagar",
+    "women's fashion boutique Nepal",
+    "kurta shop Kanchanpur",
+    "combo sets Nepal boutique",
+    "cargo jeans women Nepal",
+    "women's clothing store Bhimdattanagar",
+    "online women's boutique Nepal delivery",
+    "The Style Zone Mahendranagar",
+    "Saraswati Bist boutique Nepal",
+    `Sanbi Bist boutique Nepal`,
+    "Fashion Hub Mahendranagar",
+    "ladies wear Far-Western Nepal",
+    "Kanchanpur women's clothing delivery",
+  ],
+  openGraph: {
+    title: "Terms of Service | The Style Zone",
+    description:
+      "Understand the terms, guidelines, and conditions for ordering from The Style Zone.",
+    type: 'website',
+  },
 };
 
+function parseMarkdown(raw: string) {
+  const lines = raw.split('\n');
+  const sections: { id: string; title: string; lines: string[] }[] = [];
+  let current: (typeof sections)[0] | null = null;
+  for (const line of lines) {
+    const h2 = line.match(/^## (.+)/);
+    if (h2) {
+      if (current) sections.push(current);
+      const title = h2[1].trim().replace(/^\d+\.\s+/, '');
+      const id = title.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
+      current = { id, title, lines: [] };
+    } else if (current) {
+      current.lines.push(line);
+    }
+  }
+  if (current) sections.push(current);
+  return sections;
+}
+
+function inlineFormat(t: string) {
+  return t.replace(/\*\*(.+?)\*\*/g, '<strong style="font-weight:600;color:#111111">$1</strong>');
+}
+
+function renderLines(lines: string[]) {
+  const nodes: React.ReactNode[] = [];
+  let i = 0;
+  while (i < lines.length) {
+    const line = lines[i];
+    if (!line.trim()) { i++; continue; }
+    if (line.trim().startsWith('- ')) {
+      const items: string[] = [];
+      while (i < lines.length && lines[i].trim().startsWith('- ')) {
+        items.push(lines[i].trim().slice(2));
+        i++;
+      }
+      nodes.push(
+        <ul key={i} className="list-disc list-inside pl-2 space-y-2 mt-3">
+          {items.map((item, j) => (
+            <li key={j} className="text-gray-600 leading-relaxed font-sans text-sm md:text-base"
+              dangerouslySetInnerHTML={{ __html: inlineFormat(item) }} />
+          ))}
+        </ul>
+      );
+      continue;
+    }
+    nodes.push(
+      <p key={i}
+        className="text-gray-600 leading-relaxed font-sans text-sm md:text-base mt-3"
+        dangerouslySetInnerHTML={{ __html: inlineFormat(line.trim()) }}
+      />
+    );
+    i++;
+  }
+  return nodes;
+}
+
 export default function TermsPage() {
+  const filePath = path.join(process.cwd(), 'public', 'legal', 'terms.md');
+  const raw = fs.readFileSync(filePath, 'utf-8');
+  const sections = parseMarkdown(raw);
+
   return (
     <div className="flex flex-col min-h-screen bg-[#F5F5F0]">
       <Navbar />
 
-      <main className="flex-grow py-16 px-6 md:px-10">
-        <div className="max-w-[1560px] mx-auto">
-          
-          {/* Header Section */}
-          <div className="max-w-2xl mx-auto mb-16 animate-on-scroll text-center">
-            <p className="text-xs font-bold tracking-[0.3em] text-[#FE5733] uppercase mb-2 ">
-              THE STYLE ZONE • TERMS
+      <main className="flex-grow py-12 px-4 md:px-6">
+        <div className="max-w-4xl mx-auto">
+          <div className="bg-white rounded-xl shadow-lg p-8 md:p-12">
+
+            {/* Title */}
+            <div className="text-center mb-10">
+              <p className="text-xs font-bold tracking-[0.25em] text-[#FE5733] uppercase mb-3 font-sans">
+                The Style Zone
+              </p>
+              <p className="font-sans text-3xl md:text-4xl font-extrabold text-gray-800">
+                Terms of <span className="text-[#FE5733]">Service</span>
+              </p>
+              <p className="text-sm text-gray-400 mt-3 font-sans">Last updated: May 29, 2026</p>
+            </div>
+
+            {/* Intro */}
+            <p className="text-sm md:text-base text-gray-600 leading-relaxed font-sans mb-8">
+              Please read these terms carefully before using The Style Zone website and making purchases. By accessing our services, you agree to be bound by these terms.
             </p>
-            <h1 className="text-4xl md:text-6xl font-black uppercase tracking-tighter text-[#121212] font-display leading-[1.1]">
-              Terms of <span className="text-[#FE5733]">Service.</span>
-            </h1>
-            <p className="text-sm opacity-70 mt-4 leading-relaxed font-sans">
-              Please read these terms carefully before using The Style Zone website and making purchases.
-            </p>
-            <div className="mt-6 pt-6 border-t border-[#121212]/10">
-              <p className="text-xs text-[#121212]/50 ">Last Updated: May 29, 2026</p>
-            </div>
-          </div>
 
-          {/* Content Sections */}
-          <div className="max-w-4xl mx-auto space-y-6">
-            
-            {/* Section 1 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">1. Order Placement & Acceptance</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
-                By placing an order through The Style Zone, you confirm that you are at least 18 years old or have parental consent to make purchases. All orders are subject to product availability and our acceptance of your order.
-              </p>
-            </div>
+            <div className="border-b border-gray-200 mb-8" />
 
-            {/* Section 2 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">2. Pricing & Payment Methods</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                All prices are listed in Nepalese Rupees (Rs) and include applicable taxes. We accept eSewa, Khalti, and Cash on Delivery for payments within Nepal.
-              </p>
-              <ul className="space-y-2 text-xs text-[#121212]/70">
-                <li>Secure payment processing through trusted gateways</li>
-                <li>Price protection against unauthorized charges</li>
-                <li>Cash on Delivery available for Kanchanpur district</li>
-              </ul>
+            {/* Sections */}
+            <div className="space-y-8">
+              {sections.map((s, idx) => (
+                <section key={s.id} id={s.id}>
+                  <div className="flex items-center gap-3 mb-3">
+                    <span className="w-1.5 h-1.5 rounded-full bg-[#FE5733] shrink-0" />
+                    <p className="text-base md:text-lg font-bold text-gray-800 font-sans">
+                      {s.title}
+                    </p>
+                  </div>
+                  <div className="pl-5">
+                    {renderLines(s.lines)}
+                  </div>
+                  {idx < sections.length - 1 && (
+                    <div className="border-b border-gray-100 mt-8" />
+                  )}
+                </section>
+              ))}
             </div>
 
-            {/* Section 3 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">3. Returns & Refunds Policy</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed mb-4">
-                We offer a 15-day return window for unworn, unwashed items in original packaging with tags attached.
-              </p>
-              <p className="text-xs text-[#121212]/70">
-                <span className="font-bold text-[#121212]">Returnable Items:</span> Clothing, footwear, and accessories in original condition
-              </p>
-              <p className="text-xs text-[#121212]/70 mt-2">
-                <span className="font-bold text-[#121212]">Non-Returnable:</span> Sale items, intimate apparel, and customized products
-              </p>
-            </div>
-
-            {/* Section 4 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">4. Shipping & Delivery</h2>
-              <div className="text-stone-600 space-y-3 font-sans">
-                We offer a flat-rate shipping fee across our delivery zones. Standard delivery timelines apply based on courier service availability.
-              </div>
-              <p className="text-xs text-[#121212]/60">
-                <span className="font-bold text-[#121212]">Delivery Zones:</span> Kanchanpur and surrounding areas (Nationwide delivery coming soon)
-              </p>
-            </div>
-
-            {/* Section 5 */}
-            <div className="bg-white border border-[#121212]/5 rounded-[4px] p-6 md:p-8 animate-on-scroll">
-              <h2 className="text-lg font-bold uppercase tracking-tight font-display text-[#121212] mb-4">5. Limitations & Liability</h2>
-              <p className="text-xs md:text-sm text-[#121212]/70 leading-relaxed">
-                The Style Zone shall not be liable for any indirect, incidental, or consequential damages arising from the use of our products or services. Product images are representative and actual colors may vary slightly.
-              </p>
-            </div>
-
-          </div>
-
-          {/* Footer Info */}
-          <div className="max-w-4xl mx-auto mt-12 pt-8 border-t border-[#121212]/10 animate-on-scroll">
-            <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+            {/* CTA */}
+            <div className="mt-12 bg-[#121212] rounded-lg p-6 md:p-8 flex flex-col sm:flex-row sm:items-center justify-between gap-4">
               <div>
-                <p className="text-sm text-[#121212]/70 mb-1">This agreement is governed by the laws of Nepal.</p>
-                <p className="text-xs text-[#121212]/50">For questions, contact our support team.</p>
+                <p className="text-base font-bold text-white font-sans">This agreement is governed by the laws of Nepal.</p>
+                <p className="text-sm text-white/40 mt-1 font-sans">Questions? Our support team is here to help.</p>
               </div>
-              <a 
-                href="/contact" 
-                className="bg-[#FE5733] hover:bg-[#121212] text-white px-8 py-4 shrink-0 transition-colors uppercase tracking-widest text-xs font-bold rounded-sm"
+              <a
+                href="/contact"
+                className="shrink-0 bg-[#FE5733] hover:bg-white hover:text-[#121212] text-white font-bold font-sans uppercase tracking-wider text-xs px-8 py-3 rounded-lg transition-all duration-200 whitespace-nowrap text-center"
               >
                 Contact Support
               </a>
             </div>
-          </div>
 
+          </div>
         </div>
       </main>
 

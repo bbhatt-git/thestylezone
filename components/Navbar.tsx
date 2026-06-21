@@ -71,14 +71,14 @@ export default function Navbar() {
     <>
       <div className="sticky top-0 z-50 w-full">
         {announcementVisible && (
-          <div className="w-full flex items-center justify-between gap-4 px-4 py-2 bg-[#FE5733] text-white text-[12px] font-medium tracking-[0.18em]">
-            <p className="min-w-0 truncate text-left">
-              Free delivery above Rs. 2000 — 30 day returns — Authentic products only
+          <div className="w-full flex items-center justify-between gap-3 px-4 py-1 bg-[#FE5733] text-white text-[12px] font-semibold tracking-[0.18em]">
+            <p className="min-w-0 text-left">
+              Shop our latest collection and enjoy exclusive offers! Limited time only.
             </p>
             <button
               onClick={dismissAnnouncement}
               aria-label="Dismiss announcement"
-              className="p-2 rounded-full bg-white/10 hover:bg-white/20 transition-colors"
+              className="p-1 rounded-[5px] bg-white/10 hover:bg-white/30 hover:text-black/50 transition-colors shrink-0"
             >
               <X className="w-4 h-4" />
             </button>
@@ -113,11 +113,10 @@ export default function Navbar() {
                   key={link.href}
                   href={link.href}
                   aria-label={`Navigate to ${link.label}`}
-                  className={`text-[13px] font-nav font-medium tracking-[0.16em] transition-colors duration-200 ${
-                    isActive(link.href)
+                  className={`text-[13px] font-nav font-medium tracking-[0.16em] transition-colors duration-200 ${isActive(link.href)
                       ? 'text-black'
                       : 'text-stone-600 hover:text-black'
-                  }`}
+                    }`}
                 >
                   {link.label}
                 </Link>
@@ -128,11 +127,10 @@ export default function Navbar() {
               <Link
                 href="/wishlist"
                 aria-label="Wishlist"
-                className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200 ${
-                  isActive('/wishlist')
+                className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200 ${isActive('/wishlist')
                     ? 'text-[#FE5733]'
                     : 'text-stone-600 hover:text-[#FE5733]'
-                }`}
+                  }`}
               >
                 <Heart className="w-5 h-5" />
                 {isMounted && totalWishItems > 0 && (
@@ -145,11 +143,10 @@ export default function Navbar() {
               <button
                 onClick={() => setIsCartOpen(true)}
                 aria-label="Cart"
-                className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200 ${
-                  isCartOpen
+                className={`relative flex items-center justify-center w-10 h-10 rounded-full transition-colors duration-200 ${isCartOpen
                     ? 'text-[#FE5733]'
                     : 'text-stone-600 hover:text-[#FE5733]'
-                }`}
+                  }`}
               >
                 <ShoppingBag className="w-5 h-5" />
                 {isMounted && totalCartItems > 0 && (

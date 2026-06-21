@@ -122,7 +122,7 @@ export default function HeroClient({ featuredProducts, allProducts }: HeroClient
             {/* Main headline — Cormorant-inspired via font-display */}
             <h1
               className="font-display font-black text-white leading-[0.95] tracking-tight mb-10 whitespace-pre-line"
-              style={{ fontSize: 'clamp(2.8rem, 8vw, 4.4rem)' }}
+              style={{ fontSize: 'clamp(3rem, 10vw, 5rem)' }}
             >
               {slide.headline}
             </h1>
@@ -131,18 +131,18 @@ export default function HeroClient({ featuredProducts, allProducts }: HeroClient
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <Link
                 href={slide.ctaLink}
-                className="group btn btn-primary inline-flex items-center gap-2 px-6 py-3"
+                className="group btn btn-primary inline-flex items-center gap-2 px-5 py-2"
               >
                 {slide.ctaText}
                 <ChevronRight className="w-4 h-4 transition-transform duration-200 group-hover:translate-x-1" />
               </Link>
 
               <Link
-                href="/search"
-                className="group btn btn-ghost inline-flex items-center gap-2.5 px-4 py-3"
+                href="/shop"
+                className="group btn btn-ghost inline-flex items-center gap-2.5 px-4 py-2"
               >
                 <Search className="w-4 h-4" />
-                Search
+                Search Products
               </Link>
             </div>
           </div>

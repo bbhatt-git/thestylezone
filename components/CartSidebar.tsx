@@ -53,11 +53,11 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
         <div className="flex items-center justify-between px-6 py-5 border-b-2 border-black shrink-0">
           <h2 className="text-xl font-black text-black uppercase tracking-tighter">
             Your Bag
-            <span className="ml-2 text-black/40 font-bold text-xs tracking-widest">({isMounted ? totalItems : 0} {isMounted && totalItems === 1 ? 'ITEM' : 'ITEMS'})</span>
+            <span className="ml-2 font-serif text-black/40 font-bold text-[15px] tracking-widest">({isMounted ? totalItems : 0} {isMounted && totalItems === 1 ? 'ITEM' : 'ITEMS'})</span>
           </h2>
           <button
             onClick={onClose}
-            className="btn btn-ghost btn-sm p-2 rounded-full"
+            className="btn btn-ghost btn-sm p-1 rounded-[6px]"
             aria-label="Close cart"
           >
             <X className="w-5 h-5" />
