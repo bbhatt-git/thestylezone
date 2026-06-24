@@ -41,8 +41,13 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Handle both image formats
   const imagesArray = Array.isArray(product.images) ? product.images : [];
-  const primaryImage = imagesArray[0]?.src || imagesArray[0] || 'https://picsum.photos/seed/placeholder/600/800';
-  const secondaryImage = imagesArray[1]?.src || imagesArray[1] || primaryImage;
+  const getImageUrl = (img: string | { src: string } | undefined): string => {
+    if (!img) return 'https://picsum.photos/seed/placeholder/600/800';
+    if (typeof img === 'string') return img;
+    return img.src;
+  };
+  const primaryImage = getImageUrl(imagesArray[0]);
+  const secondaryImage = getImageUrl(imagesArray[1]) || primaryImage;
 
   // Handle stock status
   const stockStatus = product.stock_status || (product.stock_total === 0 ? 'outofstock' : 'instock');
