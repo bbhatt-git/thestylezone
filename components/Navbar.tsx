@@ -5,14 +5,16 @@ import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import { useCart } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
-import { ShoppingBag, Heart, Menu, X } from 'lucide-react';
+import { ShoppingBag, Heart, Menu } from 'lucide-react';
 import CartSidebar from '@/components/CartSidebar';
+import MenuDrawer from '@/components/MenuDrawer';
 
 export default function Navbar() {
   const pathname = usePathname();
-  const [isOpen, setIsOpen] = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
+  const [scrolled, setScrolled] = useState(false);
 
   const totalCartItems = useCart((state) => state.getTotalItems());
   const totalWishItems = useWishlist((state) => state.itemIds.length);
@@ -22,8 +24,10 @@ export default function Navbar() {
   }, []);
 
   useEffect(() => {
-    setIsOpen(false);
-  }, [pathname]);
+    const handleScroll = () => setScrolled(window.scrollY > 10);
+    window.addEventListener('scroll', handleScroll, { passive: true });
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
 
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
@@ -36,102 +40,92 @@ export default function Navbar() {
 
   return (
     <>
-      <div className="sticky top-0 z-50 w-full bg-white border-b border-black/5">
-        <nav className="max-w-[1560px] mx-auto px-4 sm:px-6">
-          <div className="flex items-center justify-between h-14 sm:h-16">
-            {/* Mobile Menu Button */}
-            <button
-              onClick={() => setIsOpen(!isOpen)}
-              className="lg:hidden flex items-center justify-center p-2 text-stone-600 hover:text-black transition-colors"
-              aria-label="Toggle navigation"
-            >
-              {isOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
-            </button>
-
-            {/* Logo */}
-            <Link href="/" aria-label="Home" className="flex items-center">
-              <div className="font-display font-black text-lg sm:text-xl tracking-tighter text-black">
-                THE STYLE ZONE
-              </div>
-            </Link>
-
-            {/* Desktop Navigation */}
-            <div className="hidden lg:flex items-center gap-6">
-              {navLinks.map((link) => (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  aria-label={`Navigate to ${link.label}`}
-                  className={`text-sm font-medium transition-colors ${
-                    isActive(link.href)
-                      ? 'text-[#FE5733]'
-                      : 'text-stone-600 hover:text-black'
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              ))}
-            </div>
-
-            {/* Right Actions */}
-            <div className="flex items-center gap-1 sm:gap-2">
-              <Link
-                href="/wishlist"
-                aria-label="Wishlist"
-                className={`relative flex items-center justify-center p-2 transition-colors ${
-                  isActive('/wishlist')
-                    ? 'text-[#FE5733]'
-                    : 'text-stone-600 hover:text-[#FE5733]'
-                }`}
-              >
-                <Heart className="w-5 h-5" />
-                {isMounted && totalWishItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FE5733] text-white text-[10px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center">
-                    {totalWishItems > 9 ? '9+' : totalWishItems}
-                  </span>
-                )}
+      <div className="sticky top-0 z-50 w-full">
+        <header
+          className={`transition-all duration-300 ${
+            scrolled 
+              ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-black/5' 
+              : 'bg-white border-b border-black/5'
+          }`}
+        >
+          <nav className="max-w-[1560px] mx-auto px-4 sm:px-6">
+            <div className="flex items-center justify-between h-12 sm:h-14">
+              {/* Logo - Left */}
+              <Link href="/" aria-label="Home" className="flex items-center">
+                <div className="font-display font-black text-base sm:text-lg tracking-tighter text-black">
+                  THE STYLE ZONE
+                </div>
               </Link>
 
-              <button
-                onClick={() => setIsCartOpen(true)}
-                aria-label="Cart"
-                className={`relative flex items-center justify-center p-2 transition-colors ${
-                  isCartOpen
-                    ? 'text-[#FE5733]'
-                    : 'text-stone-600 hover:text-[#FE5733]'
-                }`}
-              >
-                <ShoppingBag className="w-5 h-5" />
-                {isMounted && totalCartItems > 0 && (
-                  <span className="absolute -top-1 -right-1 bg-[#FE5733] text-white text-[10px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center">
-                    {totalCartItems > 9 ? '9+' : totalCartItems}
-                  </span>
-                )}
-              </button>
-            </div>
-          </div>
-        </nav>
+              {/* Desktop Navigation - Center */}
+              <div className="hidden lg:flex items-center gap-8">
+                {navLinks.map((link) => (
+                  <Link
+                    key={link.href}
+                    href={link.href}
+                    aria-label={`Navigate to ${link.label}`}
+                    className={`text-sm font-medium transition-colors ${
+                      isActive(link.href)
+                        ? 'text-[#FE5733]'
+                        : 'text-stone-600 hover:text-black'
+                    }`}
+                  >
+                    {link.label}
+                  </Link>
+                ))}
+              </div>
 
-        {/* Mobile Menu */}
-        {isOpen && (
-          <div className="lg:hidden bg-white border-t border-black/5">
-            <div className="px-4 py-4 space-y-3">
-              {navLinks.map((link) => (
+              {/* Right Actions */}
+              <div className="flex items-center gap-1 sm:gap-2">
                 <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setIsOpen(false)}
-                  aria-label={`Navigate to ${link.label}`}
-                  className="block text-sm font-medium text-stone-700 hover:text-[#FE5733] transition-colors py-2"
+                  href="/wishlist"
+                  aria-label="Wishlist"
+                  className={`relative flex items-center justify-center p-2 transition-colors ${
+                    isActive('/wishlist')
+                      ? 'text-[#FE5733]'
+                      : 'text-stone-600 hover:text-[#FE5733]'
+                  }`}
                 >
-                  {link.label}
+                  <Heart className="w-5 h-5" />
+                  {isMounted && totalWishItems > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#FE5733] text-white text-[10px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center">
+                      {totalWishItems > 9 ? '9+' : totalWishItems}
+                    </span>
+                  )}
                 </Link>
-              ))}
+
+                <button
+                  onClick={() => setIsCartOpen(true)}
+                  aria-label="Cart"
+                  className={`relative flex items-center justify-center p-2 transition-colors ${
+                    isCartOpen
+                      ? 'text-[#FE5733]'
+                      : 'text-stone-600 hover:text-[#FE5733]'
+                  }`}
+                >
+                  <ShoppingBag className="w-5 h-5" />
+                  {isMounted && totalCartItems > 0 && (
+                    <span className="absolute -top-1 -right-1 bg-[#FE5733] text-white text-[10px] font-bold min-w-[16px] h-4 rounded-full flex items-center justify-center">
+                      {totalCartItems > 9 ? '9+' : totalCartItems}
+                    </span>
+                  )}
+                </button>
+
+                {/* Mobile Menu Button - Right */}
+                <button
+                  onClick={() => setIsMenuOpen(!isMenuOpen)}
+                  className="lg:hidden flex items-center justify-center p-2 text-stone-600 hover:text-black transition-colors"
+                  aria-label="Toggle navigation"
+                >
+                  <Menu className="w-5 h-5" />
+                </button>
+              </div>
             </div>
-          </div>
-        )}
+          </nav>
+        </header>
       </div>
 
+      <MenuDrawer isOpen={isMenuOpen} onClose={() => setIsMenuOpen(false)} />
       <CartSidebar isOpen={isCartOpen} onClose={() => setIsCartOpen(false)} />
     </>
   );
