@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 
 export default function GlobalError({
   error,
@@ -25,15 +26,24 @@ export default function GlobalError({
           <h2 className="text-2xl font-bold text-black">Something went wrong</h2>
         </div>
         <p className="text-sm text-stone-600 leading-relaxed">
-          We encountered an unexpected issue. Please try again or contact support if the problem persists.
+          We encountered an unexpected issue. Please try again or go back to the home page.
         </p>
-        <button
-          onClick={() => reset()}
-          className="w-full h-11 btn btn-primary flex items-center justify-center gap-2"
-        >
-          <RefreshCw className="w-4 h-4" />
-          Try Again
-        </button>
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={() => reset()}
+            className="w-full h-11 bg-[#FE5733] hover:bg-[#121212] text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2"
+          >
+            <RefreshCw className="w-4 h-4" />
+            Try Again
+          </button>
+          <Link
+            href="/"
+            className="w-full h-11 bg-[#121212] hover:bg-white hover:text-[#121212] text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-[#121212]"
+          >
+            <Home className="w-4 h-4" />
+            Go Home
+          </Link>
+        </div>
       </div>
     </div>
   );

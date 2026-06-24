@@ -45,15 +45,6 @@ export default function NotFound() {
             </button>
           </div>
 
-          <div className="mt-12">
-            <div className="h-px bg-[#121212]/10 w-64 mx-auto" />
-          </div>
-
-          <div className="mt-6">
-            <p className="text-xs text-stone-400 uppercase tracking-widest">
-              Error Code: 404 • Page Missing
-            </p>
-          </div>
         </div>
       </main>
 

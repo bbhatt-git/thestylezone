@@ -238,13 +238,14 @@ export default function CheckoutPage() {
           'Content-Type': 'application/json'
         },
         body: JSON.stringify({
-          code: couponCodeInput.trim(),
+          code: couponCodeInput.trim().toUpperCase(),
           subtotal: cartTotal
         })
       });
       const data = await res.json();
       if (data.success) {
         setAppliedCoupon(data);
+        setCouponCodeInput('');
         showModal('success', 'Coupon Applied!', `Discount code applied successfully. You save Rs ${data.discountAmount.toLocaleString()}!`);
       } else {
         setCouponError(data.error || 'Failed to apply promotional code.');

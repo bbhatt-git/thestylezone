@@ -1,7 +1,8 @@
 'use client';
 
 import React, { useEffect } from 'react';
-import { AlertTriangle, RefreshCw } from 'lucide-react';
+import Link from 'next/link';
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 
 export default function GlobalError({
@@ -19,24 +20,33 @@ export default function GlobalError({
     <div>
       <Navbar />
       <div className="min-h-screen flex flex-col items-center justify-center bg-[#F5F5F0] px-4 text-center">
-
         <div className="bg-white border border-black/10 p-8 md:p-12 rounded-lg shadow-sm max-w-md w-full space-y-6">
           <div className="w-16 h-16 bg-[#FE5733]/10 text-[#FE5733] rounded-full flex items-center justify-center mx-auto border border-[#FE5733]/20">
             <AlertTriangle className="w-7 h-7" strokeWidth={1.5} />
           </div>
           <div>
-            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-2">Catalog Unavailable</p>
-            <h2 className="text-2xl font-bold text-black">Failed to Load <br /> Products</h2>
+            <p className="text-xs font-semibold uppercase tracking-[0.2em] text-black/50 mb-2">Oops</p>
+            <h2 className="text-2xl font-bold text-black">Failed to Load Products</h2>
           </div>
           <p className="text-sm text-stone-600 leading-relaxed">
-            We couldn't retrieve the latest collection right now. Our servers might be experiencing heavy traffic.        </p>
-          <button
-            onClick={() => reset()}
-            className="w-full h-11 btn btn-primary flex items-center justify-center gap-2"
-          >
-            <RefreshCw className="w-4 h-4" />
-            Try Again
-          </button>
+            We couldn't retrieve the latest collection right now. Please try again or go back to the home page.
+          </p>
+          <div className="flex flex-col gap-3">
+            <button
+              onClick={() => reset()}
+              className="w-full h-11 bg-[#FE5733] hover:bg-[#121212] text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2"
+            >
+              <RefreshCw className="w-4 h-4" />
+              Try Again
+            </button>
+            <Link
+              href="/"
+              className="w-full h-11 bg-[#121212] hover:bg-white hover:text-[#121212] text-white font-bold text-xs tracking-wider uppercase transition-all flex items-center justify-center gap-2 border border-[#121212]"
+            >
+              <Home className="w-4 h-4" />
+              Go Home
+            </Link>
+          </div>
         </div>
       </div>
     </div>
