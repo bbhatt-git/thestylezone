@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readDb, saveDb, Product, ProductVariant } from '@/lib/db';
+import { readDb, saveDb, Product, ProductVariation } from '@/lib/db';
 
 export async function GET(req: NextRequest, { params }: { params: Promise<{ slug: string }> }) {
   try {
@@ -74,7 +74,7 @@ export async function PUT(req: NextRequest, { params }: { params: Promise<{ slug
       db.variants = db.variants.filter(v => v.product_id !== product.id);
       
       let stock_total = 0;
-      const savedVariants: ProductVariant[] = data.variants.map((v: any, index: number) => {
+      const savedVariants: ProductVariation[] = data.variants.map((v: any, index: number) => {
         const sQty = parseInt(v.stock || '0', 10);
         stock_total += sQty;
         return {
