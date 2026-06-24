@@ -28,8 +28,6 @@ interface OrderData {
   customer_phone: string;
   customer_email: string | null;
   shipping_address: string;
-  municipality: string;
-  wardNo: string;
   payment_method: string;
   payment_status: string;
   payment_txn_id: string | null;
@@ -149,7 +147,7 @@ function CheckoutSuccessContent() {
               <div className="bg-black/5 p-6 rounded-xl max-w-md mx-auto">
                 <p className="text-xs font-bold tracking-widest uppercase text-black text-center">
                   <strong className="block mb-2 text-[#FE5733]">Pay on Delivery</strong>
-                  Dispatching to {orderData.municipality} shortly.
+                  Dispatching shortly.
                 </p>
               </div>
             ) : (
@@ -192,7 +190,7 @@ function CheckoutSuccessContent() {
               <div>
                 <p className="text-[10px] text-black/40 font-bold uppercase tracking-widest mb-1">Shipping Address</p>
                 <p className="text-black font-black uppercase text-sm">{orderData.customer_name}</p>
-                <p className="text-black/60 text-xs mt-1 uppercase font-bold tracking-widest">{orderData.shipping_address}, {orderData.municipality}, Ward {orderData.wardNo}</p>
+                <p className="text-black/60 text-xs mt-1 uppercase font-bold tracking-widest">{orderData.shipping_address}</p>
                 <p className="text-black/40 text-xs mt-1">{orderData.customer_phone}</p>
               </div>
             </div>

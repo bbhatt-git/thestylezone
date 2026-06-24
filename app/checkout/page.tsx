@@ -529,7 +529,6 @@ export default function CheckoutPage() {
                         onClick={() => {
                           setCountryOpen(!countryOpen);
                           setDistrictOpen(false);
-                          setMunicipalityOpen(false);
                         }}
                         className="w-full h-10 bg-transparent border-b border-black/10 px-0 text-sm text-black outline-none flex items-center justify-between"
                       >
@@ -682,14 +681,6 @@ export default function CheckoutPage() {
                           <div>
                             <p className="text-[11px] text-stone-500 mb-1">District</p>
                             <p className="font-semibold text-[#121212]">{districts.find(d => d.id === district)?.name || district}</p>
-                          </div>
-                          <div>
-                            <p className="text-[11px] text-stone-500 mb-1">Municipality</p>
-                            <p className="font-semibold text-[#121212]">{municipalities.find(m => m.id === municipality)?.name || municipality}</p>
-                          </div>
-                          <div>
-                            <p className="text-[11px] text-stone-500 mb-1">Ward No.</p>
-                            <p className="font-semibold text-[#121212]">{wardNo}</p>
                           </div>
                         </>
                       )}
@@ -910,7 +901,7 @@ export default function CheckoutPage() {
                     <BadgeHelp className="w-6 h-6 text-[#FE5733] flex-none mt-0.5" />
                     <div className="space-y-1.5 text-sm leading-relaxed text-stone-500">
                       <h4 className="text-sm font-semibold text-[#121212]">Cash on Delivery (COD) rules</h4>
-                      <p>No upfront transaction IDs or payments are required. Your order will be compiled instantly with status &ldquo;Confirmed&rdquo;. Please pay <strong>Rs {grandTotal.toLocaleString()}</strong> in cash directly to our delivery executive when your parcel package is handed to you in {municipality}.</p>
+                      <p>No upfront transaction IDs or payments are required. Your order will be compiled instantly with status &ldquo;Confirmed&rdquo;. Please pay <strong>Rs {grandTotal.toLocaleString()}</strong> in cash directly to our delivery executive when your parcel package is handed to you.</p>
                     </div>
                   </div>
                 )}
@@ -1010,7 +1001,7 @@ export default function CheckoutPage() {
                   </div>
                 )}
                 <div className="flex justify-between">
-                  <span>Shipping rates ({municipality})</span>
+                  <span>Shipping rates</span>
                   <span className="text-[#121212] ">Rs {shippingFee.toLocaleString()}</span>
                 </div>
                 
