@@ -30,7 +30,7 @@ export default function WishlistClient({ allProducts }: WishlistClientProps) {
     setIsMounted(true);
   }, []);
 
-  const wishlistedProducts = allProducts.filter((product) => itemIds.includes(product.id));
+  const wishlistedProducts = allProducts.filter((product) => itemIds.includes(String(product.id)));
 
   if (!isMounted) {
     return (
