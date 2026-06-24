@@ -164,35 +164,18 @@ export async function getMunicipalityByName(name: string, districtId: string): P
 // Calculate shipping cost based on location
 export async function calculateShippingCost(
   countryCode: string,
-  districtName?: string,
-  municipalityName?: string
+  districtName?: string
 ): Promise<number> {
-  // First get the country rate
-  const country = await getCountryByCode(countryCode);
-  
-  if (!country) {
-    return 200; // Default fallback
-  }
-  
-  // If not Nepal, return country rate
+  // If not Nepal, return international flat rate
   if (countryCode !== 'NP') {
-    return country.shipping_cost;
-  }
-  
-  // For Nepal, check municipality first
-  if (municipalityName && districtName) {
-    const district = await getDistrictByName(districtName);
-    if (district) {
-      const municipality = await getMunicipalityByName(municipalityName, district.id);
-      if (municipality && municipality.shipping_cost !== null) {
-        return municipality.shipping_cost;
-      }
-      // If municipality has no override, use district rate
-      return district.shipping_cost;
+    const country = await getCountryByCode(countryCode);
+    if (country) {
+      return country.shipping_cost;
     }
+    return 2500; // Default international rate
   }
   
-  // If district provided directly
+  // For Nepal, use district shipping cost
   if (districtName) {
     const district = await getDistrictByName(districtName);
     if (district) {
@@ -200,8 +183,8 @@ export async function calculateShippingCost(
     }
   }
   
-  // Fallback to country rate
-  return country.shipping_cost;
+  // Fallback to default Nepal rate
+  return 200;
 }
 
 // Get store settings
