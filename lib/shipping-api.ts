@@ -3,7 +3,14 @@ import { createClient } from '@supabase/supabase-js';
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL || '';
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || '';
 
-const supabase = createClient(supabaseUrl, supabaseAnonKey);
+let supabase: any = null;
+
+function getSupabaseClient() {
+  if (!supabase && supabaseUrl && supabaseAnonKey) {
+    supabase = createClient(supabaseUrl, supabaseAnonKey);
+  }
+  return supabase;
+}
 
 export interface Country {
   id: string;
@@ -37,7 +44,10 @@ export interface StoreSettings {
 
 // Get all countries
 export async function getCountries(): Promise<Country[]> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return [];
+  
+  const { data, error } = await client
     .from('countries')
     .select('*')
     .eq('is_active', true)
@@ -53,7 +63,10 @@ export async function getCountries(): Promise<Country[]> {
 
 // Get country by code
 export async function getCountryByCode(code: string): Promise<Country | null> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return null;
+  
+  const { data, error } = await client
     .from('countries')
     .select('*')
     .eq('code', code)
@@ -70,7 +83,10 @@ export async function getCountryByCode(code: string): Promise<Country | null> {
 
 // Get all districts
 export async function getDistricts(): Promise<District[]> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return [];
+  
+  const { data, error } = await client
     .from('districts')
     .select('*')
     .eq('is_active', true)
@@ -86,7 +102,10 @@ export async function getDistricts(): Promise<District[]> {
 
 // Get district by name
 export async function getDistrictByName(name: string): Promise<District | null> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return null;
+  
+  const { data, error } = await client
     .from('districts')
     .select('*')
     .eq('name', name)
@@ -103,7 +122,10 @@ export async function getDistrictByName(name: string): Promise<District | null> 
 
 // Get municipalities by district
 export async function getMunicipalitiesByDistrict(districtId: string): Promise<Municipality[]> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return [];
+  
+  const { data, error } = await client
     .from('municipalities')
     .select('*')
     .eq('district_id', districtId)
@@ -120,7 +142,10 @@ export async function getMunicipalitiesByDistrict(districtId: string): Promise<M
 
 // Get municipality by name and district
 export async function getMunicipalityByName(name: string, districtId: string): Promise<Municipality | null> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return null;
+  
+  const { data, error } = await client
     .from('municipalities')
     .select('*')
     .eq('name', name)
@@ -181,7 +206,10 @@ export async function calculateShippingCost(
 
 // Get store settings
 export async function getStoreSettings(): Promise<StoreSettings | null> {
-  const { data, error } = await supabase
+  const client = getSupabaseClient();
+  if (!client) return null;
+  
+  const { data, error } = await client
     .from('store_settings')
     .select('*')
     .single();
