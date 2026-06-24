@@ -104,3 +104,52 @@ export async function calculateShippingCost(countryCode: string, districtName?: 
   // Fallback to default Nepal rate
   return 200;
 }
+
+// Get all store config
+export async function getAllStoreConfig(): Promise<StoreConfig[]> {
+  const client = getSupabaseClient();
+  if (!client) return [];
+  
+  const { data, error } = await client
+    .from('store_config')
+    .select('*');
+  
+  if (error) {
+    console.error('Error fetching store config:', error);
+    return [];
+  }
+  
+  return data || [];
+}
+
+// Update store config value
+export async function updateStoreConfig(key: string, value: string): Promise<StoreConfig | null> {
+  const client = getSupabaseClient();
+  if (!client) return null;
+  
+  const { data, error } = await client
+    .from('store_config')
+    .update({ value, updated_at: new Date().toISOString() })
+    .eq('key', key)
+    .select()
+    .single();
+  
+  if (error) {
+    console.error('Error updating store config:', error);
+    return null;
+  }
+  
+  return data;
+}
+
+// Get auto approve reviews setting
+export async function getAutoApproveReviews(): Promise<boolean> {
+  const value = await getStoreConfig('auto_approve_reviews');
+  return value === 'true';
+}
+
+// Update auto approve reviews setting
+export async function updateAutoApproveReviews(enabled: boolean): Promise<boolean> {
+  const result = await updateStoreConfig('auto_approve_reviews', enabled ? 'true' : 'false');
+  return result !== null;
+}
