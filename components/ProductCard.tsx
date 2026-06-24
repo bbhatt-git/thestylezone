@@ -11,7 +11,7 @@ interface ProductCardProps {
     name: string;
     slug: string;
     regular_price?: string;
-    sale_price?: string | null;
+    sale_price?: string | number | null;
     base_price?: number;
     images: Array<{ src: string }> | string[];
     average_rating?: string;
@@ -34,7 +34,7 @@ export default function ProductCard({ product }: ProductCardProps) {
 
   // Handle both WooCommerce format and local DB format
   const regularPrice = parseFloat(product.regular_price || String(product.base_price || 0));
-  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const salePrice = product.sale_price ? parseFloat(String(product.sale_price)) : null;
   const price = salePrice || regularPrice;
   const originalPrice = salePrice ? regularPrice : null;
   const discountPct = salePrice && regularPrice > 0 ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
