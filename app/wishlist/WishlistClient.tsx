@@ -7,24 +7,15 @@ import ProductCard from '@/components/ProductCard';
 import { Heart, ArrowLeft, SlidersHorizontal } from 'lucide-react';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  brand: string;
-  base_price: number;
-  sale_price: number | null;
-  discount_pct: number;
-  images: string[];
-  rating_avg: number;
-  rating_count: number;
-  stock_total: number;
-  is_active: boolean;
-  is_featured: boolean;
-  created_at: string;
   description: string;
-  categories: string[];
-  colors: string[];
-  sizes: string[];
+  regular_price: string;
+  sale_price?: string;
+  price: string;
+  images: Array<{ src: string; alt: string; name: string }>;
+  categories: Array<{ id: number; name: string; slug: string }>;
 }
 
 interface WishlistClientProps {
