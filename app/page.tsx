@@ -160,29 +160,6 @@ export default async function HomePage() {
           </div>
         </section>
 
-        <style jsx global>{`
-          .custom-shape-divider-bottom-1782285797 {
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            overflow: hidden;
-            line-height: 0;
-            transform: rotate(180deg);
-          }
-
-          .custom-shape-divider-bottom-1782285797 svg {
-            position: relative;
-            display: block;
-            width: calc(100% + 1.3px);
-            height: 137px;
-          }
-
-          .custom-shape-divider-bottom-1782285797 .shape-fill {
-            fill: #F9F9F9;
-          }
-        `}</style>
-
         {/* Bestsellers Section - Clean Minimalist */}
         <section className="py-24 px-6 md:px-10 bg-[#F9F9F9]">
           <div className="max-w-[1560px] mx-auto">
