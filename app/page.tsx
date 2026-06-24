@@ -61,24 +61,24 @@ export default async function HomePage() {
         <HeroClient />
 
         {/* Curated Aesthetics - Modern Grid with Wave Divider */}
-        <section className="relative py-32 px-6 md:px-10 bg-black text-white overflow-hidden">
+        <section className="relative py-16 sm:py-24 lg:py-32 px-4 sm:px-6 lg:px-10 bg-black text-white overflow-hidden">
           <div className="max-w-[1560px] mx-auto relative z-10">
             
             {/* Header */}
-            <div className="text-center mb-20">
-              <h2 className="text-5xl md:text-7xl font-black uppercase tracking-tighter font-display leading-none mb-4">
+            <div className="text-center mb-12 sm:mb-16 lg:mb-20">
+              <h2 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black uppercase tracking-tighter font-display leading-none mb-3 sm:mb-4">
                 Curated<br/>
                 <span className="text-[#FE5733]">Aesthetics</span>
               </h2>
-              <p className="text-white/50 max-w-2xl mx-auto text-sm uppercase tracking-widest font-bold">
+              <p className="text-white/50 max-w-xl mx-auto text-xs sm:text-sm uppercase tracking-widest font-bold px-4">
                 Discover collections crafted for the modern individual
               </p>
             </div>
 
             {/* Grid Layout */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
               {/* Large Featured Card */}
-              <Link href="/shop?category=clothing" className="group relative aspect-[3/4] lg:row-span-2 lg:col-span-2 overflow-hidden rounded-2xl bg-stone-900 block">
+              <Link href="/shop?category=clothing" className="group relative aspect-[3/4] sm:aspect-[4/3] lg:aspect-[3/4] lg:row-span-2 lg:col-span-2 overflow-hidden rounded-2xl bg-stone-900 block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src="https://images.pexels.com/photos/1598505/pexels-photo-1598505.jpeg" 
@@ -86,13 +86,13 @@ export default async function HomePage() {
                   className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-10 w-full">
-                  <span className="inline-block px-3 py-1 bg-[#FE5733] text-white text-xs font-bold uppercase tracking-widest mb-3 rounded-full">Featured</span>
-                  <h3 className="text-4xl font-black uppercase tracking-tighter mb-2 text-white">Denim Edit</h3>
-                  <p className="text-sm font-medium tracking-wide text-white/70 mb-4">Timeless pieces for every wardrobe</p>
-                  <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#FE5733] group-hover:gap-4 transition-all">
+                <div className="absolute bottom-0 left-0 p-6 sm:p-8 lg:p-10 w-full">
+                  <span className="inline-block px-2 sm:px-3 py-1 bg-[#FE5733] text-white text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-2 sm:mb-3 rounded-full">Featured</span>
+                  <h3 className="text-2xl sm:text-3xl lg:text-4xl font-black uppercase tracking-tighter mb-1 sm:mb-2 text-white">Denim Edit</h3>
+                  <p className="text-xs sm:text-sm font-medium tracking-wide text-white/70 mb-3 sm:mb-4">Timeless pieces for every wardrobe</p>
+                  <span className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FE5733] group-hover:gap-4 transition-all">
                     Explore Collection
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </span>
                 </div>
               </Link>
@@ -106,9 +106,9 @@ export default async function HomePage() {
                   className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6 w-full">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter mb-1 text-white">Beauty</h3>
-                  <p className="text-xs font-bold tracking-widest text-[#FE5733] uppercase">Shop Now</p>
+                <div className="absolute bottom-0 left-0 p-4 sm:p-6 w-full">
+                  <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter mb-1 text-white">Beauty</h3>
+                  <p className="text-[10px] sm:text-xs font-bold tracking-widest text-[#FE5733] uppercase">Shop Now</p>
                 </div>
               </Link>
 
@@ -121,14 +121,14 @@ export default async function HomePage() {
                   className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-6 w-full">
-                  <h3 className="text-2xl font-black uppercase tracking-tighter mb-1 text-white">Footwear</h3>
-                  <p className="text-xs font-bold tracking-widest text-[#FE5733] uppercase">Shop Now</p>
+                <div className="absolute bottom-0 left-0 p-4 sm:p-6 w-full">
+                  <h3 className="text-xl sm:text-2xl font-black uppercase tracking-tighter mb-1 text-white">Footwear</h3>
+                  <p className="text-[10px] sm:text-xs font-bold tracking-widest text-[#FE5733] uppercase">Shop Now</p>
                 </div>
               </Link>
 
               {/* Wide Card */}
-              <Link href="/shop?category=sale" className="group relative aspect-[2/1] lg:col-span-2 overflow-hidden rounded-2xl bg-stone-900 block">
+              <Link href="/shop?category=sale" className="group relative aspect-[2/1] sm:aspect-[3/2] lg:aspect-[2/1] lg:col-span-2 overflow-hidden rounded-2xl bg-stone-900 block">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img 
                   src="https://images.pexels.com/photos/1898552/pexels-photo-1898552.jpeg" 
@@ -136,14 +136,14 @@ export default async function HomePage() {
                   className="w-full h-full object-cover opacity-50 group-hover:opacity-70 group-hover:scale-105 transition-all duration-700 ease-out" 
                 />
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/40 to-transparent" />
-                <div className="absolute bottom-0 left-0 p-8 w-full flex items-end justify-between">
+                <div className="absolute bottom-0 left-0 p-4 sm:p-6 lg:p-8 w-full flex flex-col sm:flex-row items-start sm:items-end justify-between gap-2 sm:gap-4">
                   <div>
-                    <span className="inline-block px-3 py-1 bg-white text-black text-xs font-bold uppercase tracking-widest mb-2 rounded-full">Limited Time</span>
-                    <h3 className="text-3xl font-black uppercase tracking-tighter text-white">Clearance Sale</h3>
+                    <span className="inline-block px-2 sm:px-3 py-1 bg-white text-black text-[10px] sm:text-xs font-bold uppercase tracking-widest mb-1 sm:mb-2 rounded-full">Limited Time</span>
+                    <h3 className="text-xl sm:text-2xl lg:text-3xl font-black uppercase tracking-tighter text-white">Clearance Sale</h3>
                   </div>
-                  <span className="inline-flex items-center gap-2 text-xs font-bold uppercase tracking-widest text-[#FE5733] group-hover:gap-4 transition-all">
+                  <span className="inline-flex items-center gap-2 text-[10px] sm:text-xs font-bold uppercase tracking-widest text-[#FE5733] group-hover:gap-4 transition-all">
                     Up to 50% Off
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
+                    <svg className="w-3 h-3 sm:w-4 sm:h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 8l4 4m0 0l-4 4m4-4H3" /></svg>
                   </span>
                 </div>
               </Link>
