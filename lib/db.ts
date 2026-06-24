@@ -267,10 +267,12 @@ export async function readDb(): Promise<DbData> {
     const results = await Promise.allSettled([
       api.get('products', { per_page: 100, status: 'publish' }),
       api.get('products/categories', { per_page: 100 }),
+      api.get('coupons', { per_page: 100 }),
     ]);
 
     const productsResult = results[0];
     const categoriesResult = results[1];
+    const couponsResult = results[2];
 
     // Process categories - use WooCommerce native structure
     if (categoriesResult.status === 'fulfilled') {
@@ -359,6 +361,29 @@ export async function readDb(): Promise<DbData> {
       }
     } else {
       console.warn('WooCommerce products fetch failed:', productsResult.reason?.message || productsResult.reason);
+    }
+
+    // Process coupons - map WooCommerce coupons to local format
+    if (couponsResult.status === 'fulfilled') {
+      const wcCoupons = couponsResult.value.data;
+      if (Array.isArray(wcCoupons)) {
+        db.coupons = wcCoupons.map((c: any) => ({
+          id: String(c.id),
+          code: c.code,
+          discount_type: c.discount_type === 'percent' ? 'percentage' : 'fixed',
+          discount_value: parseFloat(c.amount) || 0,
+          min_order_value: parseFloat(c.minimum_amount) || 0,
+          expires_at: c.date_expires || null,
+          max_uses: c.usage_limit || null,
+          used_count: c.usage_count || 0,
+          is_active: c.status === 'publish',
+          description: c.description || ''
+        }));
+      } else {
+        console.warn('WooCommerce coupons data is not an array:', typeof wcCoupons, wcCoupons);
+      }
+    } else {
+      console.warn('WooCommerce coupons fetch failed:', couponsResult.reason?.message || couponsResult.reason);
     }
 
     // Save to cache

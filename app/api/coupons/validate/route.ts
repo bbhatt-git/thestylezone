@@ -6,14 +6,20 @@ export async function POST(req: NextRequest) {
     const data = await req.json();
     const { code, subtotal } = data;
     
+    console.log('Coupon validation request:', { code, subtotal, couponsCount: (await readDb()).coupons.length });
+    
     if (!code) {
       return NextResponse.json({ success: false, error: 'Coupon code is required' }, { status: 400 });
     }
     
     const db = await readDb();
     
+    console.log('Available coupons:', db.coupons.map(c => ({ code: c.code, is_active: c.is_active })));
+    
     // Find matching active coupon
     const coupon = db.coupons.find(c => c.code.toUpperCase() === code.trim().toUpperCase());
+    
+    console.log('Matched coupon:', coupon);
     
     if (!coupon) {
       return NextResponse.json({ success: false, error: 'Coupon code is invalid' });
@@ -61,6 +67,7 @@ export async function POST(req: NextRequest) {
       description: coupon.description
     });
   } catch (err: any) {
+    console.error('Coupon validation error:', err);
     return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });
   }
 }
