@@ -4,21 +4,6 @@ import React, { useState, useEffect, useCallback } from 'react';
 import Link from 'next/link';
 import { ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
-interface Product {
-  id: string;
-  name: string;
-  slug: string;
-  base_price: number;
-  sale_price: number | null;
-  images: string[];
-  is_featured: boolean;
-}
-
-interface HeroClientProps {
-  featuredProducts: Product[];
-  allProducts: Product[];
-}
-
 const SLIDES = [
   {
     id: 'slide-1',
@@ -48,7 +33,7 @@ const SLIDES = [
 
 const SLIDE_DURATION = 6000;
 
-export default function HeroClient({ featuredProducts, allProducts }: HeroClientProps) {
+export default function HeroClient() {
   const [currentSlide, setCurrentSlide] = useState(0);
   const [isAnimating, setIsAnimating] = useState(false);
   

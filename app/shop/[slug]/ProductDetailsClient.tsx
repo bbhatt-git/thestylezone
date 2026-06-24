@@ -7,31 +7,29 @@ import { useWishlist } from '@/store/wishlistStore';
 import { Star, Heart, Check, ShoppingCart } from 'lucide-react';
 import ProductReviews from '@/components/ProductReviews';
 import CartSidebar from '@/components/CartSidebar';
-import type { ProductVariant } from '@/lib/db';
+import type { ProductVariation } from '@/lib/db';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  brand: string;
-  base_price: number;
-  sale_price: number | null;
-  discount_pct: number;
-  images: string[];
-  rating_avg: number;
+  regular_price: string;
+  sale_price?: string;
+  images: Array<{ src: string }>;
+  average_rating: string;
   rating_count: number;
-  stock_total: number;
+  stock_quantity?: number;
+  stock_status: string;
   description: string;
   short_description: string;
-  categories: string[];
-  colors: string[];
-  sizes: string[];
-  sku: string;
+  categories: Array<{ id: number; name: string; slug: string }>;
+  attributes: Array<{ name: string; options: string[] }>;
+  sku?: string;
 }
 
 interface ProductDetailsClientProps {
   product: Product;
-  variants?: ProductVariant[];
+  variations?: ProductVariation[];
 }
 
 // Basic color mapping for swatch UI
@@ -53,8 +51,8 @@ const colorMap: Record<string, string> = {
   'brown': '#8b4513'
 };
 
-export default function ProductDetailsClient({ product, variants = [] }: ProductDetailsClientProps) {
-  const [selectedImage, setSelectedImage] = useState(product.images[0] || 'https://picsum.photos/seed/placeholder/600/800');
+export default function ProductDetailsClient({ product, variations = [] }: ProductDetailsClientProps) {
+  const [selectedImage, setSelectedImage] = useState(product.images[0]?.src || 'https://picsum.photos/seed/placeholder/600/800');
   const [selectedSize, setSelectedSize] = useState<string | null>(null);
   const [selectedColor, setSelectedColor] = useState<string | null>(null);
   const [addedMessage, setAddedMessage] = useState(false);
@@ -62,42 +60,45 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
 
   const { addItem } = useCart();
   const { toggleWishlist, hasItem } = useWishlist();
-  const isLiked = hasItem(product.id);
+  const isLiked = hasItem(String(product.id));
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const requiresSize = product.sizes.length > 0;
-  const requiresColor = product.colors.length > 0;
+  const sizeAttr = product.attributes.find(a => a.name.toLowerCase() === 'size');
+  const colorAttr = product.attributes.find(a => a.name.toLowerCase() === 'color');
+  const requiresSize = sizeAttr?.options && sizeAttr.options.length > 0;
+  const requiresColor = colorAttr?.options && colorAttr.options.length > 0;
 
   // Use selected options if picked, else default to null for the logic
   const matchSize = selectedSize || (requiresSize ? null : 'M');
   const matchColor = selectedColor || (requiresColor ? null : 'Default');
 
-  // Find matching variant only if required options are selected
-  let selectedVariant = variants[0] || null; // fallback
+  // Find matching variation only if required options are selected
+  let selectedVariation = variations[0] || null; // fallback
   if ((!requiresSize || selectedSize) && (!requiresColor || selectedColor)) {
-    selectedVariant = variants.find(
-      (v) => (v.size === matchSize || (!v.size && matchSize === 'M')) && 
-             (v.color === matchColor || (!v.color && matchColor === 'Default'))
-    ) || variants[0];
+    selectedVariation = variations.find(
+      (v) => {
+        const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+        const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+        return (sizeAttr?.option === matchSize || (!sizeAttr && matchSize === 'M')) && 
+               (colorAttr?.option === matchColor || (!colorAttr && matchColor === 'Default'));
+      }
+    ) || variations[0];
   }
-
-  const variantPriceDelta = selectedVariant?.price_delta || 0;
   
-  // Display stock. If options selected, show variant stock, else show total
+  // Display stock. If options selected, show variation stock, else show total
   const missingOptions = (requiresSize && !selectedSize) || (requiresColor && !selectedColor);
-  const currentStock = missingOptions ? product.stock_total : (selectedVariant ? selectedVariant.stock : product.stock_total);
+  const currentStock = missingOptions ? (product.stock_quantity || 10) : (selectedVariation ? (selectedVariation.stock_quantity || 10) : (product.stock_quantity || 10));
 
-  const basePriceCalc = product.base_price + variantPriceDelta;
-  const salePriceCalc = product.sale_price !== null && product.sale_price !== undefined 
-    ? product.sale_price + variantPriceDelta 
-    : null;
-
-  const price = salePriceCalc !== null ? salePriceCalc : basePriceCalc;
-  const originalPrice = salePriceCalc !== null ? basePriceCalc : null;
+  const regularPrice = parseFloat(product.regular_price || '0');
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const variationPrice = selectedVariation?.price ? parseFloat(selectedVariation.price) : (salePrice || regularPrice);
+  const price = variationPrice;
+  const originalPrice = salePrice ? regularPrice : null;
+  const discountPct = salePrice && regularPrice > 0 ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
 
   const isDisabled = currentStock <= 0 || missingOptions;
   const buttonText = currentStock <= 0 ? 'Out of Stock' : missingOptions ? 'Select Options' : 'Add to Cart';
@@ -107,9 +108,9 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
 
     addItem({
       productId: product.id,
-      variantId: selectedVariant?.id || `${product.id}-${selectedColor || 'def'}-${selectedSize || 'def'}`,
+      variantId: selectedVariation?.id || 0,
       name: product.name,
-      imageUrl: product.images[0] || selectedImage,
+      imageUrl: product.images[0]?.src || selectedImage,
       size: selectedSize || '',
       color: selectedColor || '',
       quantity: 1,
@@ -157,12 +158,12 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
               {product.images.map((img, i) => (
                 <button
                   key={i}
-                  onClick={() => setSelectedImage(img)}
+                  onClick={() => setSelectedImage(img.src)}
                   className={`w-10 h-10 rounded-full overflow-hidden border-2 transition-all ${
-                    selectedImage === img ? 'border-black scale-110' : 'border-transparent opacity-60 hover:opacity-100'
+                    selectedImage === img.src ? 'border-black scale-110' : 'border-transparent opacity-60 hover:opacity-100'
                   }`}
                 >
-                  <img src={img} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
+                  <img src={img.src} alt={`${product.name} ${i + 1}`} className="w-full h-full object-cover" />
                 </button>
               ))}
             </div>
@@ -170,7 +171,7 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
 
           {/* Wishlist Button */}
           <button
-            onClick={() => toggleWishlist(product.id)}
+            onClick={() => toggleWishlist(String(product.id))}
             className="absolute top-4 right-4 w-12 h-12 bg-white rounded-full flex items-center justify-center shadow-lg hover:scale-110 transition-transform"
           >
             <Heart
@@ -193,22 +194,22 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
             <div className="flex items-center gap-2 mb-6">
               <div className="flex text-amber-500">
                 {Array.from({ length: 5 }).map((_, i) => (
-                  <Star key={i} className={`w-5 h-5 ${i < Math.round(product.rating_avg) ? 'fill-amber-500' : 'fill-neutral-200 text-neutral-200'}`} />
+                  <Star key={i} className={`w-5 h-5 ${i < Math.round(parseFloat(product.average_rating || '0')) ? 'fill-amber-500' : 'fill-neutral-200 text-neutral-200'}`} />
                 ))}
               </div>
-              <span className="text-sm font-medium text-neutral-700">{product.rating_avg.toFixed(1)}</span>
+              <span className="text-sm font-medium text-neutral-700">{parseFloat(product.average_rating || '0').toFixed(1)}</span>
               <span className="text-sm text-neutral-500">({product.rating_count} reviews)</span>
             </div>
           )}
 
           {/* Price */}
           <div className="flex items-baseline gap-3 mb-6">
-            <span className="text-2xl font-bold text-black">Rs {price.toLocaleString()}</span>
+            <span className="text-2xl font-bold text-black">Rs {Math.round(price).toLocaleString()}</span>
             {originalPrice && (
               <>
-                <span className="text-md text-neutral-400 line-through">Rs {originalPrice.toLocaleString()}</span>
+                <span className="text-md text-neutral-400 line-through">Rs {Math.round(originalPrice).toLocaleString()}</span>
                 <span className="bg-red-400 text-white text-xs px-1 py-1 rounded-[3px]">
-                  - {product.discount_pct}%
+                  - {discountPct}%
                 </span>
               </>
             )}
@@ -226,11 +227,11 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
           <div className="w-full h-px bg-neutral-200 mb-8" />
 
           {/* Color Selection */}
-          {product.colors.length > 0 && (
+          {requiresColor && (
             <div className="mb-8">
               <p className="text-sm font-semibold text-black mb-3">Color: <span className="font-normal text-neutral-600">{selectedColor || 'Select'}</span></p>
               <div className="flex gap-3">
-                {product.colors.map((col) => {
+                {colorAttr?.options.map((col) => {
                   const mappedColor = colorMap[col.toLowerCase()] || '#cccccc';
                   return (
                     <button
@@ -255,11 +256,11 @@ export default function ProductDetailsClient({ product, variants = [] }: Product
           )}
 
           {/* Size Selection */}
-          {product.sizes.length > 0 && (
+          {requiresSize && (
             <div className="mb-8">
               <p className="text-sm font-semibold text-black mb-3">Size: <span className="font-normal text-neutral-600">{selectedSize || 'Select'}</span></p>
               <div className="flex flex-wrap gap-2">
-                {product.sizes.map((sz) => (
+                {sizeAttr?.options.map((sz) => (
                   <button
                     key={sz}
                     onClick={() => setSelectedSize(sz)}

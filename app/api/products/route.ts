@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { readDb, saveDb, generateId, Product, ProductVariant } from '@/lib/db';
+import { readDb, Product } from '@/lib/db';
 
 export async function GET(req: NextRequest) {
   try {
@@ -8,7 +8,6 @@ export async function GET(req: NextRequest) {
     
     // Parse filters
     const categorySlug = searchParams.get('category');
-    const gender = searchParams.get('gender');
     const q = searchParams.get('q')?.toLowerCase() || '';
     const minPrice = parseFloat(searchParams.get('minPrice') || '0');
     const maxPrice = parseFloat(searchParams.get('maxPrice') || '100000');
@@ -21,9 +20,9 @@ export async function GET(req: NextRequest) {
     
     let filteredProducts = db.products;
     
-    // Filter active
+    // Filter active (published)
     if (activeOnly) {
-      filteredProducts = filteredProducts.filter(p => p.is_active);
+      filteredProducts = filteredProducts.filter(p => p.status === 'publish');
     }
     
     // Filter category
@@ -31,81 +30,81 @@ export async function GET(req: NextRequest) {
       const cat = db.categories.find(c => c.slug === categorySlug);
       if (cat) {
         // Find if this is parent category or subcategory
-        const childCats = db.categories.filter(c => c.parent_id === cat.id);
+        const childCats = db.categories.filter(c => c.parent === cat.id);
         const catIds = [cat.id, ...childCats.map(c => c.id)];
-        filteredProducts = filteredProducts.filter(p => catIds.includes(p.category_id));
+        filteredProducts = filteredProducts.filter(p => 
+          p.categories.some((c: any) => catIds.includes(c.id))
+        );
       } else {
         filteredProducts = [];
       }
     }
     
-    // Filter gender
-    if (gender) {
-      filteredProducts = filteredProducts.filter(p => p.gender === gender || p.gender === 'unisex');
-    }
-    
-    // Filter by query (name, description, brand, tags)
+    // Filter by query (name, description, tags)
     if (q) {
       filteredProducts = filteredProducts.filter(p => 
         p.name.toLowerCase().includes(q) ||
         p.description.toLowerCase().includes(q) ||
-        p.brand.toLowerCase().includes(q) ||
-        p.tags.some(t => t.toLowerCase().includes(q))
+        p.tags.some((t: any) => t.name.toLowerCase().includes(q))
       );
     }
     
-    // Filter by sizes and colors (via variants)
+    // Filter by sizes and colors (via attributes)
     if (sizes.length > 0 || colors.length > 0) {
       filteredProducts = filteredProducts.filter(p => {
-        const productVariants = db.variants.filter(v => v.product_id === p.id && v.is_active && v.stock > 0);
+        const sizeAttr = p.attributes.find((a: any) => a.name?.toLowerCase() === 'size');
+        const colorAttr = p.attributes.find((a: any) => a.name?.toLowerCase() === 'color');
         
-        const matchesSize = sizes.length === 0 || productVariants.some(v => sizes.includes(v.size));
-        const matchesColor = colors.length === 0 || productVariants.some(v => colors.some(col => v.color.toLowerCase().includes(col.toLowerCase())));
+        const sizeOptions = sizeAttr?.options || [];
+        const colorOptions = colorAttr?.options || [];
+        
+        const matchesSize = sizes.length === 0 || sizes.some((s: string) => sizeOptions.includes(s));
+        const matchesColor = colors.length === 0 || colors.some((c: string) => colorOptions.some((co: string) => co.toLowerCase().includes(c.toLowerCase())));
         
         return matchesSize && matchesColor;
       });
     }
     
-    // Filter by price range (using sale_price if present, else base_price)
+    // Filter by price range (using sale_price if present, else regular_price)
     filteredProducts = filteredProducts.filter(p => {
-      const price = p.sale_price !== null && p.sale_price !== undefined ? p.sale_price : p.base_price;
+      const price = p.sale_price ? parseFloat(p.sale_price) : parseFloat(p.regular_price || '0');
       return price >= minPrice && price <= maxPrice;
     });
     
     // Sort products
     if (sort === 'newest') {
-      filteredProducts.sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime());
+      filteredProducts.sort((a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime());
     } else if (sort === 'price-asc') {
       filteredProducts.sort((a, b) => {
-        const pa = a.sale_price !== null && a.sale_price !== undefined ? a.sale_price : a.base_price;
-        const pb = b.sale_price !== null && b.sale_price !== undefined ? b.sale_price : b.base_price;
+        const pa = a.sale_price ? parseFloat(a.sale_price) : parseFloat(a.regular_price || '0');
+        const pb = b.sale_price ? parseFloat(b.sale_price) : parseFloat(b.regular_price || '0');
         return pa - pb;
       });
     } else if (sort === 'price-desc') {
       filteredProducts.sort((a, b) => {
-        const pa = a.sale_price !== null && a.sale_price !== undefined ? a.sale_price : a.base_price;
-        const pb = b.sale_price !== null && b.sale_price !== undefined ? b.sale_price : b.base_price;
+        const pa = a.sale_price ? parseFloat(a.sale_price) : parseFloat(a.regular_price || '0');
+        const pb = b.sale_price ? parseFloat(b.sale_price) : parseFloat(b.regular_price || '0');
         return pb - pa;
       });
     } else if (sort === 'rating') {
-      filteredProducts.sort((a, b) => b.rating_avg - a.rating_avg);
+      filteredProducts.sort((a, b) => parseFloat(b.average_rating || '0') - parseFloat(a.average_rating || '0'));
     } else {
       // default: popularity (sort by rating_count desc, then rating_avg desc)
       filteredProducts.sort((a, b) => {
         if (b.rating_count !== a.rating_count) {
           return b.rating_count - a.rating_count;
         }
-        return b.rating_avg - a.rating_avg;
+        return parseFloat(b.average_rating || '0') - parseFloat(a.average_rating || '0');
       });
     }
     
-    // Assemble variants inside the return if requested
+    // Assemble variations inside the return if requested
     const withVariants = searchParams.get('include_variants') === 'true';
     const productsToSend = filteredProducts.map(p => {
       if (withVariants) {
         return {
           ...p,
-          variants: db.variants.filter(v => v.product_id === p.id)
+          variations: db.variations.filter(v => v.product_id === p.id)
         };
       }
       return p;
@@ -123,88 +122,12 @@ export async function GET(req: NextRequest) {
 
 export async function POST(req: NextRequest) {
   try {
-    const db = await readDb();
-    const data = await req.json();
-    
-    // Validate required fields
-    if (!data.name || !data.category_id || !data.brand || data.base_price === undefined) {
-      return NextResponse.json({ success: false, error: 'Missing required product fields' }, { status: 400 });
-    }
-    
-    const slug = data.slug || data.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
-    
-    // Check uniqueness
-    if (db.products.some(p => p.slug === slug)) {
-      return NextResponse.json({ success: false, error: 'Product slug or name already exists' }, { status: 400 });
-    }
-    
-    const nowStr = new Date().toISOString();
-    const productId = generateId();
-    
-    // Round sale price vs base price
-    const base_price = parseFloat(data.base_price);
-    const sale_price = data.sale_price ? parseFloat(data.sale_price) : null;
-    const discount_pct = sale_price && base_price > 0 
-      ? Math.round(((base_price - sale_price) / base_price) * 100) 
-      : 0;
-      
-    // Set total stock based on variants
-    const formVariants = data.variants || [];
-    let stock_total = 0;
-    
-    const savedVariants: ProductVariant[] = formVariants.map((v: any, index: number) => {
-      const sQty = parseInt(v.stock || '0', 10);
-      stock_total += sQty;
-      return {
-        id: generateId(),
-        product_id: productId,
-        size: v.size || 'M',
-        color: v.color || 'Default',
-        color_hex: v.color_hex || '978877',
-        sku: v.sku || `${data.brand.substring(0,3).toUpperCase()}-${data.name.substring(0,3).toUpperCase()}-${index}-${v.size || 'M'}`,
-        stock: sQty,
-        price_delta: parseFloat(v.price_delta || '0'),
-        is_active: true,
-        created_at: nowStr
-      };
-    });
-    
-    const newProduct: Product = {
-      id: productId,
-      name: data.name,
-      slug,
-      description: data.description || '',
-      short_description: data.short_description || data.description?.substring(0, 150) || '',
-      category_id: data.category_id,
-      brand: data.brand,
-      gender: data.gender || 'unisex',
-      base_price,
-      sale_price,
-      discount_pct,
-      images: data.images && data.images.length > 0 ? data.images : ['https://picsum.photos/seed/defaultp/600/800'],
-      tags: data.tags || [],
-      is_active: data.is_active !== undefined ? data.is_active : true,
-      is_featured: data.is_featured !== undefined ? data.is_featured : false,
-      stock_total,
-      rating_avg: 0,
-      rating_count: 0,
-      categories: db.categories.find(c => String(c.id) === String(data.category_id))?.name ? [db.categories.find(c => String(c.id) === String(data.category_id))!.name] : [],
-      colors: Array.from(new Set(savedVariants.map(v => v.color))),
-      sizes: Array.from(new Set(savedVariants.map(v => v.size))),
-      sku: savedVariants[0]?.sku || '',
-      created_at: nowStr,
-      updated_at: nowStr
-    };
-    
-    db.products.push(newProduct);
-    db.variants.push(...savedVariants);
-    await saveDb(db);
-    
-    return NextResponse.json({
-      success: true,
-      product: newProduct,
-      variantsCount: savedVariants.length
-    });
+    // Note: Products should be created via admin panel which syncs to WooCommerce
+    // Storefront is read-only for products
+    return NextResponse.json({ 
+      success: false, 
+      error: 'Products should be created via admin panel' 
+    }, { status: 400 });
   } catch (err: any) {
     return NextResponse.json({ success: false, error: err?.message || 'Server error' }, { status: 500 });
   }

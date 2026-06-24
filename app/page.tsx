@@ -44,10 +44,10 @@ export default async function HomePage() {
   const allProducts = db.products || [];
   
   const newArrivals = [...allProducts]
-    .sort((a, b) => new Date(b.created_at).getTime() - new Date(a.created_at).getTime())
+    .sort((a, b) => new Date(b.date_created).getTime() - new Date(a.date_created).getTime())
     .slice(0, 4);
 
-  const featuredProducts = allProducts.filter(p => p.is_featured).slice(0, 4);
+  const featuredProducts = allProducts.filter(p => p.featured).slice(0, 4);
   const bestsellers = featuredProducts.length > 0 ? featuredProducts : allProducts.slice(4, 8);
 
   return (
@@ -58,7 +58,7 @@ export default async function HomePage() {
       <main>
         
         {/* HERO SECTION - Stark Cinematic Layout */}
-        <HeroClient featuredProducts={featuredProducts} allProducts={allProducts} />
+        <HeroClient />
 
         {/* Categories - Edgy Grid */}
         <section className="py-24 px-6 md:px-10 bg-black text-white">

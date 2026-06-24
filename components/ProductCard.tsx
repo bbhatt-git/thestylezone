@@ -7,48 +7,50 @@ import { useWishlist } from '@/store/wishlistStore';
 
 interface ProductCardProps {
   product: {
-    id: string;
+    id: number;
     name: string;
     slug: string;
-    brand: string;
-    base_price: number;
-    sale_price?: number | null;
-    discount_pct?: number;
-    images: string[];
-    rating_avg: number;
+    regular_price: string;
+    sale_price?: string;
+    images: Array<{ src: string }>;
+    average_rating: string;
     rating_count: number;
-    stock_total: number;
+    stock_quantity?: number;
+    stock_status: string;
   };
 }
 
 export default function ProductCard({ product }: ProductCardProps) {
   const { toggleWishlist, hasItem } = useWishlist();
   const [isMounted, setIsMounted] = useState(false);
-  const isLiked = hasItem(product.id);
+  const isLiked = hasItem(String(product.id));
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  const price = product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price;
-  const originalPrice = product.sale_price !== null && product.sale_price !== undefined ? product.base_price : null;
+  const regularPrice = parseFloat(product.regular_price || '0');
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const price = salePrice || regularPrice;
+  const originalPrice = salePrice ? regularPrice : null;
+  const discountPct = salePrice && regularPrice > 0 ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
 
   // Get secondary image for hover effect
-  const primaryImage = product.images[0] || 'https://picsum.photos/seed/placeholder/600/800';
-  const secondaryImage = product.images[1] || primaryImage;
+  const primaryImage = product.images[0]?.src || 'https://picsum.photos/seed/placeholder/600/800';
+  const secondaryImage = product.images[1]?.src || primaryImage;
 
   return (
-    <div className={`group relative flex flex-col h-full bg-transparent transition-all duration-500 ${product.stock_total <= 0 ? 'opacity-60 grayscale' : ''}`}>
+    <div className={`group relative flex flex-col h-full bg-transparent transition-all duration-500 ${product.stock_status === 'outofstock' ? 'opacity-60 grayscale' : ''}`}>
       <div className="relative aspect-[3/4] bg-gray-100 overflow-hidden rounded-xl mb-3 md:mb-5">
 
         {/* Sale and New badges */}
         <div className="absolute top-4 left-4 z-10 flex flex-col gap-2">
-          {originalPrice && product.discount_pct && (
+          {originalPrice && discountPct > 0 && (
             <span className="bg-white/95 backdrop-blur-sm text-[#121212] text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em] shadow-sm border border-black/10">
-              Sale {product.discount_pct}%
+              Sale {discountPct}%
             </span>
           )}
-          {product.stock_total <= 0 && (
+          {product.stock_status === 'outofstock' && (
             <span className="bg-black/95 backdrop-blur-sm text-white text-[10px] font-bold px-3 py-1 uppercase tracking-[0.2em] shadow-sm">
               Sold Out
             </span>
@@ -70,7 +72,7 @@ export default function ProductCard({ product }: ProductCardProps) {
           onClick={(e) => {
             e.preventDefault();
             e.stopPropagation();
-            toggleWishlist(product.id);
+            toggleWishlist(String(product.id));
           }}
           className="absolute bottom-4 right-4 z-20 bg-white/90 backdrop-blur-md p-3 rounded-full text-[#121212] shadow-sm opacity-100 translate-y-0 transition-all duration-500 ease-out focus:outline-none hover:bg-[#FE5733] hover:text-white hover:scale-110"
           aria-label={isMounted && isLiked ? "Remove from wishlist" : "Add to wishlist"}
@@ -84,14 +86,14 @@ export default function ProductCard({ product }: ProductCardProps) {
       </div>
 
       <div className="flex flex-col flex-grow">
-        <h4 className={`text-lg font-semibold tracking-tight line-clamp-2 mb-2 ${product.stock_total <= 0 ? 'text-black/50' : 'text-black/90'}`}>
-          <Link href={`/shop/${product.slug}`} className={`transition-colors ${product.stock_total <= 0 ? 'hover:text-black/70' : 'hover:text-black'}`}>
+        <h4 className={`text-lg font-semibold tracking-tight line-clamp-2 mb-2 ${product.stock_status === 'outofstock' ? 'text-black/50' : 'text-black/90'}`}>
+          <Link href={`/shop/${product.slug}`} className={`transition-colors ${product.stock_status === 'outofstock' ? 'hover:text-black/70' : 'hover:text-black'}`}>
             {product.name}
           </Link>
         </h4>
 
         <div className="mt-auto flex items-baseline gap-3">
-          <span className={`text-sm font-black font-semibold tracking-wide ${product.stock_total <= 0 ? 'text-black/50' : 'text-black'}`}>Rs {price.toLocaleString()}</span>
+          <span className={`text-sm font-black font-semibold tracking-wide ${product.stock_status === 'outofstock' ? 'text-black/50' : 'text-black'}`}>Rs {Math.round(price).toLocaleString()}</span>
           {originalPrice && (
             <span className="text-xs text-black/40 line-through">Rs {originalPrice.toLocaleString()}</span>
           )}

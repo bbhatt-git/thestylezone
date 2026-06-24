@@ -28,13 +28,14 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     };
   }
 
-  const price = product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price;
+  const regularPrice = parseFloat(product.regular_price || '0');
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const price = salePrice || regularPrice;
   
   // Ensure all keywords are strings
   const keywords = [
-    ...product.categories,
-    product.brand,
-    ...product.tags,
+    ...product.categories.map(c => c.name),
+    ...product.tags.map(t => t.name),
     product.name,
     'fashion',
     'clothing',
@@ -51,7 +52,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       type: 'website',
       images: product.images[0] ? [
         {
-          url: product.images[0],
+          url: product.images[0].src,
           width: 800,
           height: 1000,
           alt: product.name,
@@ -62,7 +63,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
       card: 'summary_large_image',
       title: `${product.name} | The Style Zone`,
       description: product.short_description || product.description,
-      images: product.images[0] ? [product.images[0]] : [],
+      images: product.images[0] ? [product.images[0].src] : [],
     },
   };
 }
@@ -78,11 +79,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   // Find related products
   const relatedProducts = db.products
-    .filter((p) => p.id !== product.id && p.categories.some((cat) => product.categories.includes(cat)))
+    .filter((p) => p.id !== product.id && p.categories.some((cat) => product.categories.some(pc => pc.id === cat.id)))
     .slice(0, 4);
 
-  // Get product variants
-  const productVariants = db.variants.filter((v) => v.product_id === product.id);
+  // Get product variations
+  const productVariations = db.variations.filter((v) => v.product_id === product.id);
+
+  const regularPrice = parseFloat(product.regular_price || '0');
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const price = salePrice || regularPrice;
 
   // Product Schema
   const productSchema = {
@@ -90,19 +95,15 @@ export default async function ProductDetailPage({ params }: PageProps) {
     '@type': 'Product',
     name: product.name,
     description: product.short_description || product.description,
-    image: product.images,
-    brand: {
-      '@type': 'Brand',
-      name: product.brand,
-    },
+    image: product.images.map(img => img.src),
     offers: {
       '@type': 'Offer',
-      price: product.sale_price || product.base_price,
+      price: price,
       priceCurrency: 'NPR',
-      availability: product.stock_total > 0 ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
+      availability: product.stock_status === 'instock' ? 'https://schema.org/InStock' : 'https://schema.org/OutOfStock',
       url: `https://thestylezone.com.np/shop/${product.slug}`,
     },
-    category: product.categories.join(', '),
+    category: product.categories.map(c => c.name).join(', '),
   };
 
   return (
@@ -127,7 +128,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
           </div>
 
           {/* Dynamic Details Interactive Section */}
-          <ProductDetailsClient product={product} variants={productVariants} />
+          <ProductDetailsClient product={product} variations={productVariations} />
 
           {/* Description section */}
           {product.description && (
@@ -142,7 +143,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
           {/* Reviews section */}
           <div className="mt-12 mb-20">
-            <ProductReviews productId={product.id} />
+            <ProductReviews productId={String(product.id)} />
           </div>
 
           {/* Related Products Grid */}

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWooCommerce } from '@/lib/db';
+import { getStoreSettings } from '@/lib/shipping-api';
 
 export async function GET(request: NextRequest) {
   try {
@@ -29,7 +30,9 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: 'Missing required fields' }, { status: 400 });
     }
 
-    const autoApprove = process.env.NEXT_AUTO_APPROVE_REVIEWS === 'true';
+    // Get auto-approve setting from Supabase
+    const storeSettings = await getStoreSettings();
+    const autoApprove = storeSettings?.auto_approve_reviews || false;
     
     const api = getWooCommerce();
     

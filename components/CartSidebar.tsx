@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useCart } from '@/store/cartStore';
 import { X, Truck, Trash2, Plus, Minus, ArrowRight, ShoppingBag } from 'lucide-react';
+import { calculateShippingCost } from '@/lib/shipping-api';
 
 interface CartSidebarProps {
   isOpen: boolean;
@@ -14,8 +15,22 @@ export default function CartSidebar({ isOpen, onClose }: CartSidebarProps) {
   const { items, updateQuantity, removeItem, getTotalPrice, getTotalItems } = useCart();
   const totalPrice = getTotalPrice();
   const totalItems = getTotalItems();
-  const shippingCost = Number(process.env.NEXT_PUBLIC_SHIPPING_COST || 100);
+  const [shippingCost, setShippingCost] = useState(200);
   const finalTotal = totalPrice + shippingCost;
+
+  // Calculate shipping cost (default to Nepal rate for cart display)
+  useEffect(() => {
+    const fetchShippingCost = async () => {
+      try {
+        const cost = await calculateShippingCost('NP');
+        setShippingCost(cost);
+      } catch (err) {
+        console.error('Error fetching shipping cost:', err);
+        setShippingCost(200);
+      }
+    };
+    fetchShippingCost();
+  }, []);
 
   const [isMounted, setIsMounted] = useState(false);
 

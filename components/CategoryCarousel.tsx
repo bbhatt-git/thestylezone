@@ -5,10 +5,10 @@ import Link from 'next/link';
 import { ArrowLeft, ArrowRight } from 'lucide-react';
 
 interface Category {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  image_url?: string | null;
+  image?: { src: string };
 }
 
 interface CategoryCarouselProps {
@@ -70,10 +70,10 @@ export default function CategoryCarousel({ categories, customCategoryImages }: C
       {/* Category Grid */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 md:gap-6 lg:gap-8">
         {visibleCategories.map((cat) => {
-          const displayImage = customCategoryImages[cat.slug] || cat.image_url || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600';
+          const displayImage = customCategoryImages[cat.slug] || cat.image?.src || 'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?w=600';
           return (
             <div 
-              key={cat.id}
+              key={String(cat.id)}
               className="flex bg-white rounded-[24px] md:rounded-[32px] overflow-hidden border border-zinc-100 shadow-[0_4px_24px_rgba(0,0,0,0.015)] group hover:shadow-md transition-all duration-500 ease-out animate-fade-in"
             >
               {/* Left Side: info block */}

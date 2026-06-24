@@ -23,58 +23,85 @@ export function getWooCommerce() {
   return woocommerceClient;
 }
 
-// Data Schema Interfaces
+// Data Schema Interfaces - WooCommerce Native Structure
 export interface Category {
-  id: any;
+  id: number;
   name: string;
   slug: string;
-  parent_id?: any;
-  image_url?: string | null;
-  gender?: 'men' | 'women' | 'unisex' | string;
-  sort_order: number;
-  is_active: boolean;
-  created_at: string;
+  parent?: number;
+  image?: { src: string };
+  menu_order: number;
   count?: number;
 }
 
+export interface ProductAttribute {
+  id: number;
+  name: string;
+  slug: string;
+  options: string[];
+  position: number;
+  visible: boolean;
+  variation: boolean;
+}
+
+export interface ProductImage {
+  id: number;
+  src: string;
+  alt: string;
+  name: string;
+}
+
+export interface ProductCategory {
+  id: number;
+  name: string;
+  slug: string;
+}
+
+export interface ProductTag {
+  id: number;
+  name: string;
+  slug: string;
+}
+
 export interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
   description: string;
   short_description: string;
-  category_id: any;
-  brand: string;
-  gender: string;
-  base_price: number;
-  sale_price: number | null;
-  discount_pct: number;
-  images: string[];
-  tags: string[];
-  is_active: boolean;
-  is_featured: boolean;
-  stock_total: number;
-  rating_avg: number;
+  type: 'simple' | 'variable' | 'grouped' | 'external';
+  status: 'publish' | 'draft' | 'pending' | 'private';
+  regular_price: string;
+  sale_price?: string;
+  price: string;
+  images: ProductImage[];
+  categories: ProductCategory[];
+  tags: ProductTag[];
+  attributes: ProductAttribute[];
+  stock_quantity?: number;
+  manage_stock: boolean;
+  stock_status: 'instock' | 'outofstock' | 'onbackorder';
+  sku?: string;
+  featured: boolean;
+  average_rating: string;
   rating_count: number;
-  categories: string[];
-  colors: string[];
-  sizes: string[];
-  sku: string;
-  created_at: string;
-  updated_at: string;
+  date_created: string;
+  date_modified: string;
 }
 
-export interface ProductVariant {
-  id: string;
-  product_id: string;
-  size: string;
-  color: string;
-  color_hex: string;
-  sku: string;
-  stock: number;
-  price_delta: number;
-  is_active: boolean;
-  created_at: string;
+export interface ProductVariation {
+  id: number;
+  product_id: number;
+  attributes: Array<{ id: number; name: string; option: string }>;
+  price: string;
+  regular_price: string;
+  sale_price?: string;
+  sku?: string;
+  stock_quantity?: number;
+  manage_stock: boolean;
+  stock_status: 'instock' | 'outofstock' | 'onbackorder';
+  status: 'publish' | 'draft' | 'private';
+  date_created: string;
 }
 
 export interface OrderItem {
@@ -108,8 +135,10 @@ export interface Order {
   customer_phone: string;
   customer_email: string | null;
   shipping_address: string;
-  municipality: string;
-  wardNo: string;
+  country: string;
+  district: string | null;
+  municipality: string | null;
+  wardNo: string | null;
   notes: string | null;
   admin_note: string | null;
   shipped_at?: string;
@@ -166,7 +195,7 @@ export interface Review {
 export interface DbData {
   products: Product[];
   categories: Category[];
-  variants: ProductVariant[];
+  variations: ProductVariation[];
   orders: Order[];
   orderItems: OrderItem[];
   notifications: Notification[];
@@ -183,7 +212,7 @@ if (!globalDb.__TSZ_DB__) {
   globalDb.__TSZ_DB__ = {
     products: [],
     categories: [],
-    variants: [],
+    variations: [],
     orders: [],
     orderItems: [],
     notifications: [],
@@ -230,7 +259,7 @@ export async function readDb(): Promise<DbData> {
       const cached = globalDb.__TSZ_CACHE__.data;
       db.products = cached.products;
       db.categories = cached.categories;
-      db.variants = cached.variants;
+      db.variations = cached.variations;
       return db;
     }
 
@@ -245,22 +274,19 @@ export async function readDb(): Promise<DbData> {
     const productsResult = results[0];
     const categoriesResult = results[1];
 
-    // Process categories only if that specific call succeeded
+    // Process categories - use WooCommerce native structure
     if (categoriesResult.status === 'fulfilled') {
       const wcCategories = categoriesResult.value.data;
       if (Array.isArray(wcCategories)) {
         db.categories = wcCategories.map((c: any) => ({
-        id: c.id,
-        name: c.name,
-        slug: c.slug,
-        parent_id: c.parent || null,
-        image_url: c.image?.src || null,
-        gender: 'unisex',
-        sort_order: c.menu_order || 0,
-        is_active: true,
-        created_at: new Date().toISOString(),
-        count: c.count
-      }));
+          id: c.id,
+          name: c.name,
+          slug: c.slug,
+          parent: c.parent || undefined,
+          image: c.image ? { src: c.image.src } : undefined,
+          menu_order: c.menu_order || 0,
+          count: c.count
+        }));
       } else {
         console.warn('WooCommerce categories data is not an array:', typeof wcCategories, wcCategories);
       }
@@ -268,41 +294,61 @@ export async function readDb(): Promise<DbData> {
       console.warn('WooCommerce categories fetch failed:', categoriesResult.reason?.message || categoriesResult.reason);
     }
 
-    // Process products only if that specific call succeeded
+    // Process products - use WooCommerce native structure
     if (productsResult.status === 'fulfilled') {
       const wcProducts = productsResult.value.data;
       if (Array.isArray(wcProducts)) {
-        // First, fetch variations for variable products
-        const variableProducts = wcProducts.filter((p: any) => p.type === 'variable');
-        
+        db.products = wcProducts.map((p: any) => ({
+          id: p.id,
+          name: p.name,
+          slug: p.slug,
+          description: p.description || '',
+          short_description: p.short_description || '',
+          type: p.type || 'simple',
+          status: p.status || 'publish',
+          regular_price: p.regular_price || '0',
+          sale_price: p.sale_price || undefined,
+          price: p.price || p.regular_price || '0',
+          images: p.images || [],
+          categories: p.categories || [],
+          tags: p.tags || [],
+          attributes: p.attributes || [],
+          stock_quantity: p.stock_quantity,
+          manage_stock: p.manage_stock || false,
+          stock_status: p.stock_status || 'instock',
+          sku: p.sku,
+          featured: p.featured || false,
+          average_rating: p.average_rating || '0',
+          rating_count: p.rating_count || 0,
+          date_created: p.date_created || new Date().toISOString(),
+          date_modified: p.date_modified || new Date().toISOString()
+        }));
+
+        // Fetch variations for variable products
+        const variableProducts = db.products.filter((p: Product) => p.type === 'variable');
         for (const product of variableProducts) {
           try {
             const variationsResult = await api.get(`products/${product.id}/variations`, { per_page: 100 });
             if (variationsResult.data && Array.isArray(variationsResult.data)) {
-              const variations = variationsResult.data;
-              const productVariants: ProductVariant[] = variations.map((v: any) => {
-                // Extract size and color from variation attributes
-                const sizeAttr = v.attributes?.find((a: any) => a.name?.toLowerCase() === 'size');
-                const colorAttr = v.attributes?.find((a: any) => a.name?.toLowerCase() === 'color');
-                
-                return {
-                  id: String(v.id),
-                  product_id: String(product.id),
-                  size: sizeAttr?.option || 'M',
-                  color: colorAttr?.option || 'Default',
-                  color_hex: '978877', // Default hex color
-                  sku: v.sku || '',
-                  stock: v.stock_quantity || (v.stock_status === 'instock' ? 10 : 0),
-                  price_delta: v.price ? (parseFloat(v.price) - parseFloat(product.regular_price || product.price || '0')) : 0,
-                  is_active: v.status === 'publish',
-                  created_at: v.date_created || new Date().toISOString()
-                };
-              });
+              const variations = variationsResult.data.map((v: any) => ({
+                id: v.id,
+                product_id: product.id,
+                attributes: v.attributes || [],
+                price: v.price || '0',
+                regular_price: v.regular_price || '0',
+                sale_price: v.sale_price || undefined,
+                sku: v.sku,
+                stock_quantity: v.stock_quantity,
+                manage_stock: v.manage_stock || false,
+                stock_status: v.stock_status || 'instock',
+                status: v.status || 'publish',
+                date_created: v.date_created || new Date().toISOString()
+              }));
               
-              // Only add variants that don't already exist
-              productVariants.forEach(variant => {
-                if (!db.variants.some(v => v.id === variant.id)) {
-                  db.variants.push(variant);
+              // Add variations to db
+              variations.forEach((variation: ProductVariation) => {
+                if (!db.variations.some((v: ProductVariation) => v.id === variation.id)) {
+                  db.variations.push(variation);
                 }
               });
             }
@@ -310,91 +356,6 @@ export async function readDb(): Promise<DbData> {
             console.warn(`Failed to fetch variations for product ${product.id}:`, varErr);
           }
         }
-        
-        // Create default variants for simple products
-        const simpleProducts = wcProducts.filter((p: any) => p.type === 'simple');
-        for (const product of simpleProducts) {
-          const existingVariant = db.variants.find(v => v.product_id === String(product.id));
-          if (!existingVariant) {
-            const colors = product.attributes?.find((a: any) => a.name?.toLowerCase() === 'color')?.options || [];
-            const sizes = product.attributes?.find((a: any) => a.name?.toLowerCase() === 'size')?.options || [];
-            
-            const defaultVariant: ProductVariant = {
-              id: `var_${product.id}`,
-              product_id: String(product.id),
-              size: sizes[0] || 'M',
-              color: colors[0] || 'Default',
-              color_hex: '978877',
-              sku: product.sku || '',
-              stock: product.stock_quantity || (product.stock_status === 'instock' ? 10 : 0),
-              price_delta: 0,
-              is_active: product.status === 'publish',
-              created_at: product.date_created || new Date().toISOString()
-            };
-            db.variants.push(defaultVariant);
-          }
-        }
-        
-        db.products = wcProducts.map((p: any) => {
-        const basePrice = parseFloat(p.regular_price || p.price || '0');
-        const salePrice = p.sale_price ? parseFloat(p.sale_price) : null;
-        
-        let discountPct = 0;
-        if (salePrice && basePrice > 0) {
-          discountPct = Math.round(((basePrice - salePrice) / basePrice) * 100);
-        }
-
-        const images = p.images && p.images.length > 0 
-          ? p.images.map((img: any) => img.src) 
-          : ['https://picsum.photos/seed/placeholder/600/800'];
-
-        const colors = p.attributes?.find((a: any) => a.name?.toLowerCase() === 'color')?.options || [];
-        const sizes = p.attributes?.find((a: any) => a.name?.toLowerCase() === 'size')?.options || [];
-
-        // For variable products, get colors and sizes from variants
-        if (p.type === 'variable') {
-          const productVariants = db.variants.filter(v => v.product_id === String(p.id));
-          if (productVariants.length > 0) {
-            const variantColors = [...new Set(productVariants.map(v => v.color).filter(c => c && c !== 'Default'))];
-            const variantSizes = [...new Set(productVariants.map(v => v.size).filter(s => s))];
-            if (variantColors.length > 0) {
-              colors.length = 0;
-              colors.push(...variantColors);
-            }
-            if (variantSizes.length > 0) {
-              sizes.length = 0;
-              sizes.push(...variantSizes);
-            }
-          }
-        }
-
-        return {
-          id: String(p.id),
-          name: p.name,
-          slug: p.slug,
-          description: p.description || 'No description available.',
-          short_description: p.short_description || p.description?.substring(0, 160) || 'No description details.',
-          category_id: p.categories && p.categories.length > 0 ? p.categories[0].id : 'cat_apparel',
-          brand: p.brands && p.brands.length > 0 ? p.brands[0].name : 'The Style Zone',
-          gender: 'unisex',
-          base_price: basePrice,
-          sale_price: salePrice,
-          discount_pct: discountPct,
-          images: images,
-          tags: p.tags ? p.tags.map((t: any) => t.name) : [],
-          is_active: p.status === 'publish',
-          is_featured: p.featured || false,
-          stock_total: p.stock_quantity !== null && p.stock_quantity !== undefined ? p.stock_quantity : (p.stock_status === 'instock' ? 15 : 0),
-          rating_avg: parseFloat(p.average_rating || '0'),
-          rating_count: parseInt(p.rating_count || '0'),
-          categories: p.categories ? p.categories.map((c: any) => c.name) : [],
-          colors: colors,
-          sizes: sizes,
-          sku: p.sku || '',
-          created_at: p.date_created || new Date().toISOString(),
-          updated_at: p.date_modified || new Date().toISOString()
-        };
-      });
       } else {
         console.warn('WooCommerce products data is not an array:', typeof wcProducts, wcProducts);
       }
@@ -409,7 +370,7 @@ export async function readDb(): Promise<DbData> {
         ...db,
         products: db.products,
         categories: db.categories,
-        variants: db.variants
+        variations: db.variations
       }
     };
 
@@ -420,7 +381,7 @@ export async function readDb(): Promise<DbData> {
       const cached = globalDb.__TSZ_CACHE__.data;
       db.products = cached.products;
       db.categories = cached.categories;
-      db.variants = cached.variants;
+      db.variations = cached.variations;
     }
   }
 

@@ -2,13 +2,12 @@ import { create } from 'zustand';
 import { persist, createJSONStorage } from 'zustand/middleware';
 
 export interface CartItem {
-  productId: string;
-  variantId: string;
+  productId: number;
+  variantId: number;
   name: string;
   imageUrl: string;
   size: string;
   color: string;
-  colorHex?: string;
   quantity: number;
   unitPrice: number;
   maxStock: number;
@@ -17,8 +16,8 @@ export interface CartItem {
 interface CartState {
   items: CartItem[];
   addItem: (item: CartItem) => void;
-  removeItem: (productId: string, variantId: string) => void;
-  updateQuantity: (productId: string, variantId: string, quantity: number) => void;
+  removeItem: (productId: number, variantId: number) => void;
+  updateQuantity: (productId: number, variantId: number, quantity: number) => void;
   clearCart: () => void;
   getTotalItems: () => number;
   getTotalPrice: () => number;

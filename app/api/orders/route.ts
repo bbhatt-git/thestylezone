@@ -1,15 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { readDb, saveDb, generateId, Order, OrderItem, Notification } from '@/lib/db';
-
-function calculateShipping(district: string): number {
-  const normalized = district.trim().toLowerCase();
-  if (normalized === 'kanchanpur') return 0;
-  
-  const sudurpashchim = ['dadeldhura', 'baitadi', 'darchula', 'bajhang', 'bajura', 'achham', 'doti', 'kailali'];
-  if (sudurpashchim.includes(normalized)) return 80;
-  
-  return 150;
-}
+import { calculateShippingCost } from '@/lib/shipping-api';
 
 export async function GET(req: NextRequest) {
   try {
@@ -62,6 +53,8 @@ export async function POST(req: NextRequest) {
       customerPhone,
       customerEmail,
       shippingAddress,
+      country,
+      district,
       municipality,
       wardNo,
       paymentMethod,
@@ -74,8 +67,12 @@ export async function POST(req: NextRequest) {
     if (!sessionToken || !items || !Array.isArray(items) || items.length === 0) {
       return NextResponse.json({ success: false, error: 'Cart items and session token are required' }, { status: 400 });
     }
-    if (!customerName || !customerPhone || !shippingAddress || !municipality || !wardNo) {
+    if (!customerName || !customerPhone || !shippingAddress || !country) {
       return NextResponse.json({ success: false, error: 'Shipping details are incomplete' }, { status: 400 });
+    }
+    // For Nepal, require district, municipality, and ward
+    if (country === 'NP' && (!district || !municipality || !wardNo)) {
+      return NextResponse.json({ success: false, error: 'District, Municipality, and Ward are required for Nepal orders' }, { status: 400 });
     }
     if (!['esewa', 'khalti', 'cash_on_delivery'].includes(paymentMethod)) {
       return NextResponse.json({ success: false, error: 'Invalid payment method' }, { status: 400 });
@@ -84,10 +81,12 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ success: false, error: `Transaction ID is required for ${paymentMethod}` }, { status: 400 });
     }
     
-    // 2. Validate phone number (Nepal format 98 or 97 and 10 digits)
-    const phoneRegex = /^(98|97)\d{8}$/;
-    if (!phoneRegex.test(customerPhone)) {
-      return NextResponse.json({ success: false, error: 'Invalid Nepal phone format. Use 98XXXXXXXX or 97XXXXXXXX' }, { status: 400 });
+    // 2. Validate phone number (Nepal format 98 or 97 and 10 digits for Nepal orders)
+    if (country === 'NP') {
+      const phoneRegex = /^(98|97)\d{8}$/;
+      if (!phoneRegex.test(customerPhone)) {
+        return NextResponse.json({ success: false, error: 'Invalid Nepal phone format. Use 98XXXXXXXX or 97XXXXXXXX' }, { status: 400 });
+      }
     }
     
     // 3. Recalculate subtotal on the server side (NEVER trust client pricing)
@@ -101,56 +100,68 @@ export async function POST(req: NextRequest) {
         return NextResponse.json({ success: false, error: `Product not found: ${item.name}` }, { status: 404 });
       }
       
-      // For simple products, we may not have variants - allow order if product exists
-      const productVariants = db.variants.filter(v => v.product_id === item.productId);
+      // For simple products, we may not have variations - allow order if product exists
+      const productVariations = db.variations.filter(v => v.product_id === item.productId);
       
-      let variant = null;
-      if (productVariants.length > 0) {
-        // Product has variants - try to find the specific one
-        variant = db.variants.find(v => v.id === item.variantId);
-        if (!variant) {
-          // Try to find a matching variant by size/color as fallback
-          variant = productVariants.find(v => v.size === item.size && v.color === item.color);
+      let variation = null;
+      if (productVariations.length > 0) {
+        // Product has variations - try to find the specific one
+        variation = db.variations.find(v => v.id === item.variantId);
+        if (!variation) {
+          // Try to find a matching variation by attributes as fallback
+          variation = productVariations.find(v => {
+            const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+            const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+            return sizeAttr?.option === item.size && colorAttr?.option === item.color;
+          });
         }
-        if (!variant) {
+        if (!variation) {
           return NextResponse.json({ 
             success: false, 
-            error: `Selected variant not found for: ${item.name}. Available variants: ${productVariants.map(v => `${v.size}/${v.color}`).join(', ')}` 
+            error: `Selected variation not found for: ${item.name}. Available variations: ${productVariations.map(v => v.attributes.map(a => `${a.name}:${a.option}`).join(', ')).join('; ')}` 
           }, { status: 404 });
         }
       } else {
-        // Simple product without variants - create a virtual variant for ordering
-        variant = {
+        // Simple product without variations - create a virtual variation for ordering
+        variation = {
           id: item.variantId || `simple_${product.id}`,
           product_id: product.id,
-          size: item.size || 'M',
-          color: item.color || 'Default',
-          stock: product.stock_total,
-          price_delta: 0
+          attributes: [{ name: 'size', option: item.size || 'M' }, { name: 'color', option: item.color || 'Default' }],
+          stock_quantity: product.stock_quantity || 10,
+          price: product.regular_price || '0',
+          regular_price: product.regular_price || '0'
         };
       }
       
       // Stock check
-      const availableStock = productVariants.length > 0 ? variant.stock : product.stock_total;
+      const availableStock = productVariations.length > 0 ? (variation.stock_quantity || 0) : (product.stock_quantity || 10);
       if (availableStock < item.quantity) {
-        return NextResponse.json({ success: false, error: `Insufficient stock for ${item.name} in size ${variant.size} - ${variant.color}. Only ${availableStock} left.` }, { status: 400 });
+        const sizeAttr = variation.attributes.find(a => a.name.toLowerCase() === 'size');
+        const colorAttr = variation.attributes.find(a => a.name.toLowerCase() === 'color');
+        return NextResponse.json({ success: false, error: `Insufficient stock for ${item.name} in size ${sizeAttr?.option || 'N/A'} - ${colorAttr?.option || 'N/A'}. Only ${availableStock} left.` }, { status: 400 });
       }
       
-      const activeUnitPrice = product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price;
-      // Note: price_delta can adjust the unit price (e.g. XL adds Rs 100)
-      const adjustedPrice = activeUnitPrice + (variant.price_delta || 0);
+      const regularPrice = parseFloat(product.regular_price || '0');
+      const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+      const activeUnitPrice = salePrice || regularPrice;
+      // For variations, use their own price if available
+      const variationPrice = variation.price ? parseFloat(variation.price) : activeUnitPrice;
+      const adjustedPrice = variationPrice;
       
       calculatedSubtotal += adjustedPrice * item.quantity;
+      
+      const sizeAttr = variation.attributes.find(a => a.name.toLowerCase() === 'size');
+      const colorAttr = variation.attributes.find(a => a.name.toLowerCase() === 'color');
       
       orderItemsToSave.push({
         id: generateId(),
         order_id: orderId,
-        product_id: product.id,
-        variant_id: variant.id,
+        product_id: String(product.id),
+        variant_id: String(variation.id),
         name: product.name,
-        image_url: product.images[0] || 'https://picsum.photos/seed/defaultitem/300/400',
-        size: variant.size,
-        color: variant.color,
+        image_url: product.images[0]?.src || 'https://picsum.photos/seed/defaultitem/300/400',
+        size: sizeAttr?.option || 'M',
+        color: colorAttr?.option || 'Default',
         quantity: item.quantity,
         unit_price: adjustedPrice,
         total_price: adjustedPrice * item.quantity
@@ -185,19 +196,59 @@ export async function POST(req: NextRequest) {
       }
     }
     
-    // 5. Shipping Fee Calculation
-    const shippingFee = Number(process.env.NEXT_PUBLIC_SHIPPING_COST || 100);
+    // 5. Shipping Fee Calculation using Supabase
+    let shippingFee = 0;
+    try {
+      // Get district and municipality names from Supabase
+      let districtName = '';
+      let municipalityName = '';
+      
+      if (country === 'NP' && district) {
+        // Fetch district name from Supabase
+        const { createClient } = await import('@supabase/supabase-js');
+        const supabase = createClient(
+          process.env.NEXT_PUBLIC_SUPABASE_URL || '',
+          process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || ''
+        );
+        
+        const { data: districtData } = await supabase
+          .from('districts')
+          .select('name')
+          .eq('id', district)
+          .single();
+        
+        if (districtData) districtName = districtData.name;
+        
+        if (municipality && districtName) {
+          // Fetch municipality name from Supabase
+          const { data: municipalityData } = await supabase
+            .from('municipalities')
+            .select('name')
+            .eq('id', municipality)
+            .single();
+          
+          if (municipalityData) municipalityName = municipalityData.name;
+        }
+      }
+      
+      shippingFee = await calculateShippingCost(country, districtName || undefined, municipalityName || undefined);
+    } catch (error) {
+      console.error('Error calculating shipping cost:', error);
+      // Fallback to default
+      shippingFee = country === 'NP' ? 200 : 2500;
+    }
+    
     const total = calculatedSubtotal - discountAmount + shippingFee;
     
     // 6. Deduct inventory stocks
     for (const item of orderItemsToSave) {
-      const variant = db.variants.find(v => v.id === item.variant_id);
-      if (variant) {
-        variant.stock -= item.quantity;
+      const variation = db.variations.find(v => String(v.id) === item.variant_id);
+      if (variation && variation.stock_quantity !== undefined) {
+        variation.stock_quantity -= item.quantity;
       }
-      const product = db.products.find(p => p.id === item.product_id);
-      if (product) {
-        product.stock_total -= item.quantity;
+      const product = db.products.find(p => String(p.id) === item.product_id);
+      if (product && product.stock_quantity !== undefined) {
+        product.stock_quantity -= item.quantity;
       }
     }
     
@@ -237,8 +288,10 @@ export async function POST(req: NextRequest) {
       customer_phone: customerPhone,
       customer_email: customerEmail || null,
       shipping_address: shippingAddress,
-      municipality: municipality,
-      wardNo: wardNo,
+      country: country,
+      district: district || null,
+      municipality: municipality || null,
+      wardNo: wardNo || null,
       notes: notes || null,
       admin_note: null,
       created_at: nowStr,
@@ -268,7 +321,7 @@ export async function POST(req: NextRequest) {
       if (woocommerce) {
         const wcLineItems = orderItemsToSave.map(item => ({
           name: `${item.name} (${item.color} - ${item.size})`,
-          product_id: parseInt(item.product_id.replace(/\D/g, '')) || 0, // Fallback if local product IDs aren't integers
+          product_id: parseInt(item.product_id) || 0,
           quantity: item.quantity,
           total: item.total_price.toString()
         }));

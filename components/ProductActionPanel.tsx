@@ -5,44 +5,46 @@ import { useCart, CartItem } from '@/store/cartStore';
 import { useWishlist } from '@/store/wishlistStore';
 import { Heart, Plus, Minus, ShoppingCart, Share2, Check } from 'lucide-react';
 
-interface Variant {
-  id: string;
-  size: string;
-  color: string;
-  color_hex: string;
-  stock: number;
-  price_delta: number;
-  sku: string;
+interface Variation {
+  id: number;
+  product_id: number;
+  attributes: Array<{ id: number; name: string; option: string }>;
+  price: string;
+  regular_price: string;
+  sale_price?: string;
+  stock_quantity?: number;
+  stock_status: string;
+  sku?: string;
 }
 
 interface ProductActionPanelProps {
   product: {
-    id: string;
+    id: number;
     name: string;
-    brand: string;
-    base_price: number;
-    sale_price?: number | null;
-    discount_pct: number;
-    images: string[];
-    stock_total: number;
+    regular_price: string;
+    sale_price?: string;
+    images: Array<{ src: string }>;
+    stock_quantity?: number;
+    stock_status: string;
   };
-  variants: Variant[];
+  variations: Variation[];
 }
 
-export default function ProductActionPanel({ product, variants }: ProductActionPanelProps) {
+export default function ProductActionPanel({ product, variations }: ProductActionPanelProps) {
   const addItem = useCart(state => state.addItem);
   const { toggleWishlist, hasItem } = useWishlist();
-  const isLiked = hasItem(product.id);
+  const isLiked = hasItem(String(product.id));
   const [isMounted, setIsMounted] = useState(false);
 
   useEffect(() => {
     setIsMounted(true);
   }, []);
 
-  // Group unique colors from variants
+  // Group unique colors from variations
   const uniqueColorsMap: { [key: string]: string } = {};
-  variants.forEach(v => {
-    if (v.color) uniqueColorsMap[v.color] = v.color_hex;
+  variations.forEach(v => {
+    const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+    if (colorAttr?.option) uniqueColorsMap[colorAttr.option] = colorAttr.option.toLowerCase(); // Use color name as hex fallback
   });
   const uniqueColors = Object.entries(uniqueColorsMap).map(([name, hex]) => ({ name, hex }));
   
@@ -56,26 +58,38 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
   // Sync size selection if the new color doesn't have stock or exists
   useEffect(() => {
     // Check if the current size is available for the newly selected color
-    const sizesForColor = variants.filter(v => v.color === selectedColor);
-    const matchingVariant = sizesForColor.find(v => v.size === selectedSize);
+    const sizesForColor = variations.filter(v => {
+      const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+      return colorAttr?.option === selectedColor;
+    });
+    const matchingVariant = sizesForColor.find(v => {
+      const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+      return sizeAttr?.option === selectedSize;
+    });
     
     // Auto-select first available size if current one is not valid
-    if (!matchingVariant || matchingVariant.stock <= 0) {
-      const firstInStock = sizesForColor.find(v => v.stock > 0);
+    if (!matchingVariant || (matchingVariant.stock_quantity !== undefined && matchingVariant.stock_quantity <= 0)) {
+      const firstInStock = sizesForColor.find(v => (v.stock_quantity || 0) > 0);
       if (firstInStock) {
-        queueMicrotask(() => setSelectedSize(firstInStock.size));
+        const sizeAttr = firstInStock.attributes.find(a => a.name.toLowerCase() === 'size');
+        if (sizeAttr?.option) queueMicrotask(() => setSelectedSize(sizeAttr.option));
       } else if (sizesForColor.length > 0) {
-        queueMicrotask(() => setSelectedSize(sizesForColor[0].size));
+        const sizeAttr = sizesForColor[0].attributes.find(a => a.name.toLowerCase() === 'size');
+        if (sizeAttr?.option) queueMicrotask(() => setSelectedSize(sizeAttr.option));
       }
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [selectedColor, variants]);
+  }, [selectedColor, variations]);
 
-  // Find active variant corresponding to size + color selection
-  const activeVariant = variants.find(v => v.color === selectedColor && v.size === selectedSize) || variants[0];
+  // Find active variation corresponding to size + color selection
+  const activeVariation = variations.find(v => {
+    const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+    const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+    return sizeAttr?.option === selectedSize && colorAttr?.option === selectedColor;
+  }) || variations[0];
   
-  // Fallback if no variants exist
-  if (!activeVariant) {
+  // Fallback if no variations exist
+  if (!activeVariation) {
     return (
       <div className="bg-red-50 border border-red-200 text-red-700 p-4 rounded-lg">
         <p className="text-sm font-bold">Product variants not available</p>
@@ -84,22 +98,25 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
     );
   }
   
-  const currentUnitPrice = (product.sale_price !== null && product.sale_price !== undefined ? product.sale_price : product.base_price) + (activeVariant?.price_delta || 0);
-  const currentOriginalPrice = product.sale_price !== null && product.sale_price !== undefined ? (product.base_price + (activeVariant?.price_delta || 0)) : null;
+  const regularPrice = parseFloat(product.regular_price || '0');
+  const salePrice = product.sale_price ? parseFloat(product.sale_price) : null;
+  const variationPrice = activeVariation?.price ? parseFloat(activeVariation.price) : (salePrice || regularPrice);
+  const currentUnitPrice = variationPrice;
+  const currentOriginalPrice = salePrice ? regularPrice : null;
+  const discountPct = salePrice && regularPrice > 0 ? Math.round(((regularPrice - salePrice) / regularPrice) * 100) : 0;
 
-  const maxStockLimit = activeVariant?.stock || 0;
+  const maxStockLimit = activeVariation?.stock_quantity || product.stock_quantity || 10;
 
   const handleAddToCart = () => {
-    if (!activeVariant || maxStockLimit <= 0) return;
+    if (!activeVariation || maxStockLimit <= 0) return;
 
     const cartItem: CartItem = {
       productId: product.id,
-      variantId: activeVariant.id,
+      variantId: activeVariation.id,
       name: product.name,
-      imageUrl: product.images[0] || 'https://picsum.photos/seed/cartplaceholder/300/400',
+      imageUrl: product.images[0]?.src || 'https://picsum.photos/seed/cartplaceholder/300/400',
       size: selectedSize,
       color: selectedColor,
-      colorHex: activeVariant.color_hex,
       quantity,
       unitPrice: currentUnitPrice,
       maxStock: maxStockLimit
@@ -131,13 +148,13 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
             </span>
           )}
         </div>
-        {product.discount_pct > 0 && (
+        {discountPct > 0 && (
           <div className="flex items-center gap-2 mt-1">
             <span className="bg-red-500 text-white text-[10px] font-black px-2 py-0.5 rounded uppercase tracking-wider">
-              {product.discount_pct}% OFF
+              {discountPct}% OFF
             </span>
             <p className="text-[11px] text-red-600 font-bold uppercase tracking-widest">
-              SAVE Rs {(currentOriginalPrice! - currentUnitPrice).toLocaleString()}
+              SAVE Rs {currentOriginalPrice ? Math.round(currentOriginalPrice - currentUnitPrice).toLocaleString() : '0'}
             </p>
           </div>
         )}
@@ -173,7 +190,7 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
       <div className="space-y-2.5">
         <label className="text-xs font-bold text-stone-500 uppercase tracking-wider flex items-center justify-between">
           <span>Size Option: <strong className="text-stone-900 font-extrabold font-sans">{selectedSize}</strong></span>
-          {activeVariant && (
+          {activeVariation && (
             <span className={`text-[10px] font-bold ${maxStockLimit > 3 ? 'text-stone-400' : 'text-red-500 font-extrabold'}`}>
               {maxStockLimit > 0 ? `Stock Left: ${maxStockLimit}` : 'Out of Stock'}
             </span>
@@ -181,9 +198,16 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
         </label>
         
         <div className="flex flex-wrap gap-2">
-          {Array.from(new Set(variants.map(v => v.size))).map((size) => {
-            const vOpt = variants.find(v => v.color === selectedColor && v.size === size);
-            const sizeInStock = vOpt && vOpt.stock > 0;
+          {Array.from(new Set(variations.map(v => {
+            const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+            return sizeAttr?.option;
+          }).filter(Boolean))).map((size) => {
+            const vOpt = variations.find(v => {
+              const sizeAttr = v.attributes.find(a => a.name.toLowerCase() === 'size');
+              const colorAttr = v.attributes.find(a => a.name.toLowerCase() === 'color');
+              return colorAttr?.option === selectedColor && sizeAttr?.option === size;
+            });
+            const sizeInStock = vOpt && (vOpt.stock_quantity || 0) > 0;
             const isSelected = selectedSize === size;
             
             let btnClass = 'border-stone-200 text-stone-800 bg-white hover:border-stone-400';
@@ -200,9 +224,9 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
 
             return (
               <button
-                key={size}
+                key={String(size)}
                 disabled={!sizeInStock}
-                onClick={() => setSelectedSize(size)}
+                onClick={() => setSelectedSize(String(size))}
                 className={`text-xs font-heavy tracking-wider h-11 px-4 sm:px-6 rounded-xl border transition-all cursor-pointer flex items-center justify-center min-w-14 sm:min-w-16 ${btnClass}`}
               >
                 {size}
@@ -269,7 +293,7 @@ export default function ProductActionPanel({ product, variants }: ProductActionP
         <div className="flex gap-1.5 md:gap-2 shrink-0">
           {/* Heart Wishlist Toggler */}
           <button
-            onClick={() => toggleWishlist(product.id)}
+            onClick={() => toggleWishlist(String(product.id))}
             className="w-12 h-12 rounded-full border border-stone-200 hover:border-stone-400 bg-white shadow-xs flex items-center justify-center transition-all cursor-pointer shrink-0"
             aria-label={isMounted && isLiked ? "Remove from wishlist" : "Add to wishlist"}
           >

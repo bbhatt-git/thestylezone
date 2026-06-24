@@ -7,24 +7,22 @@ import { Search, SlidersHorizontal, X, ChevronDown } from 'lucide-react';
 import { useRouter } from 'next/navigation';
 
 interface Product {
-  id: string;
+  id: number;
   name: string;
   slug: string;
-  brand: string;
-  base_price: number;
-  sale_price: number | null;
-  discount_pct: number;
-  images: string[];
-  rating_avg: number;
+  regular_price: string;
+  sale_price?: string;
+  price: string;
+  images: Array<{ src: string }>;
+  average_rating: string;
   rating_count: number;
-  stock_total: number;
-  is_active: boolean;
-  is_featured: boolean;
-  created_at: string;
+  stock_quantity?: number;
+  stock_status: string;
+  featured: boolean;
+  date_created: string;
   description: string;
-  categories: string[];
-  colors: string[];
-  sizes: string[];
+  categories: Array<{ id: number; name: string; slug: string }>;
+  attributes: Array<{ name: string; options: string[] }>;
 }
 
 interface ShopClientProps {
@@ -38,12 +36,18 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
   const [selectedColor, setSelectedColor] = useState('All');
   
   // Extract all categories, sizes, and colors for filter buttons
-  const categories = ['All', ...Array.from(new Set(initialProducts.flatMap(p => p.categories)))];
-  const allSizes = ['All', ...Array.from(new Set(initialProducts.flatMap(p => p.sizes)))];
-  const allColors = ['All', ...Array.from(new Set(initialProducts.flatMap(p => p.colors)))];
+  const categories = ['All', ...Array.from(new Set(initialProducts.flatMap(p => p.categories.map(c => c.name))))];
+  const allSizes = ['All', ...Array.from(new Set(initialProducts.flatMap(p => {
+    const sizeAttr = p.attributes.find(a => a.name.toLowerCase() === 'size');
+    return sizeAttr?.options || [];
+  })))];
+  const allColors = ['All', ...Array.from(new Set(initialProducts.flatMap(p => {
+    const colorAttr = p.attributes.find(a => a.name.toLowerCase() === 'color');
+    return colorAttr?.options || [];
+  })))];
 
   // Price range of WooCommerce items available
-  const prices = initialProducts.map(p => p.sale_price || p.base_price);
+  const prices = initialProducts.map(p => p.sale_price ? parseFloat(p.sale_price) : parseFloat(p.regular_price || '0'));
   const lowestPriceInStore = initialProducts.length > 0 ? Math.min(...prices) : 0;
   const highestProductPrice = initialProducts.length > 0 ? Math.max(...prices) : 10000;
   const highestPriceInStore = highestProductPrice + 2000;
@@ -96,12 +100,17 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
   // Handle filtrations
   const filteredProducts = initialProducts.filter((product) => {
-    const price = product.sale_price || product.base_price;
-    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
-                          product.brand.toLowerCase().includes(searchTerm.toLowerCase());
-    const matchesCategory = selectedCategory === 'All' || product.categories.includes(selectedCategory);
-    const matchesSize = selectedSize === 'All' || product.sizes.includes(selectedSize);
-    const matchesColor = selectedColor === 'All' || product.colors.includes(selectedColor);
+    const price = product.sale_price ? parseFloat(product.sale_price) : parseFloat(product.regular_price || '0');
+    const matchesSearch = product.name.toLowerCase().includes(searchTerm.toLowerCase());
+    const matchesCategory = selectedCategory === 'All' || product.categories.some(c => c.name === selectedCategory);
+    
+    const sizeAttr = product.attributes.find(a => a.name.toLowerCase() === 'size');
+    const colorAttr = product.attributes.find(a => a.name.toLowerCase() === 'color');
+    const sizeOptions = sizeAttr?.options || [];
+    const colorOptions = colorAttr?.options || [];
+    
+    const matchesSize = selectedSize === 'All' || sizeOptions.includes(selectedSize);
+    const matchesColor = selectedColor === 'All' || colorOptions.some(c => c.toLowerCase().includes(selectedColor.toLowerCase()));
     const matchesPrice = price >= minPrice && price <= maxPrice;
 
     return matchesSearch && matchesCategory && matchesSize && matchesColor && matchesPrice;
@@ -109,14 +118,14 @@ export default function ShopClient({ initialProducts }: ShopClientProps) {
 
   // Sort products
   const sortedProducts = [...filteredProducts].sort((a, b) => {
-    const priceA = a.sale_price || a.base_price;
-    const priceB = b.sale_price || b.base_price;
+    const priceA = a.sale_price ? parseFloat(a.sale_price) : parseFloat(a.regular_price || '0');
+    const priceB = b.sale_price ? parseFloat(b.sale_price) : parseFloat(b.regular_price || '0');
 
     if (sortBy === 'price-low') return priceA - priceB;
     if (sortBy === 'price-high') return priceB - priceA;
-    if (sortBy === 'rating') return b.rating_avg - a.rating_avg;
+    if (sortBy === 'rating') return parseFloat(b.average_rating || '0') - parseFloat(a.average_rating || '0');
     // default ‘latest’
-    return new Date(b.created_at).getTime() - new Date(a.created_at).getTime();
+    return new Date(b.date_created).getTime() - new Date(a.date_created).getTime();
   });
 
   // Pagination logic
