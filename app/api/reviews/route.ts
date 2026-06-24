@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getWooCommerce } from '@/lib/db';
-import { getStoreSettings } from '@/lib/shipping-api';
+import { getAutoApproveReviews } from '@/lib/simple-shipping-api';
 
 export async function GET(request: NextRequest) {
   try {
@@ -31,8 +31,7 @@ export async function POST(request: NextRequest) {
     }
 
     // Get auto-approve setting from Supabase
-    const storeSettings = await getStoreSettings();
-    const autoApprove = storeSettings?.auto_approve_reviews || false;
+    const autoApprove = await getAutoApproveReviews();
     
     const api = getWooCommerce();
     
