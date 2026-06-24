@@ -35,15 +35,6 @@ interface District {
   is_active: boolean;
 }
 
-interface Municipality {
-  id: string;
-  district_id: string;
-  name: string;
-  type: string;
-  wards: number;
-  shipping_cost: number | null;
-  is_active: boolean;
-}
 
 export default function CheckoutPage() {
   const router = useRouter();
@@ -64,30 +55,22 @@ export default function CheckoutPage() {
   const [shippingAddress, setShippingAddress] = useState('');
   const [country, setCountry] = useState('NP');
   const [district, setDistrict] = useState('');
-  const [municipality, setMunicipality] = useState('');
-  const [wardNo, setWardNo] = useState<number>(1);
   const [notes, setNotes] = useState('');
   
   // Location data states
   const [countries, setCountries] = useState<Country[]>([]);
   const [districts, setDistricts] = useState<District[]>([]);
-  const [municipalities, setMunicipalities] = useState<Municipality[]>([]);
   const [loadingCountries, setLoadingCountries] = useState(false);
   const [loadingDistricts, setLoadingDistricts] = useState(false);
-  const [loadingMunicipalities, setLoadingMunicipalities] = useState(false);
   const [shippingCost, setShippingCost] = useState(200);
 
   // Custom dropdown states
   const [countryOpen, setCountryOpen] = useState(false);
   const [districtOpen, setDistrictOpen] = useState(false);
-  const [municipalityOpen, setMunicipalityOpen] = useState(false);
-  const [wardOpen, setWardOpen] = useState(false);
   
   // Refs for click outside detection
   const countryRef = useRef<HTMLDivElement>(null);
   const districtRef = useRef<HTMLDivElement>(null);
-  const municipalityRef = useRef<HTMLDivElement>(null);
-  const wardRef = useRef<HTMLDivElement>(null);
   
   // Click outside handler to close dropdowns
   useEffect(() => {
@@ -97,12 +80,6 @@ export default function CheckoutPage() {
       }
       if (districtRef.current && !districtRef.current.contains(event.target as Node)) {
         setDistrictOpen(false);
-      }
-      if (municipalityRef.current && !municipalityRef.current.contains(event.target as Node)) {
-        setMunicipalityOpen(false);
-      }
-      if (wardRef.current && !wardRef.current.contains(event.target as Node)) {
-        setWardOpen(false);
       }
     };
 
@@ -151,35 +128,10 @@ export default function CheckoutPage() {
       fetchDistricts();
     } else {
       setDistricts([]);
-      setMunicipalities([]);
       setDistrict('');
-      setMunicipality('');
     }
   }, [country]);
 
-  // Fetch municipalities when district changes
-  useEffect(() => {
-    if (district) {
-      const fetchMunicipalities = async () => {
-        setLoadingMunicipalities(true);
-        try {
-          const res = await fetch(`/api/shipping?action=municipalities&districtId=${district}`);
-          const data = await res.json();
-          if (data.success) {
-            setMunicipalities(data.municipalities);
-          }
-        } catch (err) {
-          console.error('Error fetching municipalities:', err);
-        } finally {
-          setLoadingMunicipalities(false);
-        }
-      };
-      fetchMunicipalities();
-    } else {
-      setMunicipalities([]);
-      setMunicipality('');
-    }
-  }, [district]);
 
   // Calculate shipping cost when location changes
   useEffect(() => {
@@ -190,7 +142,6 @@ export default function CheckoutPage() {
           countryCode: country,
         });
         if (district) params.append('districtName', districts.find(d => d.id === district)?.name || '');
-        if (municipality) params.append('municipalityName', municipalities.find(m => m.id === municipality)?.name || '');
         
         const res = await fetch(`/api/shipping?${params}`);
         const data = await res.json();
@@ -202,7 +153,7 @@ export default function CheckoutPage() {
       }
     };
     calculateShipping();
-  }, [country, district, municipality, districts, municipalities]);
+  }, [country, district, districts]);
   
   // Coupon State
   const [couponCodeInput, setCouponCodeInput] = useState('');
@@ -231,8 +182,6 @@ export default function CheckoutPage() {
           setCustomerPhone(parsed.customerPhone || '');
           setCustomerEmail(parsed.customerEmail || '');
           setShippingAddress(parsed.shippingAddress || '');
-          setMunicipality(parsed.municipality || 'Bhimdatta');
-          setWardNo(parsed.wardNo || 1);
         });
       } catch (e) {
         console.error('Failed to parse previous address', e);
@@ -295,8 +244,6 @@ export default function CheckoutPage() {
     if (!country) errors.country = 'Country is required';
     if (country === 'NP') {
       if (!district) errors.district = 'District is required';
-      if (!municipality) errors.municipality = 'Municipality is required';
-      if (!wardNo) errors.wardNo = 'Ward number is required';
     }
 
     setFormErrors(errors);
@@ -400,8 +347,6 @@ export default function CheckoutPage() {
       shippingAddress,
       country,
       district: country === 'NP' ? district : undefined,
-      municipality: country === 'NP' ? municipality : undefined,
-      wardNo: country === 'NP' ? wardNo : undefined,
       paymentMethod,
       paymentTxnId: paymentMethod !== 'cash_on_delivery' ? paymentTxnId.trim() : undefined,
       couponCode: appliedCoupon ? appliedCoupon.code : undefined,
@@ -439,7 +384,7 @@ export default function CheckoutPage() {
         }
         
         // Save last-used address for auto fill
-        const addressObj = { customerName, customerPhone, customerEmail, shippingAddress, municipality, wardNo };
+        const addressObj = { customerName, customerPhone, customerEmail, shippingAddress };
         localStorage.setItem('tsz_last_address', JSON.stringify(addressObj));
         
         // Clear shopping bag and redirect!
@@ -607,8 +552,6 @@ export default function CheckoutPage() {
                                   setCountry(c.code);
                                   setCountryOpen(false);
                                   setDistrict('');
-                                  setMunicipality('');
-                                  setWardNo(1);
                                 }}
                                 className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
                               >
@@ -631,7 +574,6 @@ export default function CheckoutPage() {
                           type="button"
                           onClick={() => {
                             setDistrictOpen(!districtOpen);
-                            setMunicipalityOpen(false);
                           }}
                           className="w-full h-10 bg-transparent border-b border-black/10 px-0 text-sm text-black outline-none flex items-center justify-between"
                         >
@@ -653,8 +595,6 @@ export default function CheckoutPage() {
                                   onClick={() => {
                                     setDistrict(d.id);
                                     setDistrictOpen(false);
-                                    setMunicipality('');
-                                    setWardNo(1);
                                   }}
                                   className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
                                 >
@@ -666,93 +606,6 @@ export default function CheckoutPage() {
                         </div>
                       </div>
                       {formErrors.district && <p className="text-[10px] text-[#FE5733] font-semibold">{formErrors.district}</p>}
-                    </div>
-                  )}
-
-                  {/* Municipality Dropdown (Nepal only) */}
-                  {country === 'NP' && (
-                    <div className="space-y-2">
-                      <label className="block text-[11px] font-semibold text-black/60 tracking-wide">Municipality *</label>
-                      <div className="relative" ref={municipalityRef}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setMunicipalityOpen(!municipalityOpen);
-                            setWardOpen(false);
-                          }}
-                          className="w-full h-10 bg-transparent border-b border-black/10 px-0 text-sm text-black outline-none flex items-center justify-between"
-                        >
-                          {municipalities.find(m => m.id === municipality)?.name || 'Select Municipality'}
-                          <ChevronRight className={`w-4 h-4 text-black transition-transform duration-200 ${municipalityOpen ? 'rotate-90' : ''}`} />
-                        </button>
-                        <div className={`absolute z-10 w-full left-0 top-full mt-1 transition-all duration-200 ease-in-out ${municipalityOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                          <div 
-                            className="bg-white border border-black/10 shadow-sm max-h-48 overflow-y-auto"
-                            onWheel={(e) => e.stopPropagation()}
-                          >
-                            {loadingMunicipalities ? (
-                              <div className="px-4 py-3 text-sm text-black/60">Loading...</div>
-                            ) : (
-                              municipalities.map((m) => (
-                                <button
-                                  key={m.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setMunicipality(m.id);
-                                    setWardNo(1);
-                                    setMunicipalityOpen(false);
-                                  }}
-                                  className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
-                                >
-                                  {m.name} ({m.type})
-                                </button>
-                              ))
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                      {formErrors.municipality && <p className="text-[10px] text-[#FE5733] font-semibold">{formErrors.municipality}</p>}
-                    </div>
-                  )}
-
-                  {/* Ward No. Custom Dropdown (Nepal only) */}
-                  {country === 'NP' && (
-                    <div className="space-y-1.5">
-                      <label className="block text-[11px] font-semibold text-black/60">Ward No. *</label>
-                      <div className="relative" ref={wardRef}>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            setWardOpen(!wardOpen);
-                            setMunicipalityOpen(false);
-                          }}
-                          className="w-full h-10 bg-transparent border-b border-black/10 px-0 text-sm text-black outline-none flex items-center justify-between"
-                        >
-                          {wardNo ? `Ward No. ${wardNo}` : 'Select Ward No'}
-                          <ChevronRight className={`w-4 h-4 text-black transition-transform duration-200 ${wardOpen ? 'rotate-90' : ''}`} />
-                        </button>
-                        <div className={`absolute z-10 w-full left-0 top-full mt-1 transition-all duration-200 ease-in-out ${wardOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
-                          <div 
-                            className="bg-white border border-black/10 shadow-sm max-h-48 overflow-y-auto"
-                            onWheel={(e) => e.stopPropagation()}
-                          >
-                            {Array.from({length: municipalities.find(m => m.id === municipality)?.wards || 1}, (_, i) => i + 1).map((ward) => (
-                              <button
-                                key={ward}
-                                type="button"
-                                onClick={() => {
-                                  setWardNo(ward);
-                                  setWardOpen(false);
-                                }}
-                                className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
-                              >
-                                Ward No. {ward}
-                              </button>
-                            ))}
-                          </div>
-                        </div>
-                      </div>
-                      {formErrors.wardNo && <p className="text-[10px] text-[#FE5733] font-semibold">{formErrors.wardNo}</p>}
                     </div>
                   )}
 

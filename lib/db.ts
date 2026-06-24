@@ -137,8 +137,6 @@ export interface Order {
   shipping_address: string;
   country: string;
   district: string | null;
-  municipality: string | null;
-  wardNo: string | null;
   notes: string | null;
   admin_note: string | null;
   shipped_at?: string;

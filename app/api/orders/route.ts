@@ -55,8 +55,6 @@ export async function POST(req: NextRequest) {
       shippingAddress,
       country,
       district,
-      municipality,
-      wardNo,
       paymentMethod,
       paymentTxnId,
       couponCode,
@@ -70,9 +68,9 @@ export async function POST(req: NextRequest) {
     if (!customerName || !customerPhone || !shippingAddress || !country) {
       return NextResponse.json({ success: false, error: 'Shipping details are incomplete' }, { status: 400 });
     }
-    // For Nepal, require district, municipality, and ward
-    if (country === 'NP' && (!district || !municipality || !wardNo)) {
-      return NextResponse.json({ success: false, error: 'District, Municipality, and Ward are required for Nepal orders' }, { status: 400 });
+    // For Nepal, require district
+    if (country === 'NP' && !district) {
+      return NextResponse.json({ success: false, error: 'District is required for Nepal orders' }, { status: 400 });
     }
     if (!['esewa', 'khalti', 'cash_on_delivery'].includes(paymentMethod)) {
       return NextResponse.json({ success: false, error: 'Invalid payment method' }, { status: 400 });
@@ -198,11 +196,9 @@ export async function POST(req: NextRequest) {
     
     // 5. Shipping Fee Calculation using Supabase
     let shippingFee = 0;
+    let districtName = '';
+    
     try {
-      // Get district and municipality names from Supabase
-      let districtName = '';
-      let municipalityName = '';
-      
       if (country === 'NP' && district) {
         // Fetch district name from Supabase
         const { createClient } = await import('@supabase/supabase-js');
@@ -218,20 +214,9 @@ export async function POST(req: NextRequest) {
           .single();
         
         if (districtData) districtName = districtData.name;
-        
-        if (municipality && districtName) {
-          // Fetch municipality name from Supabase
-          const { data: municipalityData } = await supabase
-            .from('municipalities')
-            .select('name')
-            .eq('id', municipality)
-            .single();
-          
-          if (municipalityData) municipalityName = municipalityData.name;
-        }
       }
       
-      shippingFee = await calculateShippingCost(country, districtName || undefined, municipalityName || undefined);
+      shippingFee = await calculateShippingCost(country, districtName || undefined);
     } catch (error) {
       console.error('Error calculating shipping cost:', error);
       // Fallback to default
@@ -290,8 +275,6 @@ export async function POST(req: NextRequest) {
       shipping_address: shippingAddress,
       country: country,
       district: district || null,
-      municipality: municipality || null,
-      wardNo: wardNo || null,
       notes: notes || null,
       admin_note: null,
       created_at: nowStr,
@@ -335,9 +318,8 @@ export async function POST(req: NextRequest) {
             first_name: customerName.split(' ')[0] || customerName,
             last_name: customerName.split(' ').slice(1).join(' ') || '',
             address_1: shippingAddress,
-            city: municipality,
+            city: districtName || '',
             state: 'Sudurpashchim',
-            postcode: wardNo.toString(),
             country: 'NP',
             email: customerEmail || `customer${Date.now()}@example.com`,
             phone: customerPhone
@@ -346,9 +328,8 @@ export async function POST(req: NextRequest) {
             first_name: customerName.split(' ')[0] || customerName,
             last_name: customerName.split(' ').slice(1).join(' ') || '',
             address_1: shippingAddress,
-            city: municipality,
+            city: districtName || '',
             state: 'Sudurpashchim',
-            postcode: wardNo.toString(),
             country: 'NP'
           },
           line_items: wcLineItems,
@@ -363,12 +344,8 @@ export async function POST(req: NextRequest) {
               value: paymentTxnId || ''
             },
             {
-              key: "municipality",
-              value: municipality
-            },
-            {
-              key: "ward_no",
-              value: wardNo.toString()
+              key: "district",
+              value: district
             },
             {
               key: "order_source",
@@ -405,8 +382,6 @@ export async function POST(req: NextRequest) {
       customer_phone: customerPhone,
       customer_email: customerEmail || null,
       shipping_address: shippingAddress,
-      municipality: municipality,
-      wardNo: wardNo,
       payment_method: paymentMethod,
       payment_status: paymentStatus,
       payment_txn_id: paymentTxnId || null,
