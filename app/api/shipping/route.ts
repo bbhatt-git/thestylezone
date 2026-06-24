@@ -1,34 +1,19 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getCountries, getDistricts, getMunicipalitiesByDistrict, calculateShippingCost } from '@/lib/shipping-api';
+import { getShippingCosts, calculateShippingCost } from '@/lib/simple-shipping-api';
 
 export async function GET(req: NextRequest) {
   try {
     const { searchParams } = new URL(req.url);
     const action = searchParams.get('action');
 
-    if (action === 'countries') {
-      const countries = await getCountries();
-      return NextResponse.json({ success: true, countries });
-    }
-
     if (action === 'districts') {
-      const districts = await getDistricts();
+      const districts = await getShippingCosts();
       return NextResponse.json({ success: true, districts });
-    }
-
-    if (action === 'municipalities') {
-      const districtId = searchParams.get('districtId');
-      if (!districtId) {
-        return NextResponse.json({ success: false, error: 'District ID is required' }, { status: 400 });
-      }
-      const municipalities = await getMunicipalitiesByDistrict(districtId);
-      return NextResponse.json({ success: true, municipalities });
     }
 
     if (action === 'calculate') {
       const countryCode = searchParams.get('countryCode');
       const districtName = searchParams.get('districtName');
-      const municipalityName = searchParams.get('municipalityName');
 
       if (!countryCode) {
         return NextResponse.json({ success: false, error: 'Country code is required' }, { status: 400 });
@@ -36,8 +21,7 @@ export async function GET(req: NextRequest) {
 
       const shippingCost = await calculateShippingCost(
         countryCode,
-        districtName || undefined,
-        municipalityName || undefined
+        districtName || undefined
       );
       return NextResponse.json({ success: true, shippingCost });
     }

@@ -42,8 +42,6 @@ interface Order {
   customer_phone: string;
   customer_email: string | null;
   shipping_address: string;
-  municipality: string;
-  wardNo: string;
   created_at: string;
   items: OrderItem[];
 }

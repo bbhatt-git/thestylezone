@@ -50,8 +50,6 @@ export async function GET(req: NextRequest, { params }: { params: Promise<{ id: 
           customer_phone: wcOrder.billing?.phone || '',
           customer_email: wcOrder.billing?.email || null,
           shipping_address: `${wcOrder.billing?.address_1} ${wcOrder.billing?.address_2 || ''}`.trim(),
-          municipality: wcOrder.billing?.city || '',
-          wardNo: wcOrder.billing?.postcode || '',
           notes: wcOrder.customer_note || null,
           admin_note: null,
           shipped_at: null,

@@ -19,20 +19,19 @@ import {
   BadgeHelp,
   Clock
 } from 'lucide-react';
+import { getShippingCosts, calculateShippingCost } from '@/lib/simple-shipping-api';
 
 interface Country {
   id: string;
   code: string;
   name: string;
   shipping_cost: number;
-  is_active: boolean;
 }
 
 interface District {
-  id: string;
-  name: string;
+  id: number;
+  district_name: string;
   shipping_cost: number;
-  is_active: boolean;
 }
 
 
@@ -54,14 +53,15 @@ export default function CheckoutPage() {
   const [customerEmail, setCustomerEmail] = useState('');
   const [shippingAddress, setShippingAddress] = useState('');
   const [country, setCountry] = useState('NP');
-  const [district, setDistrict] = useState('');
+  const [district, setDistrict] = useState<number | ''>('');
   const [notes, setNotes] = useState('');
   
   // Location data states
-  const [countries, setCountries] = useState<Country[]>([]);
+  const [countries] = useState<Country[]>([
+    { id: 'NP', code: 'NP', name: 'Nepal', shipping_cost: 200 },
+    { id: 'INT', code: 'INT', name: 'International', shipping_cost: 2500 },
+  ]);
   const [districts, setDistricts] = useState<District[]>([]);
-  const [loadingCountries, setLoadingCountries] = useState(false);
-  const [loadingDistricts, setLoadingDistricts] = useState(false);
   const [shippingCost, setShippingCost] = useState(200);
 
   // Custom dropdown states
@@ -89,70 +89,28 @@ export default function CheckoutPage() {
     };
   }, []);
 
-  // Fetch countries on mount
+  // Load districts when country changes to Nepal
   useEffect(() => {
-    const fetchCountries = async () => {
-      setLoadingCountries(true);
-      try {
-        const res = await fetch('/api/shipping?action=countries');
-        const data = await res.json();
-        if (data.success) {
-          setCountries(data.countries);
-        }
-      } catch (err) {
-        console.error('Error fetching countries:', err);
-      } finally {
-        setLoadingCountries(false);
+    const loadDistricts = async () => {
+      if (country === 'NP') {
+        const data = await getShippingCosts();
+        setDistricts(data);
+      } else {
+        setDistricts([]);
+        setDistrict('');
       }
     };
-    fetchCountries();
-  }, []);
-
-  // Fetch districts when country changes to Nepal
-  useEffect(() => {
-    if (country === 'NP') {
-      const fetchDistricts = async () => {
-        setLoadingDistricts(true);
-        try {
-          const res = await fetch('/api/shipping?action=districts');
-          const data = await res.json();
-          if (data.success) {
-            setDistricts(data.districts);
-          }
-        } catch (err) {
-          console.error('Error fetching districts:', err);
-        } finally {
-          setLoadingDistricts(false);
-        }
-      };
-      fetchDistricts();
-    } else {
-      setDistricts([]);
-      setDistrict('');
-    }
+    loadDistricts();
   }, [country]);
-
 
   // Calculate shipping cost when location changes
   useEffect(() => {
-    const calculateShipping = async () => {
-      try {
-        const params = new URLSearchParams({
-          action: 'calculate',
-          countryCode: country,
-        });
-        if (district) params.append('districtName', districts.find(d => d.id === district)?.name || '');
-        
-        const res = await fetch(`/api/shipping?${params}`);
-        const data = await res.json();
-        if (data.success) {
-          setShippingCost(data.shippingCost);
-        }
-      } catch (err) {
-        console.error('Error calculating shipping:', err);
-      }
+    const calculate = async () => {
+      const districtName = district ? districts.find(d => d.id === district)?.district_name : undefined;
+      const cost = await calculateShippingCost(country, districtName);
+      setShippingCost(cost);
     };
-    calculateShipping();
+    calculate();
   }, [country, district, districts]);
   
   // Coupon State
@@ -540,24 +498,20 @@ export default function CheckoutPage() {
                           className="bg-white border border-black/10 shadow-sm max-h-48 overflow-y-auto"
                           onWheel={(e) => e.stopPropagation()}
                         >
-                          {loadingCountries ? (
-                            <div className="px-4 py-3 text-sm text-black/60">Loading...</div>
-                          ) : (
-                            countries.map((c) => (
-                              <button
-                                key={c.code}
-                                type="button"
-                                onClick={() => {
-                                  setCountry(c.code);
-                                  setCountryOpen(false);
-                                  setDistrict('');
-                                }}
-                                className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
-                              >
-                                {c.name}
-                              </button>
-                            ))
-                          )}
+                          {countries.map((c) => (
+                            <button
+                              key={c.code}
+                              type="button"
+                              onClick={() => {
+                                setCountry(c.code);
+                                setCountryOpen(false);
+                                setDistrict('');
+                              }}
+                              className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
+                            >
+                              {c.name}
+                            </button>
+                          ))}
                         </div>
                       </div>
                     </div>
@@ -576,7 +530,7 @@ export default function CheckoutPage() {
                           }}
                           className="w-full h-10 bg-transparent border-b border-black/10 px-0 text-sm text-black outline-none flex items-center justify-between"
                         >
-                          {districts.find(d => d.id === district)?.name || 'Select District'}
+                          {districts.find(d => d.id === district)?.district_name || 'Select District'}
                           <ChevronRight className={`w-4 h-4 text-black transition-transform duration-200 ${districtOpen ? 'rotate-90' : ''}`} />
                         </button>
                         <div className={`absolute z-10 w-full left-0 top-full mt-1 transition-all duration-200 ease-in-out ${districtOpen ? 'opacity-100 translate-y-0 pointer-events-auto' : 'opacity-0 -translate-y-2 pointer-events-none'}`}>
@@ -584,23 +538,19 @@ export default function CheckoutPage() {
                             className="bg-white border border-black/10 shadow-sm max-h-48 overflow-y-auto"
                             onWheel={(e) => e.stopPropagation()}
                           >
-                            {loadingDistricts ? (
-                              <div className="px-4 py-3 text-sm text-black/60">Loading...</div>
-                            ) : (
-                              districts.map((d) => (
-                                <button
-                                  key={d.id}
-                                  type="button"
-                                  onClick={() => {
-                                    setDistrict(d.id);
-                                    setDistrictOpen(false);
-                                  }}
-                                  className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
-                                >
-                                  {d.name}
-                                </button>
-                              ))
-                            )}
+                            {districts.map((d) => (
+                              <button
+                                key={d.id}
+                                type="button"
+                                onClick={() => {
+                                  setDistrict(d.id);
+                                  setDistrictOpen(false);
+                                }}
+                                className="w-full px-4 py-3 text-left text-sm text-black hover:bg-black hover:text-white transition-colors"
+                              >
+                                {d.district_name}
+                              </button>
+                            ))}
                           </div>
                         </div>
                       </div>
@@ -680,7 +630,7 @@ export default function CheckoutPage() {
                         <>
                           <div>
                             <p className="text-[11px] text-stone-500 mb-1">District</p>
-                            <p className="font-semibold text-[#121212]">{districts.find(d => d.id === district)?.name || district}</p>
+                            <p className="font-semibold text-[#121212]">{districts.find(d => d.id === district)?.district_name || district}</p>
                           </div>
                         </>
                       )}
