@@ -2,7 +2,7 @@
 
 import React, { useState } from 'react';
 import Link from 'next/link';
-import { ArrowUpRight, Facebook, Instagram, MessageCircle } from 'lucide-react';
+import { ArrowUpRight, Facebook, Instagram, MessageCircle, Sparkles } from 'lucide-react';
 
 // TikTok Icon SVG
 const TikTokIcon = () => (
@@ -73,7 +73,7 @@ export default function Footer() {
 
   return (
     <footer className="relative w-full bg-[#121212] text-white font-sans overflow-hidden">
-      <div className="max-w-[1560px] mx-auto px-6 md:px-10 py-12 md:py-16">
+      <div className="max-w-[1560px] mx-auto px-6 md:px-10 py-12 md:py-16 mb-10">
         
         {/* Background Dress Graphic */}
         <div className="absolute right-0 bottom-0 w-[60%] max-w-[600px] pointer-events-none z-0 translate-x-8 translate-y-12 md:translate-x-16 md:translate-y-8 lg:translate-y-4">
@@ -185,8 +185,8 @@ export default function Footer() {
             
             {/* Copyright and Legal Line */}
             <div className="flex flex-col md:flex-row justify-between items-center gap-4 text-[10px] text-white/40 mb-6 relative z-10 uppercase tracking-wider">
-              <span className="text-center md:text-left font-medium">
-                © {new Date().getFullYear()} The Style Zone. All Rights Reserved.
+              <span className="text-center md:text-left font-mono text-s">
+                &copy; {new Date().getFullYear()} The Style Zone | All Rights Reserved.
               </span>
               <div className="flex gap-6">
                 {[
@@ -201,22 +201,11 @@ export default function Footer() {
               </div>
             </div>
 
-            {/* Separator */}
-            <hr className="border-[#121212]/20 mb-6 relative z-10" />
-
-            {/* Large Brand Text */}
-            <div className="relative w-full overflow-hidden flex items-end select-none pointer-events-none">
-              <h2 
-                className="text-[13vw] md:text-[12vw] lg:text-[8rem] font-extrabold leading-[0.78] tracking-widest text-transparent bg-clip-text whitespace-nowrap uppercase font-display"
-                style={{
-                  backgroundImage: 'linear-gradient(to bottom, #FE5733, #121212)',
-                  letterSpacing: '0.02em'
-                }}
-              >
-                STYLE ZONE
-              </h2>
-            </div>
-
+<div className="flex flex-col md:flex-row justify-between items-center text-white/40relative z-10 uppercase tracking-tight">
+              <span className="text-center md:text-left text-white/40 text-[12px] flex">
+               <Sparkles className="w-4 h-4" />&nbsp;Designed & Crafted by&nbsp;<a href="https://bbhatt.com.np" className="text-white/50 font-semibold" target="_blank">Bhupesh Bhatt</a>&nbsp;<Sparkles className="w-4 h-4" />
+              </span>
+              </div>
           </div>
 
         </div>

@@ -39,16 +39,31 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     product.name,
     'fashion',
     'clothing',
-    'Mahendranagar'
+    'Mahendranagar',
+    "women's clothing Mahendranagar",
+    "ladies boutique Kanchanpur Nepal",
+    "kurti set Mahendranagar",
+    "women's fashion boutique Nepal",
+    "kurta shop Kanchanpur",
+    "combo sets Nepal boutique",
+    "cargo jeans women Nepal",
+    "women's clothing store Bhimdattanagar",
+    "online women's boutique Nepal delivery",
+    "The Style Zone Mahendranagar",
+    "Saraswati Bist boutique Nepal",
+    `Sanbi Bist boutique Nepal`,
+    "Fashion Hub Mahendranagar",
+    "ladies wear Far-Western Nepal",
+    "Pan-Nepal women's clothing delivery",
   ].filter(Boolean).map(k => String(k));
   
   return {
     title: `${product.name} | The Style Zone`,
-    description: product.short_description || product.description || `Shop ${product.name} at The Style Zone. Quality ${product.categories.join(', ')} with COD delivery across Nepal.`,
+    description: product.short_description || `Shop ${product.name} at The Style Zone. Quality ${product.categories.join(', ')} with COD delivery across Nepal.`,
     keywords: keywords,
     openGraph: {
       title: `${product.name} | The Style Zone`,
-      description: product.short_description || product.description,
+      description: product.short_description,
       type: 'website',
       images: product.images[0] ? [
         {
@@ -62,7 +77,7 @@ export async function generateMetadata({ params }: PageProps): Promise<Metadata>
     twitter: {
       card: 'summary_large_image',
       title: `${product.name} | The Style Zone`,
-      description: product.short_description || product.description,
+      description: product.short_description,
       images: product.images[0] ? [product.images[0].src] : [],
     },
   };

@@ -32,6 +32,7 @@ export default function Navbar() {
   const isActive = (path: string) => pathname === path || pathname.startsWith(path + '/');
 
   const navLinks = [
+    { href: '/', label: 'Home' },
     { href: '/shop', label: 'Shop' },
     { href: '/orders', label: 'Orders' },
     { href: '/about', label: 'About' },
@@ -44,16 +45,16 @@ export default function Navbar() {
         <header
           className={`transition-all duration-300 ${
             scrolled 
-              ? 'bg-white/90 backdrop-blur-md shadow-sm border-b border-black/5' 
-              : 'bg-white border-b border-black/5'
+              ? 'bg-white/80 backdrop-blur-3xl shadow-lg' 
+              : 'bg-white shadow-sm'
           }`}
         >
           <nav className="max-w-[1560px] mx-auto px-4 sm:px-6">
             <div className="flex items-center justify-between h-12 sm:h-14">
               {/* Logo - Left */}
               <Link href="/" aria-label="Home" className="flex items-center">
-                <div className="font-display font-black text-base sm:text-lg tracking-tighter text-black">
-                  THE STYLE ZONE
+                <div className="w-[150px] pt-1">
+                  <img src="logo.png" alt="The Style Zone" />
                 </div>
               </Link>
 
@@ -64,14 +65,22 @@ export default function Navbar() {
                     key={link.href}
                     href={link.href}
                     aria-label={`Navigate to ${link.label}`}
-                    className={`text-sm font-medium transition-colors ${
+                    className={`hover:text-[#FE5733] font-sm transition-colors duration-200 relative group tracking-wider whitespace-nowrap ${
                       isActive(link.href)
                         ? 'text-[#FE5733]'
-                        : 'text-stone-600 hover:text-black'
+                        : 'text-stone-600'
                     }`}
                   >
                     {link.label}
+                    <span className="absolute bottom-0 left-0 w-0 h-[2px] bg-[#FE5733] transition-all duration-300 group-hover:w-full"></span>
+                    <span className={`${
+                      isActive(link.href)
+                        ? 'absolute bottom-0 left-0 w-0 h-[2px] bg-[#FE5733] w-full'
+                        : ''
+                    }`}></span>
                   </Link>
+
+                  
                 ))}
               </div>
 

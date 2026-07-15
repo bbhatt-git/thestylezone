@@ -33,7 +33,7 @@ export const metadata: Metadata = {
     `Sanbi Bist boutique Nepal`,
     "Fashion Hub Mahendranagar",
     "ladies wear Far-Western Nepal",
-    "Kanchanpur women's clothing delivery",
+    "Pan-Nepal women's clothing delivery",
   ],
   openGraph: {
     title: "About | The Style Zone",
@@ -73,7 +73,7 @@ export default function AboutPage() {
                   <img
                     src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&q=80&w=600"
                     alt="Minimalist curation"
-                    className="w-full h-full object-cover filter grayscale contrast-[1.05]"
+                    className="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-700"
                   />
                 </div>
               </div>
@@ -117,7 +117,7 @@ export default function AboutPage() {
                   <img
                     src="https://images.pexels.com/photos/1536619/pexels-photo-1536619.jpeg?auto=compress&cs=tinysrgb&w=1200"
                     alt="The Style Zone Kurti Collection"
-                    className="w-full h-full object-cover hover:scale-[1.03] transition-transform duration-700"
+                    className="w-full h-full object-cover hover:scale-[1.05] transition-transform duration-700"
                   />
                 </div>
               </div>
@@ -233,9 +233,9 @@ export default function AboutPage() {
                 {/* Left Side: Elegant contextual intro block with a focus image */}
                 <div className="lg:col-span-5 space-y-6 lg:sticky lg:top-12">
                   
-                  <h2 className="font-serif text-3xl md:text-4xl leading-tight font-light text-stone-900">
+                  <h3 className="font-serif text-3xl md:text-4xl leading-tight font-light text-stone-900">
                     A rigorous, hand-vetted approach to retail.
-                  </h2>
+                  </h3>
                   <p className="text-base text-stone-600 leading-relaxed font-light">
                     We reject standard dropshipping models. Every item on our hangers passes a physical vetting process in our Mahendranagar flagship boutique before it reaches you.
                   </p>
@@ -256,7 +256,7 @@ export default function AboutPage() {
                   {/* Step 1 */}
                   <div className="space-y-4 pb-8 border-b border-stone-200/60">
                     <div className="flex items-center gap-3">
-                      <span className="font-serif text-xl italic text-[#FE5733]">01</span>
+                      <span className="font-serif text-xl text-[#FE5733]">01</span>
                       <h3 className="text-lg font-semibold text-stone-900 tracking-tight">Physical In-House Inspection</h3>
                     </div>
                     <p className="text-base text-stone-600 leading-relaxed font-light pl-8">
@@ -267,7 +267,7 @@ export default function AboutPage() {
                   {/* Step 2 */}
                   <div className="space-y-4 pb-8 border-b border-stone-200/60">
                     <div className="flex items-center gap-3">
-                      <span className="font-serif text-xl italic text-[#FE5733]">02</span>
+                      <span className="font-serif text-xl text-[#FE5733]">02</span>
                       <h3 className="text-lg font-semibold text-stone-900 tracking-tight">Dynamic Trend Sourcing</h3>
                     </div>
                     <p className="text-base text-stone-600 leading-relaxed font-light pl-8">
@@ -278,11 +278,11 @@ export default function AboutPage() {
                   {/* Step 3 */}
                   <div className="space-y-4">
                     <div className="flex items-center gap-3">
-                      <span className="font-serif text-xl italic text-[#FE5733]">03</span>
+                      <span className="font-serif text-xl text-[#FE5733]">03</span>
                       <h3 className="text-lg font-semibold text-stone-900 tracking-tight">Seamless Doorstep Logistics</h3>
                     </div>
                     <p className="text-base text-stone-600 leading-relaxed font-light pl-8">
-                      Though our flagship base is deeply connected to Mahendrangar, we provide delivery all over Kanchanpur. Experience safe, streamlined boutique checkouts with rapid delivery straight to your doorstep.
+                      Though our flagship base is deeply connected to Mahendrangar, we provide delivery all over Nepal and International shippings too. Experience safe, streamlined boutique checkouts with rapid delivery straight to your doorstep.
                     </p>
                   </div>
 

@@ -10,13 +10,29 @@ export const dynamic = 'force-dynamic';
 export const metadata: Metadata = {
   title: 'My Wishlist | The Style Zone',
   description: 'Save your favorite fashion items at The Style Zone. Create your wishlist of clothes, hoodies, and accessories to buy later.',
-  keywords: ['wishlist', 'saved items', 'favorite products', 'fashion wishlist', 'save for later'],
+  keywords: ['wishlist', 'saved items', 'favorite products', 'fashion wishlist', 'save for later', "women's clothing Mahendranagar",
+    "ladies boutique Kanchanpur Nepal",
+    "kurti set Mahendranagar",
+    "women's fashion boutique Nepal",
+    "kurta shop Kanchanpur",
+    "combo sets Nepal boutique",
+    "cargo jeans women Nepal",
+    "women's clothing store Bhimdattanagar",
+    "online women's boutique Nepal delivery",
+    "The Style Zone Mahendranagar",
+    "Saraswati Bist boutique Nepal",
+    `Sanbi Bist boutique Nepal`,
+    "Fashion Hub Mahendranagar",
+    "ladies wear Far-Western Nepal",
+    "Kanchanpur women's clothing delivery",],
   openGraph: {
     title: 'My Wishlist | The Style Zone',
     description: 'Save your favorite fashion items at The Style Zone.',
     type: 'website',
   },
 };
+
+
 
 export default async function WishlistPage() {
   const db = await readDb();

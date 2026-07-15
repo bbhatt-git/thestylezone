@@ -21,7 +21,7 @@ export const metadata = {
     `Sanbi Bist boutique Nepal`,
     "Fashion Hub Mahendranagar",
     "ladies wear Far-Western Nepal",
-    "Kanchanpur women's clothing delivery",
+    "Pan-Nepal women's clothing delivery",
   ],
   openGraph: {
     title: "Terms of Service | The Style Zone",
